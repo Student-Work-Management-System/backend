@@ -2,10 +2,12 @@ package edu.guet.studentworkmanagementsystem.common;
 
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
+import lombok.Data;
 
 import java.io.Serializable;
 
-final public class BaseResponse<T> implements Serializable {
+@Data
+public class BaseResponse<T> implements Serializable {
     private final int code;
     private final String message;
     private final T data;

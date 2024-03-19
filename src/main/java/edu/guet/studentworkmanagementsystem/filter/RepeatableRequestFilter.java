@@ -19,6 +19,7 @@ public class RepeatableRequestFilter implements Filter {
                 StringUtils.startsWithIgnoreCase(servletRequest.getContentType(), MediaType.APPLICATION_JSON_VALUE)) {
             wrapper = new RepeatableReadRequestWrapper((HttpServletRequest) servletRequest);
             filterChain.doFilter(wrapper, servletResponse);
+            return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

@@ -21,7 +21,7 @@ import java.util.List;
 
 
 @RestControllerAdvice
-final public class ExceptionControllerAdvice {
+public class ExceptionControllerAdvice {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
     @ExceptionHandler(ServiceException.class)
     public <T> BaseResponse<T> serviceHandler(ServiceException serviceException) {
@@ -50,12 +50,12 @@ final public class ExceptionControllerAdvice {
                 ServiceExceptionEnum.METHOD_ARGUMENT_NOT_VALID.getMsg() + getAllErrorMessage(exception));
     }
     @ExceptionHandler(NullPointerException.class)
-    public <T> BaseResponse<T> methodArgumentNotValidExceptionHandler(NullPointerException exception) {
+    public <T> BaseResponse<T> nullPointerExceptionHandler(NullPointerException exception) {
         logger.error("出现空指针异常: ", exception);
         return ResponseUtil.failure(ServiceExceptionEnum.NULL_POINTER);
     }
-    @ExceptionHandler({Exception.class, RuntimeException.class})
-    public <T> BaseResponse<T> unknownExceptionHandler(NullPointerException exception) {
+    @ExceptionHandler(Exception.class)
+    public <T> BaseResponse<T> unknownExceptionHandler(Exception exception) {
         logger.error("出现未知异常: ", exception);
         return ResponseUtil.failure(ServiceExceptionEnum.UNKNOWN_ERROR);
     }
@@ -64,9 +64,7 @@ final public class ExceptionControllerAdvice {
         BindingResult result = exception.getBindingResult();
         if (result.hasErrors()) {
             List<ObjectError> allErrors = result.getAllErrors();
-            allErrors.forEach((objectError -> {
-                buffer.append(objectError.getDefaultMessage()).append(" ");
-            }));
+            allErrors.forEach((objectError -> buffer.append(objectError.getDefaultMessage()).append(" ")));
         }
         return buffer.toString();
     }
