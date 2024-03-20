@@ -15,10 +15,10 @@ public class RedisUtil {
     private Integer expireTime;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-    public void setValue(String key, Object value) {
+    public void setValue(String key, String value) {
         redisTemplate.opsForValue().set(key, value, expireTime, TimeUnit.DAYS);
     }
-    public SecurityUser getValue(String key) {
-       return (SecurityUser) redisTemplate.opsForValue().get(key);
+    public Object getValue(String key) {
+       return redisTemplate.opsForValue().get(key);
     }
 }

@@ -13,19 +13,20 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Table("user")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id(keyType = KeyType.Auto)
     private String uid;
     private String username;
     private String realName;
     private String phone;
-    @JsonIgnore
     private String password;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)

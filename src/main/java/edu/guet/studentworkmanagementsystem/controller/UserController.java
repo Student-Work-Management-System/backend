@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
@@ -19,15 +20,15 @@ public class UserController {
     private UserService userService;
     @PermitAll
     @PostMapping("/login")
-    public BaseResponse<UserVO> login(@RequestBody LoginUserDTO loginUserDTO) {
+    public BaseResponse<UserVO> login(@RequestBody LoginUserDTO loginUserDTO) throws JsonProcessingException {
         return userService.login(loginUserDTO);
     }
-    @PreAuthorize("hasAuthority('user:insert')")
+    @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/add")
     public <T> BaseResponse<T> addUser(@RequestBody RegisterUserDTO registerUserDTO) {
         return userService.addUser(registerUserDTO);
     }
-    @PreAuthorize("hasAuthority('user:insert')")
+    @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/adds")
     public <T> BaseResponse<T> addUsers(@RequestBody List<RegisterUserDTO> registerUserDTOList) {
         return userService.addUsers(registerUserDTOList);

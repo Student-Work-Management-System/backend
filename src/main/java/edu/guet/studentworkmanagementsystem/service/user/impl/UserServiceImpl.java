@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.service.user.impl;
 
 import cn.hutool.jwt.JWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
@@ -15,6 +16,7 @@ import edu.guet.studentworkmanagementsystem.mapper.user.UserMapper;
 import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import edu.guet.studentworkmanagementsystem.securiy.SystemAuthority;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
+import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .setPayload("uid", redisKey)
                 .setKey(key.getBytes())
                 .sign();
-        redisUtil.setValue(redisKey, securityUser);
+        try {
+            redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
+        } catch (JsonProcessingException jsonProcessingException) {
+            ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
+        }
         UserVO userVO = new UserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(userVO);
     }
