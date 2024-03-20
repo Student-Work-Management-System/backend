@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class UserVO implements Serializable {
+public class LoginUserVO implements Serializable {
     private User user;
     private List<SystemAuthority> authorities;
     private String token;

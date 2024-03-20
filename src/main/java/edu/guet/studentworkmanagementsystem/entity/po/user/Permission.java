@@ -15,5 +15,5 @@ public class Permission{
     @JsonIgnore
     private String pid;
     private String permissionName;
-    private String permissionDescription;
+    private String permissionDesc;
 }

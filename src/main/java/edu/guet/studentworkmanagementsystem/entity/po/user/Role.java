@@ -13,5 +13,5 @@ public class Role {
     @Id(keyType = KeyType.Auto)
     private String rid;
     private String roleName;
-    private String roleDescription;
+    private String roleDesc;
 }

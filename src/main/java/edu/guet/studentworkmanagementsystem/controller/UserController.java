@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class UserController {
     private UserService userService;
     @PermitAll
     @PostMapping("/login")
-    public BaseResponse<UserVO> login(@RequestBody LoginUserDTO loginUserDTO) throws JsonProcessingException {
+    public BaseResponse<LoginUserVO> login(@RequestBody LoginUserDTO loginUserDTO) throws JsonProcessingException {
         return userService.login(loginUserDTO);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
