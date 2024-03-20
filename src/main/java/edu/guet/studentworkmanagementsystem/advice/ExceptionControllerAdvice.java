@@ -7,6 +7,7 @@ import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +35,11 @@ public class ExceptionControllerAdvice {
     }
     @ExceptionHandler(DuplicateKeyException.class)
     public <T> BaseResponse<T> duplicateKeyExceptionHandler() {
-        return ResponseUtil.failure(ServiceExceptionEnum.ACCOUNT_EXISTED);
+        return ResponseUtil.failure(ServiceExceptionEnum.KEY_EXISTED);
+    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public <T> BaseResponse<T> accessDeniedExceptionHandler() {
+        return ResponseUtil.failure(ServiceExceptionEnum.INSUFFICIENT_PERMISSIONS);
     }
     @ExceptionHandler({BadCredentialsException.class, InternalAuthenticationServiceException.class})
     public <T> BaseResponse<T> authenticationExceptionHandler() {
@@ -51,12 +56,12 @@ public class ExceptionControllerAdvice {
     }
     @ExceptionHandler(NullPointerException.class)
     public <T> BaseResponse<T> nullPointerExceptionHandler(NullPointerException exception) {
-        logger.error("出现空指针异常: ", exception);
+        logger.error("出现空指针异常:", exception);
         return ResponseUtil.failure(ServiceExceptionEnum.NULL_POINTER);
     }
     @ExceptionHandler(Exception.class)
     public <T> BaseResponse<T> unknownExceptionHandler(Exception exception) {
-        logger.error("出现未知异常: ", exception);
+        logger.error("出现未知异常:", exception);
         return ResponseUtil.failure(ServiceExceptionEnum.UNKNOWN_ERROR);
     }
     private String getAllErrorMessage(MethodArgumentNotValidException exception) {

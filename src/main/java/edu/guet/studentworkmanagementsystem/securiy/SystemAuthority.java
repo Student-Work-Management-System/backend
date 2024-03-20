@@ -1,20 +1,21 @@
 package edu.guet.studentworkmanagementsystem.securiy;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SystemAuthority implements GrantedAuthority {
-    @JsonIgnore
-    private final String permissionName;
-    private final String permissionDescription;
-    public SystemAuthority(String permissionName, String permissionDescription) {
-        this.permissionDescription = permissionDescription;
-        this.permissionName = permissionName;
-    }
+    private String authority;
+    private String permissionDesc;
     @Override
     public String getAuthority() {
-        return permissionName;
+        return authority;
     }
 }

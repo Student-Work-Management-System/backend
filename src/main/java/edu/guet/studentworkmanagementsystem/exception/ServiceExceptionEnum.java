@@ -1,11 +1,14 @@
 package edu.guet.studentworkmanagementsystem.exception;
 
+import lombok.Getter;
+
+@Getter
 public enum ServiceExceptionEnum {
     AUTHENTICATION_FAILURE(-200, "认证失败"),
     INSUFFICIENT_PERMISSIONS(-201, "权限不足"),
     ACCOUNT_NOT_FOUND(-202, "用户不存在"),
     EMAIL_NO_PASSWORD_WRONG(-203, "邮箱或密码错误"),
-    ACCOUNT_EXISTED(-204, "用户已经存在"),
+    KEY_EXISTED(-204, "主键重复"),
     METHOD_ARGUMENT_NOT_VALID(-205, ""),
     OPERATE_ERROR(-206, "操作失败"),
     KEY_ARGUMENT_NOT_INPUT(-207, "关键信息未输入"),
@@ -22,11 +25,5 @@ public enum ServiceExceptionEnum {
     ServiceExceptionEnum(int code, String msg) {
         this.code = code;
         this.msg = msg;
-    }
-    public int getCode() {
-        return code;
-    }
-    public String getMsg() {
-        return msg;
     }
 }
