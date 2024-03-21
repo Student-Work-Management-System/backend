@@ -1,5 +1,7 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.authority;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RolePermissionDTO implements Serializable {
+    @NotBlank(message = "角色id不能为空")
     private String rid;
     private Set<String> permissions;
 }

@@ -5,6 +5,7 @@ import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,13 +31,11 @@ public class Student implements Serializable {
      */
     @Id
     private String studentId;
-
     /**
      * 学生的身份证号
      */
     @Id
     private String idNumber;
-
     @Id
     private String name;
     private String gender;
@@ -53,7 +52,6 @@ public class Student implements Serializable {
      * 民族
      */
     private String nation;
-
     /**
      * 学院名称
      */
@@ -74,5 +72,4 @@ public class Student implements Serializable {
      * 政治面貌
      */
     private String politicsStatus;
-
 }

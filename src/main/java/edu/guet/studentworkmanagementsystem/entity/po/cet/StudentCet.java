@@ -26,31 +26,24 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_cet")
 public class StudentCet implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
-    @Id(keyType = KeyType.Auto)@Column(value = "student_CET_id")
+    @Id(keyType = KeyType.Auto)
+    @Column(value = "student_CET_id")
     private Long studentCETId;
-
     @Id
-    private BigInteger studentId;
-
+    private String studentId;
     private Long score;
-
     /**
-     * 考试日期
+     * 考试学期, 如: 2022-2023_1
      */
-    private Date examDate;
-
+    private String examDate;
     /**
      * 证书编号
      */
     private String certificateNumber;
-
     /**
      * 四级:CET4;六级:CET6
      */
     private String examType;
-
 }
