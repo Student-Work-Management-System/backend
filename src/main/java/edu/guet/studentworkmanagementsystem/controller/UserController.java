@@ -2,9 +2,12 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +35,20 @@ public class UserController {
     @PostMapping("/adds")
     public <T> BaseResponse<T> addUsers(@RequestBody List<RegisterUserDTO> registerUserDTOList) {
         return userService.addUsers(registerUserDTOList);
+    }
+    @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
+    @GetMapping("/detail/{username}")
+    public BaseResponse<UserDetailVO> getUserDetails(@PathVariable String username) {
+        return userService.getUserDetails(username);
+    }
+    @PreAuthorize(
+            "hasAuthority('user:update:all') " +
+            "and hasAuthority('user_role:insert') " +
+            "and hasAuthority('user_role:delete') " +
+            "and hasAuthority('role:select')"
+    )
+    @PutMapping("/update/user/role")
+    public <T> BaseResponse<T> updateUserRole(@RequestBody UserRoleDTO userRoleDTO) {
+        return userService.updateUserRole(userRoleDTO);
     }
 }
