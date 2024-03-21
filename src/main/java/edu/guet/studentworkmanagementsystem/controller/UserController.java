@@ -46,7 +46,7 @@ public class UserController {
             "and hasAuthority('user_role:delete') " +
             "and hasAuthority('role:select')"
     )
-    @PutMapping("/update/user/role")
+    @PutMapping("/update/role")
     public <T> BaseResponse<T> updateUserRole(@RequestBody UserRoleDTO userRoleDTO) {
         return userService.updateUserRole(userRoleDTO);
     }
