@@ -60,9 +60,9 @@ final public class AuthenticationFilter extends OncePerRequestFilter {
         SecurityUser securityUser = null;
         try {
             securityUser = JsonUtil.mapper.readValue(json, SecurityUser.class);
-        } catch (InvalidDefinitionException exception) {
+        } catch (Exception exception) {
             log.error(exception.getMessage());
-            ResponseUtil.failure(response, ServiceExceptionEnum.OPERATE_ERROR);
+            ResponseUtil.failure(response, ServiceExceptionEnum.UN_LOGIN);
             return;
         }
         if (Objects.isNull(securityUser)) {

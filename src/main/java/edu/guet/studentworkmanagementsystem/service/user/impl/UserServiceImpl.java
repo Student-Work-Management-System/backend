@@ -26,6 +26,7 @@ import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -150,6 +151,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
         List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
         insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
+        userRoleUpdateHandler(uid);
         return ResponseUtil.success();
     }
     @Transactional
@@ -164,6 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
         List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
         insert.forEach(item -> rolePermissionMapper.insert(new RolePermission(rid, item)));
+        rolePermissionUpdateHandler(rid);
         return ResponseUtil.success();
     }
     @Transactional
@@ -230,6 +233,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             rolePermissionList.add(new RolePermissionVO(item, permission));
         });
         return ResponseUtil.success(rolePermissionList);
+    }
+    @Override
+    public <T> BaseResponse<T> logout() {
+        String uid = SecurityUtil.getUserPrincipal();
+        if (Objects.equals(uid, "anonymousUser"))
+            throw new ServiceException(ServiceExceptionEnum.UN_LOGIN);
+        redisUtil.delete("uid:" + uid);
+        return ResponseUtil.success();
+    }
+    private void userRoleUpdateHandler(String uid) {
+        redisUtil.delete("uid" + uid);
+    }
+    private void rolePermissionUpdateHandler(String rid) {
+        QueryWrapper wrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
+        List<UserRole> userRoles = userRoleMapper.selectListByQuery(wrapper);
+        userRoles.forEach(item -> userRoleUpdateHandler(item.getUid()));
     }
     private Set<String> getInsert(Set<String> roleSetFromWeb, Set<String> roleSetFromDB) {
         return roleSetFromWeb.stream()

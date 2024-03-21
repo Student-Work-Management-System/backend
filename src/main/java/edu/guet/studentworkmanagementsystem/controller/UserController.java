@@ -50,4 +50,9 @@ public class UserController {
     public <T> BaseResponse<T> updateUserRole(@RequestBody UserRoleDTO userRoleDTO) {
         return userService.updateUserRole(userRoleDTO);
     }
+    @PermitAll
+    @DeleteMapping("/logout")
+    public <T> BaseResponse<T> logout() {
+        return userService.logout();
+    }
 }

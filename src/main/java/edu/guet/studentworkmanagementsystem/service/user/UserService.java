@@ -28,4 +28,5 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deleteRole(String rid);
     <T> BaseResponse<T> deletePermission(String pid);
     BaseResponse<List<RolePermissionVO>> getAllRole();
+    <T> BaseResponse<T> logout();
 }
