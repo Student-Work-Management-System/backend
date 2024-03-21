@@ -18,7 +18,6 @@ class StudentWorkManagementSystemApplicationTests {
     private UserService userService;
     @Test
     void contextLoads() {
-        BaseResponse<List<RolePermissionVO>> roles = userService.getAllRole();
-        System.out.println(roles);
+
     }
 }
