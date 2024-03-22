@@ -34,5 +34,4 @@ public class StudentCompetitionClaim implements Serializable {
      */
     @Id
     private String studentId;
-
 }

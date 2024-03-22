@@ -24,32 +24,25 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_cadre")
 public class StudentCadre implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentCadreId;
-
     @Id
     private String studentId;
-
     /**
      * 对应的职位id
      */
     @Id
     private Long cadreId;
-
     /**
      * 任职开始学期
      */
     private String appointmentStartTerm;
-
     /**
      * 任职结束学期
      */
     private String appointmentEndTerm;
-
     /**
      * 备注
      */

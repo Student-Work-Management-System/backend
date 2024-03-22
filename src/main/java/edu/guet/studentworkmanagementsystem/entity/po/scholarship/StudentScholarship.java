@@ -24,19 +24,14 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_scholarship")
 public class StudentScholarship implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentScholarshipId;
-
     @Id
     private String studentId;
-
     @Id
     private Long scholarshipId;
-
     /**
      * 获奖学年, YYYY-YYYY
      */

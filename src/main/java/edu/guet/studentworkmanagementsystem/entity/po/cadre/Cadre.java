@@ -23,21 +23,16 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "cadre")
 public class Cadre implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long cadreId;
-
     /**
      * 具体职位
      */
     private String cadrePosition;
-
     /**
      * 职位级别
      */
     private String cadreLevel;
-
 }

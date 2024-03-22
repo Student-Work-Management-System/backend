@@ -29,15 +29,12 @@ public class Scholarship implements Serializable {
 
     @Id(keyType = KeyType.Auto)
     private Long scholarshipId;
-
     /**
      * 奖学金名称
      */
     private String scholarshipName;
-
     /**
      * 奖学金级别
      */
     private String scholarshipLevel;
-
 }

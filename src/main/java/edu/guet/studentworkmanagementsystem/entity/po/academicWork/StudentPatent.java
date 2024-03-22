@@ -23,32 +23,25 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "student_patent")
-public class StudentPatent implements Serializable {
-
+public class StudentPatent implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentPatentId;
-
     /**
      * 发表状态：受理、公开或授权
      */
     private String publishState;
-
     /**
      * 发表日期
      */
     private Date publishDate;
-
     /**
      * 受理日期
      */
     private Date acceptDate;
-
     /**
      * 授权日期
      */
     private Date authorizationDate;
-
 }

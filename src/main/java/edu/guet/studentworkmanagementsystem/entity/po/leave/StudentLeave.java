@@ -24,34 +24,26 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_leave")
 public class StudentLeave implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentLeaveId;
-
     @Id
     private String studentId;
-
     /**
      * 请假类型
      */
     private String leaveType;
-
     /**
      * 请假理由
      */
     private String leaveReason;
-
     /**
      * 请假日期, YYYY-MM-DD
      */
     private Date leaveDate;
-
     /**
      * 请假时长, hour
      */
     private Long leaveDuration;
-
 }

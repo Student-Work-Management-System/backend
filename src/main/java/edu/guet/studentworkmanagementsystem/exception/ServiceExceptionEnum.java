@@ -7,7 +7,7 @@ public enum ServiceExceptionEnum {
     AUTHENTICATION_FAILURE(-200, "认证失败"),
     INSUFFICIENT_PERMISSIONS(-201, "权限不足"),
     ACCOUNT_NOT_FOUND(-202, "用户不存在"),
-    EMAIL_NO_PASSWORD_WRONG(-203, "邮箱或密码错误"),
+    EMAIL_NO_PASSWORD_WRONG(-203, "工号/学号或密码错误"),
     KEY_EXISTED(-204, "主键重复"),
     METHOD_ARGUMENT_NOT_VALID(-205, ""),
     OPERATE_ERROR(-206, "操作失败"),

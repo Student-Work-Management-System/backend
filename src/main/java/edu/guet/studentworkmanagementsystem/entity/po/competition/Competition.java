@@ -23,26 +23,20 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "competition")
 public class Competition implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long competitionId;
-
     /**
      * 竞赛名称
      */
     private String competitionName;
-
     /**
      * 竞赛性质： 团队/单人
      */
     private String competitionNature;
-
     /**
      * 竞赛级别
      */
     private String competitionLevel;
-
 }

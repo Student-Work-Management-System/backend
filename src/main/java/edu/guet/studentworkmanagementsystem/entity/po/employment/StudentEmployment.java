@@ -25,54 +25,42 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_employment")
 public class StudentEmployment implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentEmploymentId;
-
     @Id
     private String studentId;
-
     /**
      * 毕业后的状态：就业、待就业、升学、地方/国家基层项目、科研/管理助理
      */
     private String graduationState;
-
     /**
      * 毕业的年份
      */
     private Date graduationYear;
-
     /**
      * 毕业去向
      */
     private String whereabouts;
-
     /**
      * 单位性质
      */
     private String jobNature;
-
     /**
      * 单位所处行业
      */
     private String jobIndustry;
-
     /**
      * 单位所在地
      */
     private String jobLocation;
-
     /**
      * 职业类别
      */
     private String category;
-
     /**
      * 薪水
      */
-    private BigDecimal salary;
-
+    private String salary;
 }

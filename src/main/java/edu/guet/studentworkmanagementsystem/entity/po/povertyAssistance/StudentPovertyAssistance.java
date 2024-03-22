@@ -24,22 +24,16 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_poverty_assistance")
 public class StudentPovertyAssistance implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentPovertyAssistanceId;
-
     @Id
     private String studentId;
-
     @Id
     private Long povertyAssistanceId;
-
     /**
      * 认证学年, YYYY-YYYY
      */
     private String assistanceYear;
-
 }

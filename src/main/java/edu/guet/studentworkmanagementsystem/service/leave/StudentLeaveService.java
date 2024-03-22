@@ -1,0 +1,52 @@
+package edu.guet.studentworkmanagementsystem.service.leave;
+
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.service.IService;
+import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
+import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+
+public interface StudentLeaveService extends IService<StudentLeave> {
+    /**
+     * 使用文件导入学生请假信息
+     * @param multipartFile 文件源
+     */
+    <T> BaseResponse<T> importStudentLeave(MultipartFile multipartFile);
+    /**
+     * 对象添加学生请假信息
+     * @param studentLeave 学生请假信息记录对象
+     */
+    BaseResponse<StudentLeave> insertStudentLeave(StudentLeave studentLeave);
+    /**
+     * 修改学生请假信息的信息
+     * @param studentLeaveDTO 修改的学生请假信息
+     */
+    <T> BaseResponse<T> updateStudentLeave(StudentLeaveDTO studentLeaveDTO);
+    /**
+     * 删除学生请假信息记录(需要考虑外检约束)
+     * @param studentLeaveId 学生请假信息记录id
+     */
+    <T> BaseResponse<T> deleteStudentLeave(String studentLeaveId);
+    /**
+     * 分页查询学生就业信息, 同时按年级专业、请假时间筛选,
+     * {@link HashMap#containsKey(Object) 使用此方法判断是否存在对应key.}
+     * <br/>
+     * 年级Key: grade
+     * 专业Key: majorIn
+     * 申请时间key: leaveDate
+     * @param pageNo 页1, 默认0
+     * @param pageSize 页大小, 默认50
+     * @return 学生就业信息
+     */
+    BaseResponse<Page<StudentLeaveVO>> getStudentLeave(HashMap<String, String> keys, int pageNo, int pageSize);
+    /**
+     * 添加审核记录(注: 审核成功后不允许修改)
+     * @param studentLeaveAuditDTO 请假审核记录
+     */
+    <T> BaseResponse<T> audiStudentLeave(StudentLeaveAuditDTO studentLeaveAuditDTO);
+}

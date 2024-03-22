@@ -1,0 +1,88 @@
+package edu.guet.studentworkmanagementsystem.service.competition;
+
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.service.IService;
+import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAuditDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.Member;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.List;
+
+public interface StudentCompetitionService extends IService<StudentCompetition> {
+    /**
+     * 使用文件导入竞赛信息
+     * @param multipartFile 文件源
+     * @return 存入数据库中的竞赛信息(包含id返回)
+     */
+    BaseResponse<List<Competition>> importCompetition(MultipartFile multipartFile);
+    /**
+     * 对象添加竞赛
+     * @param competition 竞赛记录对象
+     */
+    BaseResponse<Competition> insertCompetition(Competition competition);
+    /**
+     * 修改竞赛的信息
+     * @param competition 待修改的竞赛信息
+     */
+    <T> BaseResponse<T> updateCompetition(Competition competition);
+    /**
+     * 删除竞赛(需要考虑外检约束)
+     * @param competitionId 竞赛记录id
+     */
+    <T> BaseResponse<T> deleteCompetition(String competitionId);
+    /**
+     * 学生上报获奖(设计为上报后不允许修改, 可以重新上报)
+     * <br/>
+     * 无审核人相关信息, 审核状态设置为默认: "审核中"
+     * 转为{@link StudentCompetition 数据库存储类}时可以调用{@link StudentCompetition#StudentCompetition(StudentCompetitionDTO) 特殊构造函数}
+     * <br/>
+     * 若后续审核通过则从数据库取出(json), 再转换为对象取出学号存入认领表
+     * @param studentCompetitionDTO 学生上报获奖
+     */
+    <T> BaseResponse<T> insertStudentCompetition(StudentCompetitionDTO studentCompetitionDTO);
+    /**
+     * 学生获取自己上报的奖项记录(包括所有状态的上报记录)
+     * @param studentId 学号
+     * @return 该学生所上报过的所有竞赛记录
+     */
+    BaseResponse<List<StudentCompetition>> getOwnStudentCompetition(String studentId);
+    /**
+     * 审核学生竞赛结果
+     * <br/>
+     * 通过 竞赛id 和 队长学号/参赛者学号 定位数据, 修改审核结果。
+     * 拒绝 -> 修改状态 并 填入拒绝理由
+     * 通过 -> 修改状态 并 存入认领表
+     * @param competitionAuditDTO 竞赛结果审核对象
+     */
+    <T> BaseResponse<T> auditStudentCompetition(CompetitionAuditDTO competitionAuditDTO);
+    /**
+     * 审核通过后调用插入竞赛结果认领表(一人上报全队认领)
+     * @param members 团队成员
+     * @param headerId 队长id
+     * @param competitionId 竞赛id
+     * @return 表中修改的行数(判断是否全部插入)
+     */
+    long insertStudentCompetitionAudit(List<Member> members, String headerId, String competitionId);
+    /**
+     * 删除学生获奖记录(同时要删除在认领表中的记录)
+     * @param competitionId 竞赛id
+     * @param studentId 学号
+     */
+    <T> BaseResponse<T> deleteStudentCompetition(String competitionId, String studentId);
+    /**
+     * (审核人用)分页查询学生上报记录, 默认只查询状态为 待审核 的上报记录
+     * <br/>
+     * 审核人在前端不展示, 拒绝理由只有状态未 未通过 时才展示
+     * @param keys 存储模糊查询参数的HashMap.(学号: studentId, 姓名: name)
+     * @param pageNo 页号, 默认1
+     * @param pageSize 页大小, 默认50
+     * @return 上报结果
+     */
+    BaseResponse<Page<StudentCompetition>> getAllStudentCompetition(HashMap<String, String> keys, int pageNo, int pageSize);
+}
+

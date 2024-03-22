@@ -1,6 +1,9 @@
 package edu.guet.studentworkmanagementsystem.entity.po.competition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
+import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +27,6 @@ import java.util.Date;
 public class StudentCompetition implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
     private String studentCompetitionId;
     /**
      * 竞赛id
@@ -62,5 +64,12 @@ public class StudentCompetition implements Serializable {
      * 审核人id
      */
     private String auditorId;
-
+    public StudentCompetition(StudentCompetitionDTO studentCompetitionDTO) throws JsonProcessingException {
+        this.competitionId = studentCompetitionDTO.getCompetitionId();
+        this.headerId = studentCompetitionDTO.getHeaderId();
+        this.evidence = studentCompetitionDTO.getEvidence();
+        this.awardDate = studentCompetitionDTO.getAwardDate();
+        this.awardLevel = studentCompetitionDTO.getAwardLevel();
+        this.members = JsonUtil.mapper.writeValueAsString(studentCompetitionDTO.getMembers());
+    }
 }

@@ -24,33 +24,28 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_leave_audit")
 public class StudentLeaveAudit implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentLeaveAuditId;
-
     /**
      * 审批人id
      */
     @Id
     private String auditorId;
-
     /**
      * 请假记录id
      */
     @Id
     private Long studentLeaveId;
-
     /**
      * 审批日期
      */
     private Date auditDate;
-
     /**
      * 审核状态
+     * <br/>
+     * 审核中, 通过, 拒绝
      */
     private String auditState;
-
 }

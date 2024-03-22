@@ -23,22 +23,17 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "student_soft")
-public class StudentSoft implements Serializable {
-
+public class StudentSoft implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentSoftId;
-
     /**
      * 发表单位
      */
     private String publishInstitution;
-
     /**
      * 发表日期
      */
     private Date publishDate;
-
 }

@@ -23,39 +23,30 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_academic_work")
 public class StudentAcademicWork implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
     private Long studentAcademicWorkId;
-
     @Id
     private String studentId;
-
     /**
      * 著作名称
      */
     private String academicWorkName;
-
     /**
-     * 著作类型：论文、专利和软著
+     * 著作类型：论文(1)、专利(2)和软著(3)
      */
     private String academicWorkType;
-
     /**
      * 补充信息, 根据academic_work_type字段的不同关联不同的表(论文、软著或专利表)
      */
     private Long additionalInfoId;
-
     /**
      * 作者顺序,应填入格式：[{ order: 1, studentId:"",author:""}...`.]
      */
-    private String authorsSort;
-
+    private String authors;
     /**
      * 证明材料，填写文件地址
      */
     private String evidence;
-
 }

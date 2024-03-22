@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentCetVO implements Serializable {
-    private Student student;
-    private List<StudentCet> cets;
+    private String studentId;
+    private String name;
+    private List<CetVO> cets;
 }

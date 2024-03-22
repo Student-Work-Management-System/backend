@@ -22,14 +22,10 @@ import java.io.Serial;
 @AllArgsConstructor
 @Table(value = "student_academic_work_claim")
 public class StudentAcademicWorkClaim implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id
     private Long studentAcademicWorkId;
-
     @Id
     private String studentId;
-
 }
