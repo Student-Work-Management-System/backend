@@ -18,7 +18,7 @@ public enum ServiceExceptionEnum {
     SELECT_NOT_IN(-212, "该选项不存在"),
     METHOD_NOT_SUPPORT(-2000, "方法不支持"),
     UNKNOWN_ERROR(-2001, "未知异常"),
-    JUDGE_SERVER_ERROR(-2002, "判题服务器出现错误,请稍后使用"),
+    NOT_RESOURCE(-2002, "无此资源: "),
     NULL_POINTER(-2004, "出现空指针异常");
     private final int code;
     private final String msg;

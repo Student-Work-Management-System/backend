@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.advice;
 
+import cn.hutool.core.io.resource.NoResourceException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -17,6 +18,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -53,6 +55,10 @@ public class ExceptionControllerAdvice {
     public <T> BaseResponse<T> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
         return ResponseUtil.failure(ServiceExceptionEnum.METHOD_ARGUMENT_NOT_VALID.getCode(),
                 ServiceExceptionEnum.METHOD_ARGUMENT_NOT_VALID.getMsg() + getAllErrorMessage(exception));
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public <T> BaseResponse<T> noResourceFoundException(NoResourceFoundException exception) {
+        return ResponseUtil.failure(ServiceExceptionEnum.NOT_RESOURCE.getCode(), ServiceExceptionEnum.NOT_RESOURCE.getMsg() + exception.getMessage());
     }
     @ExceptionHandler(NullPointerException.class)
     public <T> BaseResponse<T> nullPointerExceptionHandler(NullPointerException exception) {
