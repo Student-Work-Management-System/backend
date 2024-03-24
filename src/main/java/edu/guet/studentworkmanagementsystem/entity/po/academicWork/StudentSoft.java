@@ -3,14 +3,14 @@ package edu.guet.studentworkmanagementsystem.entity.po.academicWork;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.sql.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
+import java.sql.Date;
 
 /**
  * 著作详细信息表(软著) 实体类。

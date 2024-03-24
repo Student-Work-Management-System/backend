@@ -1,6 +1,11 @@
 package edu.guet.studentworkmanagementsystem.entity.po.competition;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
@@ -11,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * 学生上传的竞赛审核表 实体类。
@@ -47,7 +52,10 @@ public class StudentCompetition implements Serializable {
     /**
      * 获奖日期
      */
-    private Date awardDate;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate awardDate;
     /**
      * 团队成员, 单人比赛时为空。团队赛时应该填入的格式为 [{ order: 1, studentId:"",realName:""}....]
      */

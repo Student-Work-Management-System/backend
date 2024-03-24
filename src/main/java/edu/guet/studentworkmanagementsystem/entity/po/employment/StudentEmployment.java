@@ -1,17 +1,21 @@
 package edu.guet.studentworkmanagementsystem.entity.po.employment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * 学生就业信息 实体类。
@@ -38,7 +42,10 @@ public class StudentEmployment implements Serializable {
     /**
      * 毕业的年份
      */
-    private Date graduationYear;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate graduationYear;
     /**
      * 毕业去向
      */

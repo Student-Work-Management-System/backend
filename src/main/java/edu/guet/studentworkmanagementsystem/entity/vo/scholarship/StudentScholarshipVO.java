@@ -1,8 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.scholarship;
 
-import com.mybatisflex.annotation.Id;
-import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.mybatisflex.annotation.RelationOneToMany;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.advice;
 
-import cn.hutool.core.io.resource.NoResourceException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;

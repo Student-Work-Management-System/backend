@@ -2,7 +2,6 @@ package edu.guet.studentworkmanagementsystem.filter;
 
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTException;
-import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;

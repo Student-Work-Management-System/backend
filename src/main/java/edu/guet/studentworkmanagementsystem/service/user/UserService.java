@@ -11,8 +11,8 @@ import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 
 import java.util.List;
 

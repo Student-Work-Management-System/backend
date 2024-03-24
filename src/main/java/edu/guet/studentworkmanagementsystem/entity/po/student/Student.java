@@ -2,15 +2,13 @@ package edu.guet.studentworkmanagementsystem.entity.po.student;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.math.BigInteger;
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 学生基础信息 实体类。

@@ -3,19 +3,16 @@ package edu.guet.studentworkmanagementsystem.service.scholarship;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.StudentPovertyAssistanceDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
-import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 
-public interface StudentScholarshipService extends IService<StudentScholarship> {
+public interface ScholarshipService extends IService<StudentScholarship> {
     /**
      * 使用文件导入奖学金信息记录
      * @param multipartFile 文件源
@@ -38,17 +35,14 @@ public interface StudentScholarshipService extends IService<StudentScholarship> 
      */
     <T> BaseResponse<T> deleteScholarship(String scholarshipId);
     /**
-     * 分页查询学生奖学金信息, 同时按年级专业获奖时间筛选,
-     * {@link HashMap#containsKey(Object) 使用此方法判断是否存在对应key.}
+     * 分页查询学生奖学金信息
      * <br/>
-     * 年级Key: grade
-     * 专业Key: majorIn
-     * 请假时间key: awardYear
+     * @param query 查询参数
      * @param pageNo 页号, 默认1
      * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(HashMap<String, String> keys, int pageNo, int pageSize);
+    BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query, int pageNo, int pageSize);
     /**
      * 分配奖学金
      * @param studentScholarshipDTO 学生获得奖学金记录

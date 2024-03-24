@@ -11,8 +11,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.authority.RolePermissionMapper;
@@ -36,7 +36,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;

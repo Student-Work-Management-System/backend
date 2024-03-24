@@ -3,7 +3,6 @@ package edu.guet.studentworkmanagementsystem.mapper.authority;
 import com.mybatisflex.core.BaseMapper;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.RolePermission;
-import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;

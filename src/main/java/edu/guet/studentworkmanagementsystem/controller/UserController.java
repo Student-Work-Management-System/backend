@@ -9,7 +9,6 @@ import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

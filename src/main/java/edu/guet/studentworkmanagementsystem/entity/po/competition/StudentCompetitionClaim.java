@@ -2,13 +2,13 @@ package edu.guet.studentworkmanagementsystem.entity.po.competition;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 团队成员认领奖项 实体类。

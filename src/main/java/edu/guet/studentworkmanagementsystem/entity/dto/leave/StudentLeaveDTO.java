@@ -1,13 +1,17 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.leave;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -15,12 +19,11 @@ import java.sql.Date;
 public class StudentLeaveDTO implements Serializable {
     @NotBlank(message = "学号不能为空")
     private String studentId;
-    @NotBlank(message = "请假类型不能为空")
     private String leaveType;
-    @NotBlank(message = "请假理由不能为空")
     private String leaveReason;
-    @NotNull(message = "请假日期不能为空")
-    private Date leaveDate;
-    @NotNull(message = "请假时间不能为空")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate leaveDate;
     private Long leaveDuration;
 }

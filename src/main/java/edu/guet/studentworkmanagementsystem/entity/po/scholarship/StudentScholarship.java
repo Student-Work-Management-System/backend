@@ -3,14 +3,13 @@ package edu.guet.studentworkmanagementsystem.entity.po.scholarship;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.math.BigInteger;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 奖学金相关记录 实体类。

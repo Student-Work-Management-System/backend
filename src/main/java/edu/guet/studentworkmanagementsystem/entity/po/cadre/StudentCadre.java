@@ -3,14 +3,14 @@ package edu.guet.studentworkmanagementsystem.entity.po.cadre;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
-import java.math.BigInteger;
-
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.StudentCadreDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 学生任职记录 实体类。
@@ -47,5 +47,11 @@ public class StudentCadre implements Serializable {
      * 备注
      */
     private String comment;
-
+    public StudentCadre(StudentCadreDTO studentCadreDTO) {
+        this.cadreId = studentCadreDTO.getCadreId();
+        this.studentId = studentCadreDTO.getStudentId();
+        this.appointmentStartTerm = studentCadreDTO.getAppointmentStartTerm();
+        this.appointmentEndTerm = studentCadreDTO.getAppointmentEndTerm();
+        this.comment = studentCadreDTO.getComment();
+    }
 }

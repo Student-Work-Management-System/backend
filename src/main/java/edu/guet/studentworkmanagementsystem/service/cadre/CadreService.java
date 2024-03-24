@@ -1,16 +1,19 @@
 package edu.guet.studentworkmanagementsystem.service.cadre;
 
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.StudentCadreDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface StudentCadreService extends IService<StudentCadre> {
+public interface CadreService extends IService<StudentCadre> {
     /**
      * 使用文件导入职位信息
      * @param multipartFile 文件源
@@ -27,6 +30,11 @@ public interface StudentCadreService extends IService<StudentCadre> {
      * @param cadreDTO 待修改的职位信息
      */
     <T> BaseResponse<T> updateCadre(CadreDTO cadreDTO);
+    /**
+     * 获取所有的职位
+     * @return 职位清单
+     */
+    BaseResponse<List<Cadre>> getAllCadres();
     /**
      * 删除岗位记录(需要考虑外检约束)
      * @param cadreId 岗位记录id
@@ -55,5 +63,13 @@ public interface StudentCadreService extends IService<StudentCadre> {
      * @param cadreId 岗位id
      */
     <T> BaseResponse<T> deleteStudentCadre(String studentId, String cadreId);
-    // todo: 查询：可以按年级、专业、职位筛选，除此之外，还可以使用学号、姓名进行模糊查询
+    /**
+     * 分页查询学生任职记录
+     * <br/>
+     * @param query 查询参数
+     * @param pageNo 页号, 默认1
+     * @param pageSize 页大小, 默认50
+     * @return 学生任职记录
+     */
+    BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query, int pageNo, int pageSize);
 }

@@ -3,17 +3,16 @@ package edu.guet.studentworkmanagementsystem.service.povertyAssistance;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.StudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.StudentPovertyAssistanceDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 
-public interface StudentPovertyAssistanceService extends IService<StudentPovertyAssistance> {
+public interface PovertyAssistanceService extends IService<StudentPovertyAssistance> {
     /**
      * 使用文件导入贫困信息记录
      * @param multipartFile 文件源
@@ -41,16 +40,14 @@ public interface StudentPovertyAssistanceService extends IService<StudentPoverty
      */
     <T> BaseResponse<T> arrangeStudentPovertyAssistance(StudentPovertyAssistanceDTO studentPovertyAssistanceDTO);
     /**
-     * 分页查询学生贫困信息, 同时按年级专业筛选,
-     * {@link HashMap#containsKey(Object) 使用此方法判断是否存在对应key.}
+     * 分页查询学生贫困信息
      * <br/>
-     * 年级Key: grade
-     * 专业Key: majorIn
+     * @param query 查询参数
      * @param pageNo 页号, 默认1
      * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentEmploymentVO>> getStudentPovertyAssistance(HashMap<String, String> keys, int pageNo, int pageSize);
+    BaseResponse<Page<StudentEmploymentVO>> getStudentPovertyAssistance(PovertyAssistanceQuery query, int pageNo, int pageSize);
     /**
      * 修改学生贫困认定信息(不能修改贫困信息记录,若需变动实现下方)
      * @param studentPovertyAssistanceDTO 修改需要传递的对象, 某一为空则不修改该属性
