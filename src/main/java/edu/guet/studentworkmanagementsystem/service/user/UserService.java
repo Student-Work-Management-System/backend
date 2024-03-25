@@ -8,6 +8,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UserQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
@@ -30,5 +31,5 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deletePermission(String pid);
     BaseResponse<List<RolePermissionVO>> getAllRole();
     <T> BaseResponse<T> logout();
-    BaseResponse<Page<UserDetailVO>> gets(int pageNo, int pageSize);
+    BaseResponse<Page<UserDetailVO>> gets(UserQuery query);
 }

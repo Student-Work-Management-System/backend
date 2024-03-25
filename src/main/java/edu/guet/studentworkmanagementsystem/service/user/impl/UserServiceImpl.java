@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UserQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
@@ -73,7 +74,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (Objects.isNull(authenticate))
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
-        String redisKey = passwordEncoder.encode("uid:" + securityUser.getUser().getUid());
+        String redisKey = "uid:" + securityUser.getUser().getUid();
         String token = createToken(redisKey, key);
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
@@ -245,11 +246,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<Page<UserDetailVO>> gets(int pageNo, int pageSize) {
+    public BaseResponse<Page<UserDetailVO>> gets(UserQuery query) {
+        String username = Optional.ofNullable(query.getUsername()).orElse("%%");
+        String realName = Optional.ofNullable(query.getRealName()).orElse("%%");
+        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(0);
+        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         QueryWrapper wrapper = QueryWrapper.create()
                 .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                 .from(USER).innerJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                 .innerJoin(ROLE).on(ROLE.RID.eq(USER_ROLE.RID));
+        if (!username.equals("%%") && !realName.equals("%%"))
+            wrapper.where(USER.USERNAME.like(username)).or(USER.REAL_NAME.like(realName));
+        else if (!username.equals("%%"))
+            wrapper.where(USER.USERNAME.like(username));
+        else if (!realName.equals("%%"))
+            wrapper.where(USER.REAL_NAME.like(realName));
         Page<UserDetailVO> userPage = mapper.paginateAs(Page.of(pageNo, pageSize), wrapper, UserDetailVO.class);
         return ResponseUtil.success(userPage);
     }

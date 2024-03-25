@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UserQuery;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -42,9 +43,9 @@ public class UserController {
         return userService.getUserDetails(username);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
-    @GetMapping("/gets")
-    public BaseResponse<Page<UserDetailVO>> gets(@RequestParam(defaultValue = "1") int pageNo,@RequestParam(defaultValue = "50") int pageSize) {
-        return userService.gets(pageNo, pageSize);
+    @PostMapping("/gets")
+    public BaseResponse<Page<UserDetailVO>> gets(@RequestBody UserQuery query) {
+        return userService.gets(query);
     }
     @PreAuthorize(
             "hasAuthority('user:update:all') " +
