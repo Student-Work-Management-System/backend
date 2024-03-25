@@ -1,7 +1,9 @@
 package edu.guet.studentworkmanagementsystem.service.user.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -36,15 +38,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
 
 @Service
@@ -72,11 +73,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (Objects.isNull(authenticate))
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
-        String redisKey = "uid:" + securityUser.getUser().getUid();
-        String token = JWT.create()
-                .setPayload("uid", redisKey)
-                .setKey(key.getBytes())
-                .sign();
+        String redisKey = passwordEncoder.encode("uid:" + securityUser.getUser().getUid());
+        String token = createToken(redisKey, key);
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
@@ -245,6 +243,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisUtil.delete("uid:" + uid);
         return ResponseUtil.success();
     }
+
+    @Override
+    public BaseResponse<Page<UserDetailVO>> gets(int pageNo, int pageSize) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
+                .from(USER).innerJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                .innerJoin(ROLE).on(ROLE.RID.eq(USER_ROLE.RID));
+        Page<UserDetailVO> userPage = mapper.paginateAs(Page.of(pageNo, pageSize), wrapper, UserDetailVO.class);
+        return ResponseUtil.success(userPage);
+    }
+
     private void userRoleUpdateHandler(String uid) {
         redisUtil.delete("uid" + uid);
     }
@@ -262,5 +271,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return roleSetFromDB.stream()
                 .filter(element -> !roleSetFromWeb.contains(element))
                 .collect(Collectors.toSet());
+    }
+    private String createToken(String redisKey, String key) {
+        String uuid = UUID.randomUUID().toString();
+        return JWT.create()
+                .setPayload("uid", redisKey)
+                .setJWTId(uuid)
+                .setSubject("StudentWorkManagementSystem")
+                .setIssuer("BridgeFishDev")
+                .setIssuedAt(DateUtil.date())
+                .setExpiresAt(Date.from(Instant.now().plusSeconds(604800)))
+                .setKey(key.getBytes())
+                .sign();
     }
 }

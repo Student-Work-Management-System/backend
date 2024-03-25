@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
@@ -39,6 +40,11 @@ public class UserController {
     @GetMapping("/detail/{username}")
     public BaseResponse<UserDetailVO> getUserDetails(@PathVariable String username) {
         return userService.getUserDetails(username);
+    }
+    @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
+    @GetMapping("/gets")
+    public BaseResponse<Page<UserDetailVO>> gets(@RequestParam(defaultValue = "1") int pageNo,@RequestParam(defaultValue = "50") int pageSize) {
+        return userService.gets(pageNo, pageSize);
     }
     @PreAuthorize(
             "hasAuthority('user:update:all') " +

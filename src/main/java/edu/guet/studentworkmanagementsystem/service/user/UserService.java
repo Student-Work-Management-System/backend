@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.service.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
@@ -29,4 +30,5 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deletePermission(String pid);
     BaseResponse<List<RolePermissionVO>> getAllRole();
     <T> BaseResponse<T> logout();
+    BaseResponse<Page<UserDetailVO>> gets(int pageNo, int pageSize);
 }
