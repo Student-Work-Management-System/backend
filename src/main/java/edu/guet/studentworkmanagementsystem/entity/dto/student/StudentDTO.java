@@ -20,7 +20,6 @@ public class StudentDTO implements Serializable {
     private String postalCode;
     private String phone;
     private String nation;
-    private String collegeName;
     private String majorIn;
     private String grade;
     private String classNo;

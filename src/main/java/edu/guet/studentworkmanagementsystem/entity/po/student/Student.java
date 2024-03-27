@@ -51,10 +51,6 @@ public class Student implements Serializable {
      */
     private String nation;
     /**
-     * 学院名称
-     */
-    private String collegeName;
-    /**
      * 专业
      */
     private String majorIn;

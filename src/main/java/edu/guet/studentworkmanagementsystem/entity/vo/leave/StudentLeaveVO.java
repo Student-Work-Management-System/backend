@@ -20,7 +20,6 @@ import java.time.LocalDate;
 public class StudentLeaveVO implements Serializable {
     private String studentId;
     private String name;
-    private String collegeName;
     private String majorIn;
     private String leaveType;
     private String leaveReason;
@@ -32,7 +31,6 @@ public class StudentLeaveVO implements Serializable {
     public StudentLeaveVO(Student student, StudentLeave studentLeave) {
         this.studentId = student.getStudentId();
         this.name = student.getName();
-        this.collegeName = student.getCollegeName();
         this.majorIn = student.getMajorIn();
         this.leaveType = studentLeave.getLeaveType();
         this.leaveReason = studentLeave.getLeaveReason();

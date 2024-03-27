@@ -21,7 +21,6 @@ public class StudentPunishmentVO implements Serializable {
     private Long studentPunishmentId;
     private String studentId;
     private String name;
-    private String collegeName;
     private String majorIn;
     /**
      * 处分级别：警告、严重警告、记过、留校查看、开除学籍
@@ -42,7 +41,6 @@ public class StudentPunishmentVO implements Serializable {
         this.studentPunishmentId = studentPunishment.getStudentPunishmentId();
         this.studentId = student.getStudentId();
         this.name = student.getName();
-        this.collegeName = student.getCollegeName();
         this.majorIn = student.getMajorIn();
         this.punishmentDate = studentPunishment.getPunishmentDate();
         this.punishmentLevel = studentPunishment.getPunishmentLevel();
