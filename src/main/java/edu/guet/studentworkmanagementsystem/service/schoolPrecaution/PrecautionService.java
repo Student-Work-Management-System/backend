@@ -9,14 +9,15 @@ import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSc
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 public interface PrecautionService extends IService<StudentSchoolPrecaution> {
     /**
-     * 使用文件导入学业预警信息记录
-     * @param multipartFile 文件源
-     * @return 存入数据库中的奖学金记录
+     * 批量导入学业预警信息记录
+     * @param schoolPrecautions 学业预警信息列表
      */
-    <T> BaseResponse<T> importSchoolPrecaution(MultipartFile multipartFile);
+    <T> BaseResponse<T> importSchoolPrecaution(List<StudentSchoolPrecaution> schoolPrecautions);
     /**
      * 添加学业预警记录
      * @param schoolPrecaution 学业预警记录

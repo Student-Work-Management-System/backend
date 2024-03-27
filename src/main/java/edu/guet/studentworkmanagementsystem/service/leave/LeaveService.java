@@ -10,12 +10,14 @@ import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface LeaveService extends IService<StudentLeave> {
     /**
-     * 使用文件导入学生请假信息
-     * @param multipartFile 文件源
+     * 批量导入学生请假信息
+     * @param studentLeaves 学生请假信息列表
      */
-    <T> BaseResponse<T> importStudentLeave(MultipartFile multipartFile);
+    <T> BaseResponse<T> importStudentLeave(List<StudentLeave> studentLeaves);
      /**
      * 对象添加学生请假信息
      * @param studentLeave 学生请假信息记录对象

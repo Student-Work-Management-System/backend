@@ -11,15 +11,15 @@ import java.util.List;
 
 public interface StudentService extends IService<Student> {
     /**
-     * 使用文件导入学生, 返回处理结果
-     * @param multipartFile 文件源
-     */
-    <T> BaseResponse<T> importStudent(MultipartFile multipartFile);
-    /**
-     * 由前端处理完毕文件后导入学生, 返回处理结果
-     * @param students 学生实例
+     * 批量导入学生
+     * @param students 学生列表
      */
     <T> BaseResponse<T> importStudent(List<Student> students);
+    /**
+     * 单个导入学生
+     * @param student 学生对象
+     */
+    <T> BaseResponse<T> importStudent(Student student);
     /**
      * 分页获取学生
      * @param pageNo 页号,默认: 1

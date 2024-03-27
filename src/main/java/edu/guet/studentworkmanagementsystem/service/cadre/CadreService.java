@@ -15,11 +15,11 @@ import java.util.List;
 
 public interface CadreService extends IService<StudentCadre> {
     /**
-     * 使用文件导入职位信息
-     * @param multipartFile 文件源
+     * 批量导入职位信息
+     * @param cadres 职位信息列表
      * @return 存入数据库中的职位信息(包含id返回)
      */
-    BaseResponse<List<Cadre>> importCadres(MultipartFile multipartFile);
+    BaseResponse<List<Cadre>> importCadres(List<Cadre> cadres);
     /**
      * 对象添加职位
      * @param cadre 职位记录对象

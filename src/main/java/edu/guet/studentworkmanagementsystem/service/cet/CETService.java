@@ -13,10 +13,15 @@ import java.util.List;
 
 public interface CETService extends IService<StudentCet> {
     /**
-     * 使用文件导入学生CET成绩, 返回处理结果
-     * @param multipartFile 文件源
+     * 批量导入CET成绩
+     * @param studentCets 学生CET成绩
      */
-    <T> BaseResponse<T> importCETScore(MultipartFile multipartFile);
+    <T> BaseResponse<T> importCETScore(List<StudentCet> studentCets);
+    /**
+     * 单个插入CET成绩
+     * @param studentCet 学生CET成绩
+     */
+    <T> BaseResponse<T> insertStudentCet(StudentCet studentCet);
     /**
      * 分页获取未通过CET4的所有学生以及考试记录
      * @param query 查询参数

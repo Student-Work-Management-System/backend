@@ -8,12 +8,14 @@ import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishme
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface PunishmentService extends IService<StudentPunishment> {
     /**
-     * 使用文件导入学生处分信息
-     * @param multipartFile 文件源
+     * 批量导入学生处分信息
+     * @param studentPunishmentList 学生处分信息列表
      */
-    <T> BaseResponse<T> importStudentPunishment(MultipartFile multipartFile);
+    <T> BaseResponse<T> importStudentPunishment(List<StudentPunishment> studentPunishmentList);
     /**
      * 添加学生处分信息
      * @param studentPunishment 学生处分信息记录对象

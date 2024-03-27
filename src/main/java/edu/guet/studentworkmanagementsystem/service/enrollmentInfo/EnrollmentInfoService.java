@@ -8,14 +8,16 @@ import edu.guet.studentworkmanagementsystem.entity.po.enrollment.EnrollmentInfo;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface EnrollmentInfoService extends IService<EnrollmentInfo> {
     /**
-     * 使用文件导入学业预警信息记录
-     * @param multipartFile 文件源
+     * 批量导入招生信息记录
+     * @param enrollmentInfos 招生信息列表
      */
-    <T> BaseResponse<T> importEnrollmentInfo(MultipartFile multipartFile);
+    <T> BaseResponse<T> importEnrollmentInfo(List<EnrollmentInfo> enrollmentInfos);
     /**
-     * 添加学业预警记录
+     * 添加招生记录
      * @param enrollmentInfo 招生信息
      */
     BaseResponse<Scholarship> insertEnrollmentInfo(EnrollmentInfo enrollmentInfo);

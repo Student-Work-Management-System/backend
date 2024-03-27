@@ -14,11 +14,11 @@ import java.util.List;
 
 public interface PovertyAssistanceService extends IService<StudentPovertyAssistance> {
     /**
-     * 使用文件导入贫困信息记录
-     * @param multipartFile 文件源
+     * 批量导入贫困信息记录
+     * @param povertyAssistanceList 贫困信息列表
      * @return 存入数据库中的贫困补助记录
      */
-    BaseResponse<List<PovertyAssistance>> importPovertyAssistance(MultipartFile multipartFile);
+    BaseResponse<List<PovertyAssistance>> importPovertyAssistance(List<PovertyAssistance> povertyAssistanceList);
     /**
      * 对象添加贫困信息记录
      * @param povertyAssistance 贫困补助记录对象

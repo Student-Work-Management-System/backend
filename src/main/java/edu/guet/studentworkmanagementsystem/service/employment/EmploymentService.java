@@ -9,12 +9,14 @@ import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployme
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
-     * 使用文件导入学生就业信息
-     * @param multipartFile 文件源
+     * 批量导入学生就业信息
+     * @param studentEmploymentDTOList 学生就业信息列表
      */
-    <T> BaseResponse<T> importStudentEmployment(MultipartFile multipartFile);
+    <T> BaseResponse<T> importStudentEmployment(List<StudentEmploymentDTO> studentEmploymentDTOList);
     /**
      * 对象添加就业信息
      * @param studentEmploymentDTO 学生就业信息对象

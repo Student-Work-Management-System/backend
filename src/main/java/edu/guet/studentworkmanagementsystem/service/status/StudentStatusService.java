@@ -9,13 +9,15 @@ import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 public interface StudentStatusService extends IService<StudentStatus> {
     /**
-     * 使用文件导入学生学籍变动信息记录
-     * @param multipartFile 文件源
+     * 批量导入学生学籍变动信息记录
+     * @param studentStatuses 学生学籍信息列表
      */
-    <T> BaseResponse<T> importStudentStatus(MultipartFile multipartFile);
+    <T> BaseResponse<T> importStudentStatus(List<StudentStatus> studentStatuses);
     /**
      * 添加学生学籍变动记录
      * @param studentStatus 学籍变动信息

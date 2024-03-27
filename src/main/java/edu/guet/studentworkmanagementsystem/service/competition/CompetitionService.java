@@ -16,11 +16,11 @@ import java.util.List;
 
 public interface CompetitionService extends IService<StudentCompetition> {
     /**
-     * 使用文件导入竞赛信息
-     * @param multipartFile 文件源
+     * 批量导入竞赛信息
+     * @param competitions 竞赛列表
      * @return 存入数据库中的竞赛信息(包含id返回)
      */
-    BaseResponse<List<Competition>> importCompetition(MultipartFile multipartFile);
+    BaseResponse<List<Competition>> importCompetition(List<Competition> competitions);
     /**
      * 对象添加竞赛
      * @param competition 竞赛记录对象

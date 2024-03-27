@@ -14,11 +14,11 @@ import java.util.List;
 
 public interface ScholarshipService extends IService<StudentScholarship> {
     /**
-     * 使用文件导入奖学金信息记录
-     * @param multipartFile 文件源
+     * 批量导入奖学金信息记录
+     * @param scholarships 奖学金信息列表
      * @return 存入数据库中的奖学金记录
      */
-    BaseResponse<List<Scholarship>> importScholarship(MultipartFile multipartFile);
+    BaseResponse<List<Scholarship>> importScholarship(List<Scholarship> scholarships);
     /**
      * 对象添加奖学金记录
      * @param scholarship 奖学金记录对象

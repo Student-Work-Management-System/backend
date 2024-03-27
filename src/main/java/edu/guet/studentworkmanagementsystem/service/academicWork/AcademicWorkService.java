@@ -18,10 +18,10 @@ import java.util.List;
 
 public interface AcademicWorkService extends IService<StudentAcademicWork> {
      /**
-     * 使用文件导入学生学术作品信息
-     * @param multipartFile 文件源
+     * 批量导入学生学术作品
+      * @param studentAcademicWorkDTOList 学生学术作品列表
      */
-    <T> BaseResponse<T> importStudentAcademicWork(MultipartFile multipartFile);
+    <T> BaseResponse<T> importStudentAcademicWork(List<StudentAcademicWorkDTO> studentAcademicWorkDTOList);
     /**
      * 单个上传学生学术著作,其中存在{@link AcademicWork 学术著作类型}
      * <br/>
