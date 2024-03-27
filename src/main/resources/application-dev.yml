@@ -33,3 +33,8 @@ logging:
 jwt:
   expire-time: 7
   key: $2a$10$EOWyTIhOPiIDaO40I7znfuTmttRRCe3rEzDM9aS9/pWcLe8ZT5fSO
+
+minio:
+  access-key: root
+  endpoint: http://121.41.115.29:9000
+  secret-key: Qx310320.n

@@ -34,3 +34,8 @@ logging:
 jwt:
   expire-time: 7
   key: edu.guet
+
+minio:
+  access-key: root
+  endpoint: http://localhost:9000
+  secret-key: Qx310320.n
