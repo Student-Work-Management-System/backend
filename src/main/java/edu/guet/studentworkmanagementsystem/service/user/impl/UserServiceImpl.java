@@ -11,7 +11,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.UserQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
@@ -84,24 +83,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(loginUserVO);
     }
+    private boolean RoleNotNullOrEmpty(List<String> roles) {
+        return !Objects.isNull(roles) && !roles.isEmpty();
+    }
+    private void addUserRole(List<String> roles, String uid) {
+        ArrayList<UserRole> userRoles = new ArrayList<>();
+        if (roles.size() == 1)
+            userRoles.add(new UserRole(uid, roles.getFirst()));
+        else
+            roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
+        int i = userRoleMapper.insertBatch(userRoles);
+        if (i == roles.size())
+            return;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
     @Transactional
     @Override
     public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
         registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
         User user = new User(registerUserDTO);
-        ArrayList<UserRole> userRoles = new ArrayList<>();
         int i = mapper.insert(user);
         if (i > 0) {
             List<String> roles = registerUserDTO.getRoles();
             String uid = user.getUid();
-            if (roles.size() == 1)
-                userRoles.add(new UserRole(uid, registerUserDTO.getRoles().getFirst()));
-            else
-                roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
-            int j = userRoleMapper.insertBatch(userRoles);
-            if (j == roles.size())
-                return ResponseUtil.success();
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            if (RoleNotNullOrEmpty(roles))
+                addUserRole(roles, uid);
+            return ResponseUtil.success();
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
@@ -109,7 +116,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public <T> BaseResponse<T> addUsers(List<RegisterUserDTO> registerUserDTOList) {
         ArrayList<User> users = new ArrayList<>();
-        ArrayList<UserRole> userRoles = new ArrayList<>();
         registerUserDTOList.forEach(item -> {
             item.setPassword(passwordEncoder.encode(item.getPassword()));
             users.add(new User(item));
@@ -120,16 +126,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             for(int j = 0; j < size; j++) {
                 String uid = users.get(j).getUid();
                 List<String> roles = registerUserDTOList.get(j).getRoles();
-                if (roles.size() == 1)
-                    userRoles.add(new UserRole(uid, roles.getFirst()));
-                else
-                    roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
+                if (RoleNotNullOrEmpty(roles))
+                    addUserRole(roles, uid);
             }
-            int roleSize = userRoles.size();
-            int j = userRoleMapper.insertBatch(userRoles);
-            if (roleSize == j)
-                return ResponseUtil.success();
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            return ResponseUtil.success();
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
@@ -138,7 +138,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserDetailVO userDetailVO = new UserDetailVO(mapper.getUserByUsername(username));
         String uid = userDetailVO.getUid();
         List<Role> userRole = userRoleMapper.getUserRole(uid);
-        userDetailVO.setRoles(userRole);
+        if (!Objects.isNull(userRole))
+            userDetailVO.setRoles(userRole);
         return ResponseUtil.success(userDetailVO);
     }
     @Transactional
@@ -244,27 +245,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisUtil.delete("uid:" + uid);
         return ResponseUtil.success();
     }
-
     @Override
-    public BaseResponse<Page<UserDetailVO>> gets(UserQuery query) {
-        String username = Optional.ofNullable(query.getUsername()).orElse("%%");
-        String realName = Optional.ofNullable(query.getRealName()).orElse("%%");
-        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(0);
-        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
+    public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
         QueryWrapper wrapper = QueryWrapper.create()
-                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
-                .from(USER).innerJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
-                .innerJoin(ROLE).on(ROLE.RID.eq(USER_ROLE.RID));
-        if (!username.equals("%%") && !realName.equals("%%"))
-            wrapper.where(USER.USERNAME.like(username)).or(USER.REAL_NAME.like(realName));
-        else if (!username.equals("%%"))
-            wrapper.where(USER.USERNAME.like(username));
-        else if (!realName.equals("%%"))
-            wrapper.where(USER.REAL_NAME.like(realName));
+                .select(USER.ALL_COLUMNS)
+                .from(USER)
+                .where(USER.USERNAME.like(keyWord)).or(USER.REAL_NAME.like(keyWord));
         Page<UserDetailVO> userPage = mapper.paginateAs(Page.of(pageNo, pageSize), wrapper, UserDetailVO.class);
+        userPage.getRecords().forEach(item -> {
+            item.setRoles(null);
+            List<Role> userRole = userRoleMapper.getUserRole(item.getUid());
+            if (!Objects.isNull(userRole))
+                item.setRoles(userRole);
+        });
         return ResponseUtil.success(userPage);
     }
-
     private void userRoleUpdateHandler(String uid) {
         redisUtil.delete("uid" + uid);
     }

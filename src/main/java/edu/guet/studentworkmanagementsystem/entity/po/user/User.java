@@ -24,7 +24,7 @@ public class User {
     private String uid;
     private String username;
     private String realName;
-    private String phone;
+    private String email;
     private String password;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -33,7 +33,7 @@ public class User {
     public User(RegisterUserDTO registerUserDTO) {
         this.username = registerUserDTO.getUsername();
         this.realName = registerUserDTO.getRealName();
-        this.phone = registerUserDTO.getPhone();
+        this.email = registerUserDTO.getEmail();
         this.password = registerUserDTO.getPassword();
         this.createdAt = LocalDate.now();
     }

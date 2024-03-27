@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -22,17 +23,17 @@ public class UserDetailVO implements Serializable {
     private String uid;
     private String username;
     private String realName;
-    private String phone;
+    private String email;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
-    private List<Role> roles;
+    private List<Role> roles = null;
     public UserDetailVO(User user) {
         this.uid = user.getUid();
         this.username = user.getUsername();
         this.realName = user.getRealName();
-        this.phone = user.getPhone();
+        this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
     }
 }

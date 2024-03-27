@@ -14,14 +14,14 @@ public class LoginUserVO implements Serializable {
     private String uid;
     private String username;
     private String realName;
-    private String phone;
+    private String email;
     private List<SystemAuthority> authorities;
     private String token;
     public LoginUserVO(User user, List<SystemAuthority> authorities, String token) {
         this.uid = user.getUid();
         this.username = user.getUsername();
         this.realName = user.getRealName();
-        this.phone = user.getPhone();
+        this.email = user.getEmail();
         this.authorities = authorities;
         this.token = token;
     }
