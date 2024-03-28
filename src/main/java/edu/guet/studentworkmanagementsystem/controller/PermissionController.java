@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class PermissionController {
             "and  hasAuthority('permission:select')"
     )
     @PutMapping("/update/role/permission")
-    public <T> BaseResponse<T> updateRolePermission(@RequestBody RolePermissionDTO rolePermissionDTO) {
+    public <T> BaseResponse<T> updateRolePermission(@RequestBody @Valid RolePermissionDTO rolePermissionDTO) {
         return userService.updateRolePermission(rolePermissionDTO);
     }
     @PreAuthorize("hasAuthority('role:insert')")

@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
@@ -259,6 +260,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 item.setRoles(userRole);
         });
         return ResponseUtil.success(userPage);
+    }
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> deleteUser(String uid) {
+        QueryWrapper wrapper = QueryWrapper.create().where(USER_ROLE.UID.eq(uid));
+        int i = userRoleMapper.deleteByQuery(wrapper);
+        if (i > 0) {
+            int j = mapper.deleteById(uid);
+            if (j > 0)
+                return ResponseUtil.success();
+        }
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO) {
+        if (!Objects.isNull(updateUserDTO.getPassword()) && !updateUserDTO.getPassword().isEmpty())
+            updateUserDTO.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
+        User user = new User(updateUserDTO);
+        int update = mapper.update(user);
+        if (update > 0)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     private void userRoleUpdateHandler(String uid) {
         redisUtil.delete("uid" + uid);

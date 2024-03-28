@@ -6,10 +6,12 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +25,12 @@ public class UserController {
     private UserService userService;
     @PermitAll
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> login(@RequestBody LoginUserDTO loginUserDTO) throws JsonProcessingException {
+    public BaseResponse<LoginUserVO> login(@RequestBody @Valid LoginUserDTO loginUserDTO) throws JsonProcessingException {
         return userService.login(loginUserDTO);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> addUser(@RequestBody RegisterUserDTO registerUserDTO) {
+    public <T> BaseResponse<T> addUser(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
         return userService.addUser(registerUserDTO);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
@@ -53,8 +55,18 @@ public class UserController {
             "and hasAuthority('role:select')"
     )
     @PutMapping("/update/role")
-    public <T> BaseResponse<T> updateUserRole(@RequestBody UserRoleDTO userRoleDTO) {
+    public <T> BaseResponse<T> updateUserRole(@RequestBody @Valid UserRoleDTO userRoleDTO) {
         return userService.updateUserRole(userRoleDTO);
+    }
+    @PreAuthorize("hasAuthority('user:delete') and hasAuthority('user_role:delete')")
+    @DeleteMapping("/delete/{uid}")
+    public <T> BaseResponse<T> deleteUser(@PathVariable String uid) {
+        return userService.deleteUser(uid);
+    }
+    @PreAuthorize("hasAuthority('user:update:all')")
+    @PutMapping("/update")
+    public <T> BaseResponse<T> updateUser(@RequestBody @Valid UpdateUserDTO updateUserDTO) {
+        return userService.updateUser(updateUserDTO);
     }
     @PermitAll
     @DeleteMapping("/logout")

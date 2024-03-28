@@ -9,6 +9,7 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,5 +37,14 @@ public class User {
         this.email = registerUserDTO.getEmail();
         this.password = registerUserDTO.getPassword();
         this.createdAt = LocalDate.now();
+    }
+
+    public User(UpdateUserDTO updateUserDTO) {
+        this.uid = updateUserDTO.getUid();
+        this.username = null;
+        this.realName = updateUserDTO.getRealName();
+        this.email = updateUserDTO.getEmail();
+        this.password = updateUserDTO.getPassword();
+        this.createdAt = null;
     }
 }

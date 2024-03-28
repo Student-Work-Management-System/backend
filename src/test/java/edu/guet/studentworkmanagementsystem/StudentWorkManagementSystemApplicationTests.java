@@ -9,6 +9,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 class StudentWorkManagementSystemApplicationTests {
     @Test
     void contextLoads() {
-
     }
 }
