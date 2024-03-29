@@ -5,7 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.StudentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

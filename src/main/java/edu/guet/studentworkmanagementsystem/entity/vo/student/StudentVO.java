@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.vo;
+package edu.guet.studentworkmanagementsystem.entity.vo.student;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
