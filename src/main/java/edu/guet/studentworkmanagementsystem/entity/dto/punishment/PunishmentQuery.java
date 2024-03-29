@@ -12,4 +12,6 @@ import java.io.Serializable;
 public class PunishmentQuery implements Serializable {
     private String studentId;
     private String name;
+    private Integer pageNo;
+    private Integer pageSize;
 }

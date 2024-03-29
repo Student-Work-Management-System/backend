@@ -70,10 +70,8 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * <br/>
      * 审核人在前端不展示, 拒绝理由只有状态未 未通过 时才展示
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 上报结果
      */
-    BaseResponse<Page<StudentCompetitionVO>> getAllStudentAcademicWork(AcademicWorkQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentCompetitionVO>> getAllStudentAcademicWork(AcademicWorkQuery query);
 
 }

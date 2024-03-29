@@ -43,11 +43,9 @@ public interface PovertyAssistanceService extends IService<StudentPovertyAssista
      * 分页查询学生贫困信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentEmploymentVO>> getStudentPovertyAssistance(PovertyAssistanceQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentEmploymentVO>> getStudentPovertyAssistance(PovertyAssistanceQuery query);
     /**
      * 修改学生贫困认定信息(不能修改贫困信息记录,若需变动实现下方)
      * @param studentPovertyAssistanceDTO 修改需要传递的对象, 某一为空则不修改该属性

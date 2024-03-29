@@ -25,10 +25,8 @@ public interface CETService extends IService<StudentCet> {
     /**
      * 分页获取未通过CET4的所有学生以及考试记录
      * @param query 查询参数
-     * @param pageNo 页号,默认: 1
-     * @param pageSize 每页大小, 默认: 50
      */
-    BaseResponse<Page<StudentCetVO>> getNotPassCET4(CETQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentCetVO>> getNotPassCET4(CETQuery query);
     /**
      * 获取可选的考试学期
      * @return 学期列表

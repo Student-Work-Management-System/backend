@@ -11,6 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ScholarshipQuery implements Serializable {
     private String grade;
-    private String majorIn;
+    private String majorId;
     private String awardYear;
+    private Integer pageNo;
+    private Integer pageSize;
 }

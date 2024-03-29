@@ -16,6 +16,8 @@ public class CompetitionQuery implements Serializable {
      */
     private String name;
     private String grade;
-    private String majorIn;
+    private String majorId;
     private String awardDate;
+    private Integer pageNo;
+    private Integer pageSize;
 }

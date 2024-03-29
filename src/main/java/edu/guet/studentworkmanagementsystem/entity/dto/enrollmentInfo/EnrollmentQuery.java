@@ -14,4 +14,6 @@ public class EnrollmentQuery implements Serializable {
     private String enrollCollege;
     private String enrollMajor;
     private String firstMajor;
+    private Integer pageNo;
+    private Integer pageSize;
 }

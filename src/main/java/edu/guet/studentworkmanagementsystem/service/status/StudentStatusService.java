@@ -37,8 +37,6 @@ public interface StudentStatusService extends IService<StudentStatus> {
      * 分页查询学生学籍变动信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      */
-    BaseResponse<Page<StudentStatusVO>> getAllRecords(StatusQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentStatusVO>> getAllRecords(StatusQuery query);
 }

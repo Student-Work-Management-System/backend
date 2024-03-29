@@ -24,11 +24,9 @@ public interface PunishmentService extends IService<StudentPunishment> {
     /**
      * 分页获取所有的学生处分记录
      * @param query 查询参数
-     * @param pageNo 页号,默认1
-     * @param pageSize 页大小, 默认50
      * @return 所有的学生处分记录
      */
-    BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(PunishmentQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(PunishmentQuery query);
     /**
      * 删除处分信息
      * @param studentId 学号

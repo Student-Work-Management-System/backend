@@ -11,5 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PovertyAssistanceQuery implements Serializable {
     private String grade;
-    private String majorIn;
+    private String majorId;
+    private Integer pageNo;
+    private Integer pageSize;
 }

@@ -21,7 +21,7 @@ public class StudentEmploymentVO implements Serializable {
     private Long studentEmploymentId;
     private String studentId;
     private String name;
-    private String majorId;
+    private String majorName;
     private String graduationState;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -33,18 +33,4 @@ public class StudentEmploymentVO implements Serializable {
     private String jobLocation;
     private String category;
     private String salary;
-    public StudentEmploymentVO(Student student, StudentEmployment studentEmployment) {
-        this.studentEmploymentId = studentEmployment.getStudentEmploymentId();
-        this.studentId = student.getStudentId();
-        this.name = student.getName();
-        this.majorId = student.getMajorId();
-        this.graduationState = studentEmployment.getGraduationState();
-        this.graduationYear = studentEmployment.getGraduationYear();
-        this.whereabouts = studentEmployment.getWhereabouts();
-        this.jobNature = studentEmployment.getJobNature();
-        this.jobIndustry = studentEmployment.getJobIndustry();
-        this.jobLocation = studentEmployment.getJobLocation();
-        this.category = studentEmployment.getCategory();
-        this.salary = studentEmployment.getSalary();
-    }
 }

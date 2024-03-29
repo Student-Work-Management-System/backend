@@ -37,9 +37,7 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * 分页查询学生奖学金信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 学业预警信息
      */
-    BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(PrecautionQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(PrecautionQuery query);
 }

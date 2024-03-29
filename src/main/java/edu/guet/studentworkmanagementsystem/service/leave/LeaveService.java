@@ -34,14 +34,12 @@ public interface LeaveService extends IService<StudentLeave> {
      */
     <T> BaseResponse<T> deleteStudentLeave(String studentLeaveId);
     /**
-     * 分页查询学生就业信息
+     * 分页查询学生请假信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页1, 默认0
-     * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query);
     /**
      * 添加审核记录(注: 审核成功后不允许修改)
      * @param studentLeaveAuditDTO 请假审核记录

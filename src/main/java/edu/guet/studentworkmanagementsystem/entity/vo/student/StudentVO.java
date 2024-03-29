@@ -18,7 +18,6 @@ public class StudentVO implements Serializable {
     private String postalCode;
     private String phone;
     private String nation;
-    private String majorId;
     private String majorName;
     private String grade;
     private String classNo;

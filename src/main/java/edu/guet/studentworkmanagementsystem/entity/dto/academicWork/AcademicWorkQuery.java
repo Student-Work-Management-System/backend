@@ -21,9 +21,11 @@ public class AcademicWorkQuery implements Serializable {
      * 姓名: 模糊查询参数
      */
     private String name;
-    private String majorIn;
+    private String majorId;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate uploadTime;
+    private Integer pageNo;
+    private Integer pageSize;
 }

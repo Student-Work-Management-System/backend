@@ -11,6 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class LeaveQuery implements Serializable {
     private String grade;
-    private String majorIn;
+    private String majorId;
     private String leaveDate;
+    private Integer pageNo;
+    private Integer pageSize;
 }

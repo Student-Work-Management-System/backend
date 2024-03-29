@@ -12,4 +12,6 @@ import java.io.Serializable;
 public class StatusQuery implements Serializable {
     private String state;
     private String handle;
+    private Integer pageNo;
+    private Integer pageSize;
 }

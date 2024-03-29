@@ -16,6 +16,8 @@ public class CadreQuery implements Serializable {
      */
     private String name;
     private String grade;
-    private String majorIn;
+    private String majorId;
     private String cadrePosition;
+    private Integer pageNo;
+    private Integer pageSize;
 }

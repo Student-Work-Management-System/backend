@@ -20,7 +20,7 @@ import java.time.LocalDate;
 public class StudentLeaveVO implements Serializable {
     private String studentId;
     private String name;
-    private String majorId;
+    private String majorName;
     private String leaveType;
     private String leaveReason;
     @JsonSerialize(using = LocalDateSerializer.class)
@@ -28,13 +28,4 @@ public class StudentLeaveVO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate leaveDate;
     private Long leaveDuration;
-    public StudentLeaveVO(Student student, StudentLeave studentLeave) {
-        this.studentId = student.getStudentId();
-        this.name = student.getName();
-        this.majorId = student.getMajorId();
-        this.leaveType = studentLeave.getLeaveType();
-        this.leaveReason = studentLeave.getLeaveReason();
-        this.leaveDate = studentLeave.getLeaveDate();
-        this.leaveDuration = studentLeave.getLeaveDuration();
-    }
 }

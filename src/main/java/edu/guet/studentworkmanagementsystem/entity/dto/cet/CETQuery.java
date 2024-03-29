@@ -10,7 +10,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CETQuery implements Serializable {
-    private String majorIn;
+    private String majorId;
     private String grade;
     private String classNo;
+    private Integer pageNo;
+    private Integer pageSize;
 }

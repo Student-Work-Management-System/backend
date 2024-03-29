@@ -11,6 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PrecautionQuery implements Serializable {
     private String grade;
-    private String majorIn;
+    private String majorId;
     private String schoolPrecautionLevel;
+    private Integer pageNo;
+    private Integer pageSize;
 }

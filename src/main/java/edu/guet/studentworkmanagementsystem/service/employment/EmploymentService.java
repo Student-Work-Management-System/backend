@@ -26,11 +26,9 @@ public interface EmploymentService extends IService<StudentEmployment> {
      * 分页查询学生就业信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query);
     /**
      * 修改学生就业信息记录
      * @param studentEmploymentDTO 学生就业信息对象(学号定位)

@@ -10,6 +10,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmploymentQuery implements Serializable {
-    private String majorIn;
+    private String majorId;
     private String grade;
+    private Integer pageNo;
+    private Integer pageSize;
 }

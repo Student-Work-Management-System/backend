@@ -67,9 +67,7 @@ public interface CadreService extends IService<StudentCadre> {
      * 分页查询学生任职记录
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 学生任职记录
      */
-    BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query);
 }

@@ -1,7 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution;
 
-import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,7 @@ public class StudentSchoolPrecautionVO implements Serializable {
     private Long studentSchoolPrecautionId;
     private String studentId;
     private String name;
-    private String majorId;
+    private String majorName;
     /**
      * 学业预警等级
      */
@@ -32,13 +30,4 @@ public class StudentSchoolPrecautionVO implements Serializable {
      * 备注
      */
     private String comment;
-    public StudentSchoolPrecautionVO(Student student, StudentSchoolPrecaution studentSchoolPrecaution) {
-        this.studentSchoolPrecautionId = studentSchoolPrecaution.getStudentSchoolPrecautionId();
-        this.studentId = student.getStudentId();
-        this.name = student.getName();
-        this.majorId = student.getMajorId();
-        this.precautionTerm = studentSchoolPrecaution.getPrecautionTerm();
-        this.detailReason = studentSchoolPrecaution.getDetailReason();
-        this.comment = studentSchoolPrecaution.getComment();
-    }
 }

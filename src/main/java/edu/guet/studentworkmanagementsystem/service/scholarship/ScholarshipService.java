@@ -38,11 +38,9 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * 分页查询学生奖学金信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query);
     /**
      * 分配奖学金
      * @param studentScholarshipDTO 学生获得奖学金记录

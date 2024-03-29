@@ -35,8 +35,6 @@ public interface EnrollmentInfoService extends IService<EnrollmentInfo> {
      * 分页查询招生信息
      * <br/>
      * @param query 查询参数
-     * @param pageNo 页号, 默认1
-     * @param pageSize 页大小, 默认50
      */
-    BaseResponse<Page<EnrollmentInfo>> getAllRecords(EnrollmentQuery query, int pageNo, int pageSize);
+    BaseResponse<Page<EnrollmentInfo>> getAllRecords(EnrollmentQuery query);
 }

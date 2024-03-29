@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentStatusVO implements Serializable {
-    private String majorIn;
+    private String majorName;
     private String grade;
     private String classNo;
     private String studentId;
