@@ -4,6 +4,8 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentKeyInfo;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,17 +21,21 @@ public interface StudentService extends IService<Student> {
      * 单个导入学生
      * @param student 学生对象
      */
-    <T> BaseResponse<T> importStudent(Student student);
+    <T> BaseResponse<T> addStudent(Student student);
     /**
      * 分页获取学生
-     * @param pageNo 页号,默认: 1
-     * @param pageSize 每页大小, 默认: 50
+     * @param query 学生查询参数
      * @return 学生列表
      */
-    BaseResponse<Page<Student>> getStudents(int pageNo, int pageSize);
+    BaseResponse<Page<Student>> getStudents(StudentQuery query);
     /**
      * 修改学生信息
-     * @param student 来自前端传输的学生对象, 存在某个属性为空(使用学号定位学生, 默认姓名、身份证没有出错)
+     * @param studentDTO 学生信息对象
      */
-    <T> BaseResponse<T> updateStudent(StudentDTO student);
+    <T> BaseResponse<T> updateStudent(StudentDTO studentDTO);
+    /**
+     * 使用学号删除学生
+     * @param studentId 学号
+     */
+    <T> BaseResponse<T> deleteStudent(String studentId);
 }

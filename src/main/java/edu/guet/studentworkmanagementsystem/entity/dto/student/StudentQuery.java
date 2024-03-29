@@ -1,29 +1,22 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.student;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO implements Serializable {
-    @NotBlank(message = "学号不能为空")
-    private String studentId;
+@NoArgsConstructor
+public class StudentQuery implements Serializable {
     private String name;
-    private String idNumber;
     private String gender;
     private String nativePlace;
-    private String postalCode;
-    private String phone;
-    private String nation;
     private String majorIn;
     private String grade;
-    private String classNo;
+    private String nation;
     private String politicsStatus;
+    private Integer pageNo;
+    private Integer pageSize;
 }
