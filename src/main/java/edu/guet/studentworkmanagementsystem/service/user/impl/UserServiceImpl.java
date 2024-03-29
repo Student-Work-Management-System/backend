@@ -13,6 +13,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
@@ -284,6 +285,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
+    public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
+        List<Permission> permissions = permissionMapper.selectAll();
+        // build tree for permissions
+        PermissionTreeVO root =
+                new PermissionTreeVO("root", "root", "root", new ArrayList<>());
+        for (Permission permission : permissions) {
+            PermissionTreeVO nowAt = root;
+            int beginIndex = 0;
+            while (beginIndex != -1) {
+                String name, pid, desc;
+                int index = permission.getPermissionName().indexOf(':', beginIndex);
+                if (index == -1) {
+                    name = permission.getPermissionName();
+                    pid = permission.getPid();
+                    desc = permission.getPermissionDesc();
+                    beginIndex = -1;
+                } else {
+                    name = permission.getPermissionName().substring(beginIndex, index);
+                    desc = name;
+                    pid = "";
+                    beginIndex = index + 1;
+                }
+                PermissionTreeVO finalNowAt = nowAt;
+                nowAt = nowAt.getChildren().stream()
+                        .filter(tree -> tree.getPermissionName().equals(name))
+                        .findFirst()
+                        .orElseGet(()->{
+                            PermissionTreeVO permissionTreeVO = new PermissionTreeVO(pid, name, desc, new ArrayList<>());
+                            finalNowAt.getChildren().add(permissionTreeVO);
+                            return permissionTreeVO;
+                        }
+                );
+            }
+        }
+        return ResponseUtil.success(root.getChildren());
+    }
+
     private void userRoleUpdateHandler(String uid) {
         redisUtil.delete("uid" + uid);
     }
