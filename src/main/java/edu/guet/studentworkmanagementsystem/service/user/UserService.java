@@ -12,6 +12,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
@@ -34,4 +35,5 @@ public interface UserService extends IService<User> {
     BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize);
     <T> BaseResponse<T> deleteUser(String uid);
     <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO);
+    BaseResponse<List<PermissionTreeVO>> getPermissionTree();
 }

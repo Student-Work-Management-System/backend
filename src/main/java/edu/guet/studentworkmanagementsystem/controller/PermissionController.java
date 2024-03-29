@@ -4,6 +4,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.validation.Valid;
@@ -25,6 +26,13 @@ public class PermissionController {
     @GetMapping("/gets")
     public BaseResponse<List<RolePermissionVO>> getAllRole() {
         return userService.getAllRole();
+    }
+    @PreAuthorize(
+            "hasAuthority('permission:select')"
+    )
+    @GetMapping("/permission/gets")
+    public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
+        return userService.getPermissionTree();
     }
     @PreAuthorize(
             "hasAuthority('role_permission:insert') " +
