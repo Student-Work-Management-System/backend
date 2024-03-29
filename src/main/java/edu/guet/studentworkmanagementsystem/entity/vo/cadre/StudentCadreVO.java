@@ -27,7 +27,7 @@ public class StudentCadreVO implements Serializable {
         this.studentId = student.getStudentId();
         this.name = student.getName();
         this.gender = student.getGender();
-        this.majorIn = student.getMajorIn();
+        this.majorIn = student.getMajorId();
         this.grade = student.getGrade();
         this.cadrePosition = cadre.getCadrePosition();
         this.cadreLevel = cadre.getCadreLevel();

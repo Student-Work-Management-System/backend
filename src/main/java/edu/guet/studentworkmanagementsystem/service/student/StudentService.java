@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.StudentVO;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public interface StudentService extends IService<Student> {
      * @param query 学生查询参数
      * @return 学生列表
      */
-    BaseResponse<Page<Student>> getStudents(StudentQuery query);
+    BaseResponse<Page<StudentVO>> getStudents(StudentQuery query);
     /**
      * 修改学生信息
      * @param studentDTO 学生信息对象

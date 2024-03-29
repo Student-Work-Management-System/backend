@@ -9,8 +9,10 @@ import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.StudentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
+import edu.guet.studentworkmanagementsystem.mapper.major.MajorMapper;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -24,6 +26,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
 public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
@@ -58,18 +63,20 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<Student>> getStudents(StudentQuery query) {
+    public BaseResponse<Page<StudentVO>> getStudents(StudentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<Student> studentPage = QueryChain.of(Student.class)
+        Page<StudentVO> studentPage = QueryChain.of(Student.class)
+                .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
+                .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
                 .where(Student::getName).like(query.getName())
                 .and(Student::getNativePlace).like(query.getNativePlace())
                 .and(Student::getNation).like(query.getNation())
                 .and(Student::getGender).eq(query.getGender())
-                .and(Student::getMajorIn).eq(query.getMajorIn())
+                .and(Student::getMajorId).eq(query.getMajorId())
                 .and(Student::getPoliticsStatus).eq(query.getPoliticsStatus())
                 .and(Student::getGrade).eq(query.getGrade())
-                .page(Page.of(pageNo, pageSize));
+                .pageAs(Page.of(pageNo, pageSize), StudentVO.class);
         return ResponseUtil.success(studentPage);
     }
     @Override
@@ -82,7 +89,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .set(Student::getPostalCode, studentDTO.getPostalCode(), StringUtils.hasLength(studentDTO.getPostalCode()))
                 .set(Student::getNativePlace, studentDTO.getNativePlace(), StringUtils.hasLength(studentDTO.getNativePlace()))
                 .set(Student::getPhone, studentDTO.getPhone(), StringUtils.hasLength(studentDTO.getPhone()))
-                .set(Student::getMajorIn, studentDTO.getMajorIn(), StringUtils.hasLength(studentDTO.getMajorIn()))
+                .set(Student::getMajorId, studentDTO.getMajorId(), StringUtils.hasLength(studentDTO.getMajorId()))
                 .set(Student::getGrade, studentDTO.getGrade(), StringUtils.hasLength(studentDTO.getGrade()))
                 .set(Student::getClassNo, studentDTO.getClassNo(), StringUtils.hasLength(studentDTO.getClassNo()))
                 .set(Student::getPoliticsStatus, studentDTO.getPoliticsStatus(), StringUtils.hasLength(studentDTO.getPoliticsStatus()))

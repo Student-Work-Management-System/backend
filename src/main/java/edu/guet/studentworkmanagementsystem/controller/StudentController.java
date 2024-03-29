@@ -5,6 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.StudentVO;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class StudentController {
     private StudentService studentService;
     @PreAuthorize("hasAuthority('student:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<Student>> getAllStudent(@RequestBody @Valid StudentQuery query) {
+    public BaseResponse<Page<StudentVO>> getAllStudent(@RequestBody @Valid StudentQuery query) {
         return studentService.getStudents(query);
     }
     @PreAuthorize("hasAuthority('student:insert') and hasAuthority('user:insert') and hasAuthority('user_role:insert')")

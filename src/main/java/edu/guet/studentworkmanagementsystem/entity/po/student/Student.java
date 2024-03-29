@@ -53,7 +53,7 @@ public class Student implements Serializable {
     /**
      * 专业
      */
-    private String majorIn;
+    private String majorId;
     /**
      * 年级
      */

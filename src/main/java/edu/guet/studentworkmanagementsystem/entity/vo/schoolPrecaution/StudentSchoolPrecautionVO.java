@@ -15,7 +15,7 @@ public class StudentSchoolPrecautionVO implements Serializable {
     private Long studentSchoolPrecautionId;
     private String studentId;
     private String name;
-    private String majorIn;
+    private String majorId;
     /**
      * 学业预警等级
      */
@@ -36,7 +36,7 @@ public class StudentSchoolPrecautionVO implements Serializable {
         this.studentSchoolPrecautionId = studentSchoolPrecaution.getStudentSchoolPrecautionId();
         this.studentId = student.getStudentId();
         this.name = student.getName();
-        this.majorIn = student.getMajorIn();
+        this.majorId = student.getMajorId();
         this.precautionTerm = studentSchoolPrecaution.getPrecautionTerm();
         this.detailReason = studentSchoolPrecaution.getDetailReason();
         this.comment = studentSchoolPrecaution.getComment();
