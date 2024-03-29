@@ -22,7 +22,7 @@ public interface LeaveService extends IService<StudentLeave> {
      * 对象添加学生请假信息
      * @param studentLeave 学生请假信息记录对象
      */
-    BaseResponse<StudentLeave> insertStudentLeave(StudentLeave studentLeave);
+     <T> BaseResponse<T> insertStudentLeave(StudentLeave studentLeave);
     /**
      * 修改学生请假信息的信息
      * @param studentLeaveDTO 修改的学生请假信息
@@ -39,10 +39,11 @@ public interface LeaveService extends IService<StudentLeave> {
      * @param query 查询参数
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query);
+    BaseResponse<Page<StudentLeaveVO>> getStudentLeaveInAuditing(LeaveQuery query);
     /**
      * 添加审核记录(注: 审核成功后不允许修改)
      * @param studentLeaveAuditDTO 请假审核记录
      */
     <T> BaseResponse<T> audiStudentLeave(StudentLeaveAuditDTO studentLeaveAuditDTO);
+    <T> BaseResponse<T> insertStudentLeaveAuditRecord(String studentLeaveId);
 }

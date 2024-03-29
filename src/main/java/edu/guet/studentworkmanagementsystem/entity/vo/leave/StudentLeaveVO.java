@@ -18,8 +18,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentLeaveVO implements Serializable {
+    private String studentLeaveId;
     private String studentId;
     private String name;
+    private String grade;
     private String majorName;
     private String leaveType;
     private String leaveReason;

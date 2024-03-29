@@ -32,8 +32,7 @@ public class StudentLeave implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentLeaveId;
-    @Id
+    private String studentLeaveId;
     private String studentId;
     /**
      * 请假类型
