@@ -4,10 +4,8 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentKeyInfo;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
