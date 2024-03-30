@@ -294,6 +294,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         for (Permission permission : permissions) {
             PermissionTreeVO nowAt = root;
             int beginIndex = 0;
+            String parentPrefix = "";
             while (beginIndex != -1) {
                 String name, pid, desc;
                 int index = permission.getPermissionName().indexOf(':', beginIndex);
@@ -305,7 +306,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 } else {
                     name = permission.getPermissionName().substring(beginIndex, index);
                     desc = name;
-                    pid = "";
+                    pid = parentPrefix + name + ':';
+                    parentPrefix = pid;
                     beginIndex = index + 1;
                 }
                 PermissionTreeVO finalNowAt = nowAt;
