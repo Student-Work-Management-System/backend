@@ -12,7 +12,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Permission{
     @Id(keyType = KeyType.Auto)
-    @JsonIgnore
     private String pid;
     private String permissionName;
     private String permissionDesc;
