@@ -267,7 +267,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public <T> BaseResponse<T> deleteUser(String uid) {
         QueryWrapper wrapper = QueryWrapper.create().where(USER_ROLE.UID.eq(uid));
         int i = userRoleMapper.deleteByQuery(wrapper);
-        if (i > 0) {
+        if (i >= 0) {
             int j = mapper.deleteById(uid);
             if (j > 0)
                 return ResponseUtil.success();

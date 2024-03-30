@@ -2,6 +2,7 @@ package edu.guet.studentworkmanagementsystem.service.leave.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -79,9 +80,13 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentLeave(String studentLeaveId) {
-        int i = mapper.deleteById(studentLeaveId);
-        if (i > 0)
-            return ResponseUtil.success();
+        QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_LEAVE_AUDIT.STUDENT_LEAVE_ID.eq(studentLeaveId));
+        int i = studentLeaveAuditMapper.deleteByQuery(wrapper);
+        if (i >= 0) {
+            int j = mapper.deleteById(studentLeaveId);
+            if (j > 0)
+                return ResponseUtil.success();
+        }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
