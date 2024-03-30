@@ -39,6 +39,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
@@ -144,33 +145,59 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userDetailVO.setRoles(userRole);
         return ResponseUtil.success(userDetailVO);
     }
+    private <T> boolean listHandler(List<T> list) {
+        return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
+    }
     @Transactional
     @Override
     public <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO) {
         String uid = userRoleDTO.getUid();
-        Set<String> roleSetFromDB = userRoleMapper.getUserRole(uid).stream()
-                .map(Role::getRid)
-                .collect(Collectors.toSet());
-        Set<String> roleSetFromWeb = userRoleDTO.getRoles();
-        List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
-        delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
-        List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
-        insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
+        List<Role> roles = userRoleMapper.getUserRole(uid);
+        if (listHandler(roles)) {
+            addUserRole(userRoleDTO.getRoles().stream().toList(), uid);
+        } else {
+            Set<String> roleSetFromDB = roles.stream()
+                    .map(Role::getRid)
+                    .filter(StringUtils::hasLength)
+                    .collect(Collectors.toSet());
+            Set<String> roleSetFromWeb = userRoleDTO.getRoles();
+            List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
+            delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
+            List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
+            insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
+        }
         userRoleUpdateHandler(uid);
         return ResponseUtil.success();
+    }
+    private void addRolePermission(List<String> permissions, String rid) {
+        ArrayList<RolePermission> rolePermission = new ArrayList<>();
+        if (permissions.size() == 1)
+            rolePermission.add(new RolePermission(rid, permissions.getFirst()));
+        else
+            permissions.forEach(item -> rolePermission.add(new RolePermission(rid, item)));
+        int i = rolePermissionMapper.insertBatch(rolePermission);
+        if (i == permissions.size())
+            return;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Transactional
     @Override
     public <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO) {
         String rid = rolePermissionDTO.getRid();
-        Set<String> permissionSetFromDB = rolePermissionMapper.getRolePermission(rid).stream()
-                .map(Permission::getPermissionName)
-                .collect(Collectors.toSet());
-        Set<String> permissionSetFromWeb = rolePermissionDTO.getPermissions();
-        List<String> delete = getDelete(permissionSetFromWeb, permissionSetFromDB).stream().toList();
-        delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
-        List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
-        insert.forEach(item -> rolePermissionMapper.insert(new RolePermission(rid, item)));
+        List<Permission> permissions = rolePermissionMapper.getRolePermission(rid);
+        if (listHandler(permissions)) {
+            addRolePermission(rolePermissionDTO.getPermissions().stream().toList(), rid);
+        } else {
+            Set<String> permissionSetFromDB = permissions.stream()
+                    .map(Permission::getPid)
+                    .filter(StringUtils::hasLength)
+                    .collect(Collectors.toSet());
+            Set<String> permissionSetFromWeb = rolePermissionDTO.getPermissions();
+            List<String> delete = getDelete(permissionSetFromWeb, permissionSetFromDB).stream().toList();
+            delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
+            List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
+            insert.forEach(item -> rolePermissionMapper.insert(new RolePermission(rid, item)));
+        }
         rolePermissionUpdateHandler(rid);
         return ResponseUtil.success();
     }
@@ -197,6 +224,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper userRoleWrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
         long rolePermissionNumber = rolePermissionMapper.selectCountByQuery(rolePermissionWrapper);
         long userRoleNumber = userRoleMapper.selectCountByQuery(userRoleWrapper);
+        userRoleDeleteHandler(userRoleWrapper);
         if (rolePermissionNumber != 0) {
             int i = rolePermissionMapper.deleteByQuery(rolePermissionWrapper);
             if (i != rolePermissionNumber)
@@ -204,7 +232,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         if (userRoleNumber != 0) {
             int i = userRoleMapper.deleteByQuery(userRoleWrapper);
-            if (i != rolePermissionNumber)
+            if (i != userRoleNumber)
                 throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         }
         QueryWrapper roleWrapper = QueryWrapper.create().from(ROLE).where(ROLE.RID.eq(rid));
@@ -219,6 +247,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper rolePermissionWrapper = QueryWrapper.create().from(ROLE_PERMISSION).where(ROLE_PERMISSION.PID.eq(pid));
         QueryWrapper permissionWrapper = QueryWrapper.create().from(PERMISSION).where(PERMISSION.PID.eq(pid));
         long rolePermissionNumber = rolePermissionMapper.selectCountByQuery(rolePermissionWrapper);
+        rolePermissionDeleteHandler(rolePermissionWrapper);
         if (rolePermissionNumber != 0) {
             int i = rolePermissionMapper.deleteByQuery(rolePermissionWrapper);
             if (i != rolePermissionNumber)
@@ -234,8 +263,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<Role> roles = roleMapper.selectAll();
         ArrayList<RolePermissionVO> rolePermissionList = new ArrayList<>();
         roles.forEach(item -> {
-            List<Permission> permission = rolePermissionMapper.getRolePermission(item.getRid());
-            rolePermissionList.add(new RolePermissionVO(item, permission));
+            List<Permission> permissions = rolePermissionMapper.getRolePermission(item.getRid());
+            rolePermissionList.add(new RolePermissionVO(item, permissions));
         });
         return ResponseUtil.success(rolePermissionList);
     }
@@ -288,7 +317,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
         List<Permission> permissions = permissionMapper.selectAll();
-        // build tree for permissions
         PermissionTreeVO root =
                 new PermissionTreeVO("root", "root", "root", new ArrayList<>());
         for (Permission permission : permissions) {
@@ -324,9 +352,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return ResponseUtil.success(root.getChildren());
     }
-
+    private void rolePermissionDeleteHandler(QueryWrapper rolePermissionWrapper) {
+        List<String> rids = rolePermissionMapper.selectListByQuery(rolePermissionWrapper).stream().map(RolePermission::getRid).toList();
+        rids.forEach(this::rolePermissionUpdateHandler);
+    }
+    private void userRoleDeleteHandler(QueryWrapper userRoleWrapper) {
+        List<String> uidList = userRoleMapper.selectListByQuery(userRoleWrapper).stream().map(UserRole::getUid).toList();
+        uidList.forEach(this::userRoleUpdateHandler);
+    }
     private void userRoleUpdateHandler(String uid) {
-        redisUtil.delete("uid" + uid);
+        redisUtil.delete("uid:" + uid);
     }
     private void rolePermissionUpdateHandler(String rid) {
         QueryWrapper wrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
