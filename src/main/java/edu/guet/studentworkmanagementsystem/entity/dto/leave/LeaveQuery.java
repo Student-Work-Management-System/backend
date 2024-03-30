@@ -13,6 +13,7 @@ public class LeaveQuery implements Serializable {
     private String grade;
     private String majorId;
     private String leaveDate;
+    private String auditState;
     private Integer pageNo;
     private Integer pageSize;
 }

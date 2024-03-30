@@ -23,14 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.leave.table.StudentLeaveAuditTableDef.STUDENT_LEAVE_AUDIT;
 import static edu.guet.studentworkmanagementsystem.entity.po.leave.table.StudentLeaveTableDef.STUDENT_LEAVE;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 
 @Service
 public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLeave> implements LeaveService {
@@ -85,29 +85,60 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<StudentLeaveVO>> getStudentLeaveInAuditing(LeaveQuery query) {
+    public BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
+        if (!selectStateHandler(query))
+            throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         Page<StudentLeaveVO> studentLeaveVOPage = QueryChain.of(StudentLeave.class)
-                .select(STUDENT.ALL_COLUMNS, STUDENT_LEAVE.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
+                .select(STUDENT.ALL_COLUMNS, STUDENT_LEAVE.ALL_COLUMNS, STUDENT_LEAVE_AUDIT.AUDIT_DATE, MAJOR.ALL_COLUMNS, USER.USERNAME.as("auditorNo"), USER.REAL_NAME.as("auditorName"))
                 .from(STUDENT_LEAVE)
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_LEAVE.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.STUDENT_LEAVE_ID.eq(STUDENT_LEAVE.STUDENT_LEAVE_ID))
+                .leftJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.STUDENT_LEAVE_ID.eq(STUDENT_LEAVE.STUDENT_LEAVE_ID))
+                .leftJoin(USER).on(USER.UID.eq(STUDENT_LEAVE_AUDIT.AUDITOR_ID))
                 .where(Student::getGrade).eq(query.getGrade())
                 .and(Student::getMajorId).eq(query.getMajorId())
                 .and(StudentLeave::getLeaveDate).eq(query.getLeaveDate())
-                .and(STUDENT_LEAVE_AUDIT.AUDIT_STATE.eq("审核中"))
+                .and(STUDENT_LEAVE_AUDIT.AUDIT_STATE.eq(query.getAuditState()))
                 .pageAs(Page.of(pageNo, pageSize), StudentLeaveVO.class);
         return ResponseUtil.success(studentLeaveVOPage);
     }
     @Override
     @Transactional
     public <T> BaseResponse<T> audiStudentLeave(StudentLeaveAuditDTO studentLeaveAuditDTO) {
-        StudentLeaveAudit studentLeaveAudit = new StudentLeaveAudit(studentLeaveAuditDTO);
-        int i = studentLeaveAuditMapper.insert(studentLeaveAudit);
-        if (i > 0)
+        if (!updateStateHandler(studentLeaveAuditDTO.getAuditState()))
+            throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
+        boolean update = UpdateChain.of(StudentLeaveAudit.class)
+                .set(StudentLeaveAudit::getAuditorId, studentLeaveAuditDTO.getAuditorId())
+                .set(StudentLeaveAudit::getAuditDate, LocalDate.now())
+                .set(StudentLeaveAudit::getAuditState, studentLeaveAuditDTO.getAuditState())
+                .where(StudentLeaveAudit::getStudentLeaveId).eq(studentLeaveAuditDTO.getStudentLeaveId())
+                .update();
+        if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    private boolean updateStateHandler(String state) {
+        switch (state) {
+            case "通过", "拒绝" -> {
+                return true;
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+    private boolean selectStateHandler(LeaveQuery query) {
+        if (!Objects.isNull(query.getAuditState()))
+            switch (query.getAuditState()) {
+                case "通过", "拒绝", "审核中" -> {
+                    return true;
+                }
+                default -> {
+                    return false;
+                }
+            }
+        return true;
     }
 }

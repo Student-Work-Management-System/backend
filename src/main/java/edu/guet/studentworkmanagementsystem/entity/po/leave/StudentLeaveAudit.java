@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,10 +56,4 @@ public class StudentLeaveAudit implements Serializable {
      * 审核中, 通过, 拒绝
      */
     private String auditState = "审核中";
-    public StudentLeaveAudit(StudentLeaveAuditDTO dto) {
-        this.auditorId = dto.getAuditorId();
-        this.auditDate = dto.getAuditDate();
-        this.studentLeaveId = dto.getStudentLeaveId();
-        this.auditState = dto.getAuditState();
-    }
 }

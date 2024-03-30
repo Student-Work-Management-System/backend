@@ -8,7 +8,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDT
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public interface LeaveService extends IService<StudentLeave> {
      * @param query 查询参数
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentLeaveVO>> getStudentLeaveInAuditing(LeaveQuery query);
+    BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query);
     /**
      * 添加审核记录(注: 审核成功后不允许修改)
      * @param studentLeaveAuditDTO 请假审核记录
