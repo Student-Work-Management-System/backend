@@ -16,11 +16,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentStatusVO implements Serializable {
+    private String studentStatusId;
+    private String studentId;
+    private String name;
     private String majorName;
     private String grade;
     private String classNo;
-    private String studentId;
-    private String name;
     private String state;
     private String handle;
     @JsonSerialize(using = LocalDateSerializer.class)

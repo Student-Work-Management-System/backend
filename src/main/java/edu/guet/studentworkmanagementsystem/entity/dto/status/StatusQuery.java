@@ -10,6 +10,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatusQuery implements Serializable {
+    private String grade;
+    private String majorId;
     private String state;
     private String handle;
     private Integer pageNo;

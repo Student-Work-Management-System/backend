@@ -7,12 +7,11 @@ import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 
-public interface StudentStatusService extends IService<StudentStatus> {
+public interface StatusService extends IService<StudentStatus> {
     /**
      * 批量导入学生学籍变动信息记录
      * @param studentStatuses 学生学籍信息列表
