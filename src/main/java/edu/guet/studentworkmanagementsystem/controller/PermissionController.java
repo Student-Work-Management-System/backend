@@ -4,7 +4,6 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
-import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -44,7 +43,7 @@ public class PermissionController {
     public <T> BaseResponse<T> updateRolePermission(@RequestBody @Valid RolePermissionDTO rolePermissionDTO) {
         return userService.updateRolePermission(rolePermissionDTO);
     }
-    @PreAuthorize("hasAuthority('role:insert')")
+    @PreAuthorize("hasAuthority('role:insert') and hasAuthority('role_permission:insert')")
     @PostMapping("/add/role")
     public <T> BaseResponse<T> addRole(@RequestBody RoleDTO roleDTO) {
         return userService.addRole(roleDTO);
