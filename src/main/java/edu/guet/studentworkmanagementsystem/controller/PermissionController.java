@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
@@ -45,8 +46,8 @@ public class PermissionController {
     }
     @PreAuthorize("hasAuthority('role:insert')")
     @PostMapping("/add/role")
-    public <T> BaseResponse<T> addRole(@RequestBody Role role) {
-        return userService.addRole(role);
+    public <T> BaseResponse<T> addRole(@RequestBody RoleDTO roleDTO) {
+        return userService.addRole(roleDTO);
     }
     @PreAuthorize("hasAuthority('permission:insert')")
     @PostMapping("/add/permission")

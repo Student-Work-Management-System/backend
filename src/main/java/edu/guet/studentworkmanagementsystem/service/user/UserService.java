@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
@@ -26,7 +27,7 @@ public interface UserService extends IService<User> {
     BaseResponse<UserDetailVO> getUserDetails(String username);
     <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO);
     <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO);
-    <T> BaseResponse<T> addRole(Role role);
+    <T> BaseResponse<T> addRole(RoleDTO roleDTO);
     <T> BaseResponse<T> addPermission(Permission permission);
     <T> BaseResponse<T> deleteRole(String rid);
     <T> BaseResponse<T> deletePermission(String pid);
