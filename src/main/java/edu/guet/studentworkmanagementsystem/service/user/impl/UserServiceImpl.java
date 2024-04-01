@@ -209,7 +209,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         int i = roleMapper.insert(role);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        if (!Objects.isNull(roleDTO.getPermissions())) {
+        if (!Objects.isNull(roleDTO.getPermissions()) && !roleDTO.getPermissions().isEmpty()) {
             ArrayList<RolePermission> rolePermissions = new ArrayList<>();
             String rid = role.getRid();
             roleDTO.getPermissions().forEach(item -> rolePermissions.add(new RolePermission(rid, item.getPid())));
