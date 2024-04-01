@@ -11,7 +11,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
-import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
