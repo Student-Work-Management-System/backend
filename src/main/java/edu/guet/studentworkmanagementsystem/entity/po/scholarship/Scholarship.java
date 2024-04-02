@@ -23,12 +23,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Table(value = "scholarship")
 public class Scholarship implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-
     @Id(keyType = KeyType.Auto)
-    private Long scholarshipId;
+    private String scholarshipId;
     /**
      * 奖学金名称
      */

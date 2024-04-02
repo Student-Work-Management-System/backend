@@ -5,10 +5,11 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateScholarshipOwner;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateStudentScholarshipType;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,17 +19,18 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * @param scholarships 奖学金信息列表
      * @return 存入数据库中的奖学金记录
      */
-    BaseResponse<List<Scholarship>> importScholarship(List<Scholarship> scholarships);
+    <T> BaseResponse<T> importScholarship(List<Scholarship> scholarships);
     /**
      * 对象添加奖学金记录
      * @param scholarship 奖学金记录对象
      */
-    BaseResponse<Scholarship> insertScholarship(Scholarship scholarship);
+    <T> BaseResponse<T> insertScholarship(Scholarship scholarship);
     /**
      * 修改奖学金记录
      * @param scholarship 奖学金记录
      */
     <T> BaseResponse<T> updateScholarship(Scholarship scholarship);
+    BaseResponse<List<Scholarship>> getScholarships();
     /**
      * 删除奖学金记录
      * @param scholarshipId 奖学金表的id
@@ -52,16 +54,19 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      */
     <T> BaseResponse<T> updateStudentScholarshipInfo(StudentScholarshipDTO studentScholarshipDTO);
     /**
-     * 奖学金类型修正
-     * @param studentId 学号
-     * @param oldScholarshipId 原贫困信息记录id
-     * @param newScholarshipId 新贫困信息记录id
+     * 奖学金类型修正(获得的奖学金类型)
+     * @param updateStudentScholarshipType 修改学生奖学金对象
      */
-    <T> BaseResponse<T> updateStudentScholarship(String studentId, String oldScholarshipId, String newScholarshipId);
+    <T> BaseResponse<T> updateStudentScholarship(UpdateStudentScholarshipType updateStudentScholarshipType);
+    /**
+     * 奖学金类型修正(奖学金获得者)
+     * @param updateScholarshipOwner 修改学生奖学金对象
+     */
+    <T> BaseResponse<T> updateStudentScholarship(UpdateScholarshipOwner updateScholarshipOwner);
     /**
      * 删除学生获得奖学金记录
      * @param studentId 学号
      * @param scholarshipId 贫困信息记录id
      */
-    <T> BaseResponse<T> deleteStudentPovertyAssistance(String studentId, String scholarshipId);
+    <T> BaseResponse<T> deleteStudentScholarship(String studentId, String scholarshipId);
 }

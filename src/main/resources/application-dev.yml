@@ -38,3 +38,6 @@ minio:
   access-key: root
   endpoint: http://121.41.115.29:9000
   secret-key: Qx310320.n
+springdoc:
+  swagger-ui:
+    enabled: true
