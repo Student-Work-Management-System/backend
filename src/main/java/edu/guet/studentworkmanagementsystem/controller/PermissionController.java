@@ -27,9 +27,7 @@ public class PermissionController {
     public BaseResponse<List<RolePermissionVO>> getAllRole() {
         return userService.getAllRole();
     }
-    @PreAuthorize(
-            "hasAuthority('permission:select')"
-    )
+    @PreAuthorize("hasAuthority('permission:select')")
     @GetMapping("/permission/gets")
     public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
         return userService.getPermissionTree();
@@ -37,7 +35,7 @@ public class PermissionController {
     @PreAuthorize(
             "hasAuthority('role_permission:insert') " +
             "and hasAuthority('role_permission:delete') " +
-            "and  hasAuthority('permission:select')"
+            "and hasAuthority('permission:select')"
     )
     @PutMapping("/update/role/permission")
     public <T> BaseResponse<T> updateRolePermission(@RequestBody @Valid RolePermissionDTO rolePermissionDTO) {
