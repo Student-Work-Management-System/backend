@@ -18,7 +18,7 @@ public class InterfaceAuthorityController {
     @Autowired
     private InterfaceAuthorityService interfaceAuthorityService;
     @PermitAll
-    @GetMapping("/prefix/{prefix}")
+    @GetMapping("/get/{prefix}")
     public BaseResponse<List<InterfaceAuthority>> getInterfaceAuthorities(@PathVariable String prefix) {
         return interfaceAuthorityService.getInterfaceAuthorities(prefix);
     }
