@@ -20,6 +20,7 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add("student");
         add("status");
         add("leave");
+        add("scholarship");
     }};
     private static final ArrayList<InterfaceAuthority> userAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/user/login", null));
