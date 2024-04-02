@@ -30,6 +30,9 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * @param scholarship 奖学金记录
      */
     <T> BaseResponse<T> updateScholarship(Scholarship scholarship);
+    /**
+     * 获取全部奖学金
+     */
     BaseResponse<List<Scholarship>> getScholarships();
     /**
      * 删除奖学金记录
@@ -57,16 +60,16 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * 奖学金类型修正(获得的奖学金类型)
      * @param updateStudentScholarshipType 修改学生奖学金对象
      */
-    <T> BaseResponse<T> updateStudentScholarship(UpdateStudentScholarshipType updateStudentScholarshipType);
+    <T> BaseResponse<T> updateStudentScholarshipType(UpdateStudentScholarshipType updateStudentScholarshipType);
     /**
      * 奖学金类型修正(奖学金获得者)
      * @param updateScholarshipOwner 修改学生奖学金对象
      */
-    <T> BaseResponse<T> updateStudentScholarship(UpdateScholarshipOwner updateScholarshipOwner);
+    <T> BaseResponse<T> updateStudentScholarshipOwner(UpdateScholarshipOwner updateScholarshipOwner);
     /**
      * 删除学生获得奖学金记录
      * @param studentId 学号
      * @param scholarshipId 贫困信息记录id
      */
-    <T> BaseResponse<T> deleteStudentScholarship(String studentId, String scholarshipId);
+    <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId);
 }

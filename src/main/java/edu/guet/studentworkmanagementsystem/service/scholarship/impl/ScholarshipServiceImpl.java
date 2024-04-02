@@ -128,7 +128,7 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentScholarship(UpdateStudentScholarshipType updateStudentScholarshipType) {
+    public <T> BaseResponse<T> updateStudentScholarshipType(UpdateStudentScholarshipType updateStudentScholarshipType) {
         boolean update = UpdateChain.of(StudentScholarship.class)
                 .set(StudentScholarship::getScholarshipId, updateStudentScholarshipType.getNewScholarshipId())
                 .where(STUDENT_SCHOLARSHIP.STUDENT_ID.eq(updateStudentScholarshipType.getStudentId()))
@@ -141,7 +141,7 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentScholarship(UpdateScholarshipOwner updateScholarshipOwner) {
+    public <T> BaseResponse<T> updateStudentScholarshipOwner(UpdateScholarshipOwner updateScholarshipOwner) {
         boolean update = UpdateChain.of(StudentScholarship.class)
                 .set(StudentScholarship::getStudentId, updateScholarshipOwner.getNewStudentId())
                 .where(STUDENT_SCHOLARSHIP.STUDENT_ID.eq(updateScholarshipOwner.getOldStudentId()))
@@ -154,8 +154,8 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> deleteStudentScholarship(String studentId, String scholarshipId) {
-        QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_SCHOLARSHIP.STUDENT_ID.eq(scholarshipId)).and(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID.eq(scholarshipId));
+    public <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId) {
+        QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_SCHOLARSHIP.STUDENT_SCHOLARSHIP_ID.eq(studentScholarshipId));
         int i = mapper.deleteByQuery(wrapper);
         if (i > 0)
             return ResponseUtil.success();
