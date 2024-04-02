@@ -6,10 +6,12 @@ import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Table("role")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Role {
     @Id(keyType = KeyType.Auto)
     private String rid;

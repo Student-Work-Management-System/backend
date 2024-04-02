@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -288,18 +289,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     @Override
     public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
-        QueryWrapper wrapper = QueryWrapper.create()
-                .select(USER.ALL_COLUMNS)
+        Page<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
+                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                 .from(USER)
-                .where(USER.USERNAME.like(keyWord)).or(USER.REAL_NAME.like(keyWord));
-        Page<UserDetailVO> userPage = mapper.paginateAs(Page.of(pageNo, pageSize), wrapper, UserDetailVO.class);
-        userPage.getRecords().forEach(item -> {
-            item.setRoles(null);
-            List<Role> userRole = userRoleMapper.getUserRole(item.getUid());
-            if (!Objects.isNull(userRole))
-                item.setRoles(userRole);
-        });
-        return ResponseUtil.success(userPage);
+                .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
+                .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
+                .pageAs(Page.of(pageNo, pageSize), UserDetailVO.class);
+        return ResponseUtil.success(userDetailVOPage);
     }
     @Override
     @Transactional

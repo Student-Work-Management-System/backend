@@ -26,8 +26,6 @@ class StudentWorkManagementSystemApplicationTests {
     private InterfaceAuthorityService interfaceAuthorityService;
     @Test
     void contextLoads() throws JsonProcessingException {
-        BaseResponse<List<InterfaceAuthority>> interfaceAuthorities = interfaceAuthorityService.getInterfaceAuthorities("");
-        System.out.println(interfaceAuthorities);
     }
     private void updateUserRole() {
         UserRoleDTO userRoleDTO = new UserRoleDTO();
