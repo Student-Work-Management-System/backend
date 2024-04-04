@@ -5,8 +5,10 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.InterfaceAuthority;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.service.interfaceAuthority.InterfaceAuthorityService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,10 @@ import java.util.List;
 class StudentWorkManagementSystemApplicationTests {
     @Autowired
     private UserService userService;
+    @Autowired
+    private InterfaceAuthorityService interfaceAuthorityService;
     @Test
     void contextLoads() throws JsonProcessingException {
-        // login();
     }
     private void updateUserRole() {
         UserRoleDTO userRoleDTO = new UserRoleDTO();

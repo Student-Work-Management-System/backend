@@ -4,9 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
@@ -203,11 +205,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     @Transactional
     @Override
-    public <T> BaseResponse<T> addRole(Role role) {
+    public <T> BaseResponse<T> addRole(RoleDTO roleDTO) {
+        Role role = new Role(roleDTO);
         int i = roleMapper.insert(role);
-        if (i > 0)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (i <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (!Objects.isNull(roleDTO.getPermissions()) && !roleDTO.getPermissions().isEmpty()) {
+            ArrayList<RolePermission> rolePermissions = new ArrayList<>();
+            String rid = role.getRid();
+            roleDTO.getPermissions().forEach(item -> rolePermissions.add(new RolePermission(rid, item.getPid())));
+            int j = rolePermissionMapper.insertBatch(rolePermissions);
+            if (j != rolePermissions.size())
+                throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+        return ResponseUtil.success();
     }
     @Transactional
     @Override
@@ -278,18 +289,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     @Override
     public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
-        QueryWrapper wrapper = QueryWrapper.create()
-                .select(USER.ALL_COLUMNS)
+        Page<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
+                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                 .from(USER)
-                .where(USER.USERNAME.like(keyWord)).or(USER.REAL_NAME.like(keyWord));
-        Page<UserDetailVO> userPage = mapper.paginateAs(Page.of(pageNo, pageSize), wrapper, UserDetailVO.class);
-        userPage.getRecords().forEach(item -> {
-            item.setRoles(null);
-            List<Role> userRole = userRoleMapper.getUserRole(item.getUid());
-            if (!Objects.isNull(userRole))
-                item.setRoles(userRole);
-        });
-        return ResponseUtil.success(userPage);
+                .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
+                .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
+                .pageAs(Page.of(pageNo, pageSize), UserDetailVO.class);
+        return ResponseUtil.success(userDetailVOPage);
     }
     @Override
     @Transactional

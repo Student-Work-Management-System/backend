@@ -10,8 +10,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentScholarshipVO implements Serializable {
+    private String studentScholarshipId;
     private String studentId;
     private String name;
+    private String grade;
+    private String majorName;
     private String scholarshipName;
     private String scholarshipLevel;
     private String awardYear;

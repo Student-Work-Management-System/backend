@@ -39,3 +39,7 @@ minio:
   access-key: root
   endpoint: http://localhost:9000
   secret-key: Qx310320.n
+
+springdoc:
+  swagger-ui:
+    enabled: false

@@ -1,9 +1,9 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
-import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -27,9 +27,7 @@ public class PermissionController {
     public BaseResponse<List<RolePermissionVO>> getAllRole() {
         return userService.getAllRole();
     }
-    @PreAuthorize(
-            "hasAuthority('permission:select')"
-    )
+    @PreAuthorize("hasAuthority('permission:select')")
     @GetMapping("/permission/gets")
     public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
         return userService.getPermissionTree();
@@ -37,16 +35,16 @@ public class PermissionController {
     @PreAuthorize(
             "hasAuthority('role_permission:insert') " +
             "and hasAuthority('role_permission:delete') " +
-            "and  hasAuthority('permission:select')"
+            "and hasAuthority('permission:select')"
     )
     @PutMapping("/update/role/permission")
     public <T> BaseResponse<T> updateRolePermission(@RequestBody @Valid RolePermissionDTO rolePermissionDTO) {
         return userService.updateRolePermission(rolePermissionDTO);
     }
-    @PreAuthorize("hasAuthority('role:insert')")
+    @PreAuthorize("hasAuthority('role:insert') and hasAuthority('role_permission:insert')")
     @PostMapping("/add/role")
-    public <T> BaseResponse<T> addRole(@RequestBody Role role) {
-        return userService.addRole(role);
+    public <T> BaseResponse<T> addRole(@RequestBody RoleDTO roleDTO) {
+        return userService.addRole(roleDTO);
     }
     @PreAuthorize("hasAuthority('permission:insert')")
     @PostMapping("/add/permission")

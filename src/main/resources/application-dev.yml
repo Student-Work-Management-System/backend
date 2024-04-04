@@ -3,12 +3,12 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 123456
+    password: qx310320
     url: jdbc:mysql://127.0.0.1:3306/swms?useUnicode=true&characterEncoding=UTF-8
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
-      host: 47.98.145.148
+      host: 127.0.0.1
       database: 0
       port: 6379
       timeout: 3000ms
@@ -36,5 +36,9 @@ jwt:
 
 minio:
   access-key: root
-  endpoint: http://47.98.145.148:9000
-  secret-key: 12345678
+  endpoint: http://121.41.115.29:9000
+  secret-key: Qx310320.n
+springdoc:
+  swagger-ui:
+    enabled: true
+
