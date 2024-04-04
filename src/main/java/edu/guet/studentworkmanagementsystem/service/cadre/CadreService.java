@@ -42,9 +42,9 @@ public interface CadreService extends IService<StudentCadre> {
     <T> BaseResponse<T> deleteCadre(String cadreId);
     /**
      * 在导入完成职位信息后才能安排学生任职信息
-     * @param studentCadreDTO 前端传递的学生任职记录对象
+     * @param studentCadre 前端传递的学生任职记录对象
      */
-    <T> BaseResponse<T> arrangePositions(StudentCadreDTO studentCadreDTO);
+    BaseResponse<StudentCadre> arrangePositions(StudentCadre studentCadre);
     /**
      * 修改学生任职信息(不能变动职位,若需变动实现下方)
      * @param studentCadreDTO 修改需要传递的对象, 某一为空则不修改该属性
@@ -52,17 +52,15 @@ public interface CadreService extends IService<StudentCadre> {
     <T> BaseResponse<T> updateStudentCadreInfo(StudentCadreDTO studentCadreDTO);
     /**
      * 学生任职修正
-     * @param studentId 学号
-     * @param oldCadreId 原职位id
+     * @param studentCadreId 需要修改的记录的id
      * @param newCadreId 新职位id
      */
-    <T> BaseResponse<T> updateStudentCadre(String studentId, String oldCadreId, String newCadreId);
+    <T> BaseResponse<T> updateStudentCadre( String studentCadreId, String newCadreId);
     /**
      * 删除学生任职记录
-     * @param studentId 学号
-     * @param cadreId 岗位id
+     * @param studentCadreId 需要删除的记录的id
      */
-    <T> BaseResponse<T> deleteStudentCadre(String studentId, String cadreId);
+    <T> BaseResponse<T> deleteStudentCadre(String studentCadreId);
     /**
      * 分页查询学生任职记录
      * <br/>

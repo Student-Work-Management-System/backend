@@ -20,4 +20,6 @@ public class CadreQuery implements Serializable {
     private String cadrePosition;
     private Integer pageNo;
     private Integer pageSize;
+    private String appointmentStartTerm;
+    private String appointmentEndTerm;
 }

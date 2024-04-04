@@ -11,6 +11,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentCadreDTO implements Serializable {
+
+    private String studentCadreId ;
     @NotBlank(message = "学号不能为空")
     private String studentId;
     @NotBlank(message = "职位id不能为空")
