@@ -4,9 +4,9 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.punlishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,14 +29,12 @@ public interface PunishmentService extends IService<StudentPunishment> {
     BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(PunishmentQuery query);
     /**
      * 删除处分信息
-     * @param studentId 学号
      * @param studentPunishmentId 学生处分记录id
      */
-    <T> BaseResponse<T> deleteStudentPunishment(String studentId, String studentPunishmentId);
+    <T> BaseResponse<T> deleteStudentPunishment(String studentPunishmentId);
     /**
      * 更新处分信息
-     * @param studentId 学号
-     * @param studentPunishmentId 学生处分记录id
+     * @param studentPunishmentDTO 处分信息对象
      */
-    <T> BaseResponse<T> updateStudentPunishment(String studentId, String studentPunishmentId);
+    <T> BaseResponse<T> updateStudentPunishment(StudentPunishmentDTO studentPunishmentDTO);
 }
