@@ -4,10 +4,9 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
-import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,12 +21,12 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * 添加学业预警记录
      * @param schoolPrecaution 学业预警记录
      */
-    BaseResponse<Scholarship> insertSchoolPrecaution(StudentSchoolPrecaution schoolPrecaution);
+    <T> BaseResponse<T> insertSchoolPrecaution(StudentSchoolPrecaution schoolPrecaution);
     /**
      * 修改学业预警记录
-     * @param schoolPrecaution 待修改的学业预警记录
+     * @param schoolPrecautionDTO 待修改的学业预警记录
      */
-    <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecaution schoolPrecaution);
+    <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionDTO schoolPrecautionDTO);
     /**
      * 删除学业预警记录
      * @param studentSchoolPrecautionId 学业预警表id

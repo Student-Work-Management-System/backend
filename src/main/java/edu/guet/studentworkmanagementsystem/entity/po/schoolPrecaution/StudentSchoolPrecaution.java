@@ -26,7 +26,7 @@ public class StudentSchoolPrecaution implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentSchoolPrecautionId;
+    private String studentSchoolPrecautionId;
     @Id
     private String studentId;
     /**
