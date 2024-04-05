@@ -1,31 +1,26 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.cadre;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import javax.annotation.Nullable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentCadreDTO implements Serializable {
-    private String studentCadreId ;
-    @NotBlank(message = "学号不能为空")
+public class UpdateStudentCadreDTO {
+    @NotBlank(message = "学生任职id不能为空")
+    private String studentCadreId;
     private String studentId;
-    @NotBlank(message = "职位id不能为空")
     private String cadreId;
-    /**
-     * 任职开始学期
-     */
+    @Nullable
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职开始学期不能为空")
     private String appointmentStartTerm;
-    /**
-     * 任职结束学期
-     */
+    @Nullable
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职结束学期不能为空")
     private String appointmentEndTerm;
-    /**
-     * 备注
-     */
     private String comment;
 }

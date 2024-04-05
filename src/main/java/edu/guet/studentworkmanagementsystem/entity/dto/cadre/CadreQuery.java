@@ -11,15 +11,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CadreQuery implements Serializable {
     private String studentId;
-    /**
-     * 姓名: 模糊查询参数
-     */
     private String name;
     private String grade;
     private String majorId;
     private String cadrePosition;
-    private Integer pageNo;
-    private Integer pageSize;
+    private String cadreLevel;
     private String appointmentStartTerm;
     private String appointmentEndTerm;
+    private Integer pageNo;
+    private Integer pageSize;
 }

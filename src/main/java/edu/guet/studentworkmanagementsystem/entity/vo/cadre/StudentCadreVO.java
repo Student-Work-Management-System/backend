@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentCadreVO implements Serializable {
+    private String studentCadreId;
     private String studentId;
     private String name;
     private String gender;

@@ -3,13 +3,10 @@ package edu.guet.studentworkmanagementsystem.service.cadre;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.StudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,14 +14,13 @@ public interface CadreService extends IService<StudentCadre> {
     /**
      * 批量导入职位信息
      * @param cadres 职位信息列表
-     * @return 存入数据库中的职位信息(包含id返回)
      */
-    BaseResponse<List<Cadre>> importCadres(List<Cadre> cadres);
+    <T> BaseResponse<T> importCadres(List<Cadre> cadres);
     /**
      * 对象添加职位
      * @param cadre 职位记录对象
      */
-    BaseResponse<Cadre> insertCadre(Cadre cadre);
+    <T> BaseResponse<T> insertCadre(Cadre cadre);
     /**
      * 修改职位的信息
      * @param cadreDTO 待修改的职位信息
@@ -42,20 +38,14 @@ public interface CadreService extends IService<StudentCadre> {
     <T> BaseResponse<T> deleteCadre(String cadreId);
     /**
      * 在导入完成职位信息后才能安排学生任职信息
-     * @param studentCadre 前端传递的学生任职记录对象
+     * @param insertStudentCadreDTO 学生任职记录对象
      */
-    BaseResponse<StudentCadre> arrangePositions(StudentCadre studentCadre);
+    BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreDTO insertStudentCadreDTO);
     /**
      * 修改学生任职信息(不能变动职位,若需变动实现下方)
-     * @param studentCadreDTO 修改需要传递的对象, 某一为空则不修改该属性
+     * @param updateStudentCadreDTO 修改需要传递的对象, 某一为空则不修改该属性
      */
-    <T> BaseResponse<T> updateStudentCadreInfo(StudentCadreDTO studentCadreDTO);
-    /**
-     * 学生任职修正
-     * @param studentCadreId 需要修改的记录的id
-     * @param newCadreId 新职位id
-     */
-    <T> BaseResponse<T> updateStudentCadre( String studentCadreId, String newCadreId);
+    <T> BaseResponse<T> updateStudentCadre(UpdateStudentCadreDTO updateStudentCadreDTO);
     /**
      * 删除学生任职记录
      * @param studentCadreId 需要删除的记录的id

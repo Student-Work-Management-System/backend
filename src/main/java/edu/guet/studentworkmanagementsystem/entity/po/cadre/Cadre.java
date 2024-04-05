@@ -26,7 +26,7 @@ public class Cadre implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long cadreId;
+    private String cadreId;
     /**
      * 具体职位
      */

@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.entity.po.cadre;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.StudentCadreDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,14 +28,14 @@ public class StudentCadre implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentCadreId;
+    private String studentCadreId;
     @Id
     private String studentId;
     /**
      * 对应的职位id
      */
     @Id
-    private Long cadreId;
+    private String cadreId;
     /**
      * 任职开始学期
      */
@@ -47,11 +48,11 @@ public class StudentCadre implements Serializable {
      * 备注
      */
     private String comment;
-    public StudentCadre(StudentCadreDTO studentCadreDTO) {
-        this.cadreId = studentCadreDTO.getCadreId();
-        this.studentId = studentCadreDTO.getStudentId();
-        this.appointmentStartTerm = studentCadreDTO.getAppointmentStartTerm();
-        this.appointmentEndTerm = studentCadreDTO.getAppointmentEndTerm();
-        this.comment = studentCadreDTO.getComment();
+    public StudentCadre(InsertStudentCadreDTO insertStudentCadreDTO) {
+        this.cadreId = insertStudentCadreDTO.getCadreId();
+        this.studentId = insertStudentCadreDTO.getStudentId();
+        this.appointmentStartTerm = insertStudentCadreDTO.getAppointmentStartTerm();
+        this.appointmentEndTerm = insertStudentCadreDTO.getAppointmentEndTerm();
+        this.comment = insertStudentCadreDTO.getComment();
     }
 }
