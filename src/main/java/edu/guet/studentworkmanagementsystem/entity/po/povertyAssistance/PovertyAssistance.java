@@ -26,7 +26,7 @@ public class PovertyAssistance implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long povertyAssistanceId;
+    private String povertyAssistanceId;
     /**
      * 贫困认定等级, 特别/比较/一般困难
      */

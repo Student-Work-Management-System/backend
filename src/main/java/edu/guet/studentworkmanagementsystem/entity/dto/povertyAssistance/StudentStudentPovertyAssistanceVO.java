@@ -9,13 +9,14 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PovertyAssistanceQuery implements Serializable {
+public class StudentStudentPovertyAssistanceVO implements Serializable {
+    private String studentPovertyAssistanceId;
+    private String studentId;
+    private String name;
     private String grade;
-    private String majorId;
+    private String majorName;
     private String povertyLevel;
     private String povertyType;
-    private String assistanceYear;
     private String povertyAssistanceStandard;
-    private Integer pageNo;
-    private Integer pageSize;
+    private String assistanceYear;
 }

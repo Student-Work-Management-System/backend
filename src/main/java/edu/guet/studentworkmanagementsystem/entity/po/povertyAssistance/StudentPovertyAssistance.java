@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.InsertStudentPovertyAssistanceDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,13 +27,18 @@ public class StudentPovertyAssistance implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentPovertyAssistanceId;
+    private String studentPovertyAssistanceId;
     @Id
     private String studentId;
     @Id
-    private Long povertyAssistanceId;
+    private String povertyAssistanceId;
     /**
      * 认证学年, YYYY-YYYY
      */
     private String assistanceYear;
+    public StudentPovertyAssistance(InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
+        this.studentId = insertStudentPovertyAssistanceDTO.getStudentId();
+        this.povertyAssistanceId = insertStudentPovertyAssistanceDTO.getPovertyAssistanceId();
+        this.assistanceYear = insertStudentPovertyAssistanceDTO.getAssistanceYear();
+    }
 }
