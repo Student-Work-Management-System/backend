@@ -21,6 +21,9 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add("status");
         add("leave");
         add("scholarship");
+        add("punishment");
+        add("poverty_assistance");
+        add("school_precaution");
     }};
     private static final ArrayList<InterfaceAuthority> userAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/user/login", null));
@@ -84,6 +87,31 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/student_scholarship/update/owner", List.of("student_scholarship:update")));
         add(new InterfaceAuthority("/student_scholarship/delete/{studentScholarshipId}", List.of("student_scholarship:delete")));
     }};
+    private static final ArrayList<InterfaceAuthority> povertyAssistanceAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/poverty_assistance/gets", List.of("poverty_assistance:select")));
+        add(new InterfaceAuthority("/poverty_assistance/adds", List.of("poverty_assistance:insert")));
+        add(new InterfaceAuthority("/poverty_assistance/add", List.of("poverty_assistance:insert")));
+        add(new InterfaceAuthority("/poverty_assistance/update", List.of("poverty_assistance:update")));
+        add(new InterfaceAuthority("/poverty_assistance/delete/{povertyAssistanceId}", List.of("poverty_assistance:delete")));
+        add(new InterfaceAuthority("/student_poverty_assistance/add", List.of("student_poverty_assistance:insert")));
+        add(new InterfaceAuthority("/student_poverty_assistance/update", List.of("student_poverty_assistance:update")));
+        add(new InterfaceAuthority("/student_poverty_assistance/delete/{studentPovertyAssistanceId}", List.of("student_poverty_assistance:insert")));
+        add(new InterfaceAuthority("/student_poverty_assistance/gets", List.of("student_poverty_assistance:select", "poverty_assistance:select", "student:select", "major:select")));
+    }};
+    private static final ArrayList<InterfaceAuthority> schoolPrecautionAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/school_precaution/gets", List.of("student_school_precaution:select", "student:select", "major:select")));
+        add(new InterfaceAuthority("/school_precaution/adds", List.of("student_school_precaution:insert")));
+        add(new InterfaceAuthority("/school_precaution/add", List.of("student_school_precaution:insert")));
+        add(new InterfaceAuthority("/school_precaution/update", List.of("student_school_precaution:update")));
+        add(new InterfaceAuthority("/school_precaution/delete/{studentSchoolPrecautionId}", List.of("student_school_precaution:delete")));
+    }};
+    private static final ArrayList<InterfaceAuthority> punishmentAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/punishment/gets", List.of("student_punishment:select", "student:select", "major:select")));
+        add(new InterfaceAuthority("/punishment/adds", List.of("student_punishment:insert")));
+        add(new InterfaceAuthority("/punishment/add", List.of("student_punishment:insert")));
+        add(new InterfaceAuthority("/punishment/update", List.of("student_punishment:update")));
+        add(new InterfaceAuthority("/punishment/delete/{studentPunishmentId}", List.of("student_punishment:delete")));
+    }};
     @Override
     public BaseResponse<List<InterfaceAuthority>> getInterfaceAuthorities(String prefix) {
         switch (prefix) {
@@ -107,6 +135,15 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
             }
             case "scholarship" -> {
                 return getScholarship();
+            }
+            case "punishment" -> {
+                return getPunishment();
+            }
+            case "poverty_assistance" -> {
+                return getPovertyAssistance();
+            }
+            case "school_precaution" -> {
+                return getSchoolPrecaution();
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }
@@ -135,5 +172,14 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
     }
     private BaseResponse<List<InterfaceAuthority>> getScholarship() {
         return ResponseUtil.success(scholarshipAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getPovertyAssistance() {
+        return ResponseUtil.success(povertyAssistanceAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getSchoolPrecaution() {
+        return ResponseUtil.success(schoolPrecautionAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getPunishment() {
+        return ResponseUtil.success(punishmentAuthority);
     }
 }
