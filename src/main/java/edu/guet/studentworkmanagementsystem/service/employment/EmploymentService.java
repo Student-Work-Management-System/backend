@@ -7,7 +7,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.StudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
