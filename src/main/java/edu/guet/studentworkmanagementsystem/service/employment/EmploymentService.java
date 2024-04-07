@@ -7,8 +7,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 
-import java.util.List;
-
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
      * 批量导入学生就业信息
