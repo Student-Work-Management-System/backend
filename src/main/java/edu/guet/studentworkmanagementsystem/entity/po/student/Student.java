@@ -49,12 +49,10 @@ public class Student implements Serializable {
     /**
      * 籍贯
      */
-    @NotBlank(message = "籍贯不能为空")
     private String nativePlace;
     /**
      * 邮政编码
      */
-    @NotBlank(message = "邮政编码不能为空")
     private String postalCode;
     @NotBlank(message = "手机号不能为空")
     @Size(min = 11, max = 11, message = "请输入正常的手机号")
@@ -62,7 +60,6 @@ public class Student implements Serializable {
     /**
      * 民族
      */
-    @NotBlank(message = "民族不能为空")
     private String nation;
     /**
      * 专业
@@ -78,7 +75,6 @@ public class Student implements Serializable {
     /**
      * 班号
      */
-    @NotBlank(message = "班号不能为空")
     private String classNo;
     /**
      * 政治面貌
