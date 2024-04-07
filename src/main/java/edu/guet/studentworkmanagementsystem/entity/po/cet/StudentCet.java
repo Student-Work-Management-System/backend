@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.po.cet;
 
-import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
