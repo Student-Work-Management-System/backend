@@ -66,20 +66,12 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * 通过 -> 修改状态 并 存入认领表
      * @param competitionAuditDTO 竞赛结果审核对象
      */
-    <T> BaseResponse<T> auditStudentCompetition(CompetitionAuditDTO competitionAuditDTO);
-    /**
-     * 审核通过后调用插入竞赛结果认领表(包括队长一齐存入认领表)
-     * @param members 团队成员
-     * @param studentCompetitionId 学生竞赛id
-     * @return 表中修改的行数(判断是否全部插入)
-     */
-    boolean insertStudentCompetitionAudit(Members members, String studentCompetitionId);
+    <T> BaseResponse<T> auditStudentCompetition(CompetitionAuditDTO competitionAuditDTO) throws JsonProcessingException;
     /**
      * 删除学生获奖记录(同时要删除在认领表中的记录)
-     * @param competitionId 竞赛id
-     * @param studentId 学号
+     * @param studentCompetitionId 学生竞赛id
      */
-    <T> BaseResponse<T> deleteStudentCompetition(String competitionId, String studentId);
+    <T> BaseResponse<T> deleteStudentCompetition(String studentCompetitionId);
     /**
      * (审核人用)分页查询学生上报记录, 默认只查询状态为 待审核 的上报记录
      * <br/>

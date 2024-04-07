@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Members implements Serializable {
-    List<Member> members;
+    private List<Member> members;
 }
