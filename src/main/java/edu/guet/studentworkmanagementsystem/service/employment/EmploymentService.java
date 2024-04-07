@@ -4,7 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
@@ -13,9 +13,9 @@ import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmployme
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
      * 批量导入学生就业信息
-     * @param insertDTOList 学生就业信息列表
+     * @param insertEmploymentDTOList 学生就业信息列表
      */
-    <T> BaseResponse<T> importStudentEmployment(InsertDTOList insertDTOList);
+    <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList);
     /**
      * 对象添加就业信息
      * @param insertStudentEmploymentDTO 学生就业信息对象

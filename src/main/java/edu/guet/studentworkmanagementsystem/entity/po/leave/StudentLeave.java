@@ -8,6 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,14 +36,17 @@ public class StudentLeave implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentLeaveId;
+    @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
     private String studentId;
     /**
      * 请假类型
      */
+    @NotBlank(message = "请假类型不能为空", groups = {InsertGroup.class})
     private String leaveType;
     /**
      * 请假理由
      */
+    @NotBlank(message = "请假理由不能为空", groups = {InsertGroup.class})
     private String leaveReason;
     /**
      * 请假日期, YYYY-MM-DD
@@ -48,9 +54,11 @@ public class StudentLeave implements Serializable {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "请假日期不能为空", groups = {InsertGroup.class})
     private LocalDate leaveDate;
     /**
      * 请假时长, hour
      */
+    @NotNull(message = "请假天数不能为空", groups = {InsertGroup.class})
     private Long leaveDuration;
 }

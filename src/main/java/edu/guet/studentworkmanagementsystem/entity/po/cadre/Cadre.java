@@ -3,6 +3,9 @@ package edu.guet.studentworkmanagementsystem.entity.po.cadre;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,13 +29,16 @@ public class Cadre implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
+    @NotBlank(message = "职位id不能为空", groups = {UpdateGroup.class})
     private String cadreId;
     /**
      * 具体职位
      */
+    @NotBlank(message = "详细职位信息不能为空", groups = {InsertGroup.class})
     private String cadrePosition;
     /**
      * 职位级别
      */
+    @NotBlank(message = "职位级别不能为空", groups = {InsertGroup.class})
     private String cadreLevel;
 }

@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.leave;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveList;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
@@ -16,7 +17,7 @@ public interface LeaveService extends IService<StudentLeave> {
      * 批量导入学生请假信息
      * @param studentLeaves 学生请假信息列表
      */
-    <T> BaseResponse<T> importStudentLeave(List<StudentLeave> studentLeaves);
+    <T> BaseResponse<T> importStudentLeave(LeaveList studentLeaves);
      /**
      * 对象添加学生请假信息
      * @param studentLeave 学生请假信息记录对象

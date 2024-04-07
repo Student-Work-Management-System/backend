@@ -3,10 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.cadre;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.UpdateStudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
@@ -18,7 +15,7 @@ public interface CadreService extends IService<StudentCadre> {
      * 批量导入职位信息
      * @param cadres 职位信息列表
      */
-    <T> BaseResponse<T> importCadres(List<Cadre> cadres);
+    <T> BaseResponse<T> importCadres(CadreList cadres);
     /**
      * 对象添加职位
      * @param cadre 职位记录对象

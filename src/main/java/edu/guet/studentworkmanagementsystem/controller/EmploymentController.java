@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
@@ -25,8 +25,8 @@ public class EmploymentController {
     }
     @PreAuthorize("hasAuthority('student_employment:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importStudentEmployment(@RequestBody @Valid InsertDTOList insertDTOList) {
-        return employmentService.importStudentEmployment(insertDTOList);
+    public <T> BaseResponse<T> importStudentEmployment(@RequestBody @Valid InsertEmploymentDTOList insertEmploymentDTOList) {
+        return employmentService.importStudentEmployment(insertEmploymentDTOList);
     }
     @PreAuthorize("hasAuthority('student_employment:insert')")
     @PostMapping("/add")

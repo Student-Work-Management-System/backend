@@ -2,7 +2,9 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
@@ -10,6 +12,7 @@ import edu.guet.studentworkmanagementsystem.service.schoolPrecaution.PrecautionS
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +24,12 @@ public class PrecautionController {
     private PrecautionService precautionService;
     @PreAuthorize("hasAuthority('student_school_precaution:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importSchoolPrecaution(@RequestBody List<StudentSchoolPrecaution> schoolPrecautions) {
+    public <T> BaseResponse<T> importSchoolPrecaution(@RequestBody @Validated({InsertGroup.class}) PrecautionList schoolPrecautions) {
         return precautionService.importSchoolPrecaution(schoolPrecautions);
     }
     @PreAuthorize("hasAuthority('student_school_precaution:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertSchoolPrecaution(@RequestBody StudentSchoolPrecaution schoolPrecaution) {
+    public <T> BaseResponse<T> insertSchoolPrecaution(@RequestBody @Validated({InsertGroup.class})  StudentSchoolPrecaution schoolPrecaution) {
         return precautionService.insertSchoolPrecaution(schoolPrecaution);
     }
     @PreAuthorize("hasAuthority('student_school_precaution:update')")

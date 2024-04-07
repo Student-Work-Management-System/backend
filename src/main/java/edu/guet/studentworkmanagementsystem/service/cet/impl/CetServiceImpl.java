@@ -6,7 +6,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
@@ -33,9 +33,9 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> implements CetService {
     @Override
     @Transactional
-    public <T> BaseResponse<T> importCETScore(InsertDTOList insertDTOList) {
-        int size = insertDTOList.getInsertStudentCetDTOList().size();
-        List<StudentCet> collect = insertDTOList.getInsertStudentCetDTOList()
+    public <T> BaseResponse<T> importCETScore(InsertCetDTOList insertCetDTOList) {
+        int size = insertCetDTOList.getInsertStudentCetDTOList().size();
+        List<StudentCet> collect = insertCetDTOList.getInsertStudentCetDTOList()
                 .stream()
                 .map(this::convertToEntity)
                 .toList();

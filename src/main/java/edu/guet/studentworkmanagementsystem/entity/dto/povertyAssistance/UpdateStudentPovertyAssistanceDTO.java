@@ -18,6 +18,6 @@ public class UpdateStudentPovertyAssistanceDTO implements Serializable {
     private String studentId;
     private String povertyAssistanceId;
     @Nullable
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "认定年份不能为空")
     private String assistanceYear;
 }

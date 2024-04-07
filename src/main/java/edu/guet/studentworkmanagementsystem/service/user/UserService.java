@@ -9,6 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
@@ -22,7 +23,7 @@ import java.util.List;
 public interface UserService extends IService<User> {
     BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) throws JsonProcessingException;
     <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO);
-    <T> BaseResponse<T> addUsers(List<RegisterUserDTO> registerUserDTOList);
+    <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS);
     BaseResponse<UserDetailVO> getUserDetails(String username);
     <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO);
     <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO);

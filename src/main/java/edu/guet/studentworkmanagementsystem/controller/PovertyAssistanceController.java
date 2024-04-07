@@ -2,14 +2,15 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.InsertStudentPovertyAssistanceDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.StudentStudentPovertyAssistanceVO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.UpdateStudentPovertyAssistanceDTO;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.service.povertyAssistance.PovertyAssistanceService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,17 +26,17 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('poverty_assistance:insert')")
     @PostMapping("/poverty_assistance/adds")
-    public <T> BaseResponse<T> importPovertyAssistance(@RequestBody List<PovertyAssistance> povertyAssistanceList) {
+    public <T> BaseResponse<T> importPovertyAssistance(@RequestBody @Validated({InsertGroup.class}) PovertyAssistanceList povertyAssistanceList) {
         return povertyAssistanceService.importPovertyAssistance(povertyAssistanceList);
     }
     @PreAuthorize("hasAuthority('poverty_assistance:insert')")
     @PostMapping("/poverty_assistance/add")
-    public <T> BaseResponse<T> insertPovertyAssistance(@RequestBody PovertyAssistance povertyAssistance) {
+    public <T> BaseResponse<T> insertPovertyAssistance(@RequestBody @Validated({InsertGroup.class}) PovertyAssistance povertyAssistance) {
         return povertyAssistanceService.insertPovertyAssistance(povertyAssistance);
     }
     @PreAuthorize("hasAuthority('poverty_assistance:update')")
     @PutMapping("/poverty_assistance/update")
-    public <T> BaseResponse<T> updatePovertyAssistance(@RequestBody PovertyAssistance povertyAssistance) {
+    public <T> BaseResponse<T> updatePovertyAssistance(@RequestBody @Validated({UpdateGroup.class}) PovertyAssistance povertyAssistance) {
         return povertyAssistanceService.updatePovertyAssistance(povertyAssistance);
     }
     @PreAuthorize("hasAuthority('poverty_assistance:delete')")
@@ -45,7 +46,7 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
     @PostMapping("/student_poverty_assistance/add")
-    public <T> BaseResponse<T> arrangeStudentPovertyAssistance(@RequestBody InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
+    public <T> BaseResponse<T> arrangeStudentPovertyAssistance(@RequestBody @Valid InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
         return povertyAssistanceService.arrangeStudentPovertyAssistance(insertStudentPovertyAssistanceDTO);
     }
     @PreAuthorize(
@@ -60,7 +61,7 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:update')")
     @PutMapping("/student_poverty_assistance/update")
-    public <T> BaseResponse<T> updateStudentPovertyAssistance(@RequestBody UpdateStudentPovertyAssistanceDTO updateStudentPovertyAssistanceDTO) {
+    public <T> BaseResponse<T> updateStudentPovertyAssistance(@RequestBody @Valid UpdateStudentPovertyAssistanceDTO updateStudentPovertyAssistanceDTO) {
         return povertyAssistanceService.updateStudentPovertyAssistance(updateStudentPovertyAssistanceDTO);
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")

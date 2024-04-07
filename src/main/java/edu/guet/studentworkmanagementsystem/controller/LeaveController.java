@@ -2,6 +2,8 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveList;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
@@ -11,6 +13,7 @@ import edu.guet.studentworkmanagementsystem.service.leave.LeaveService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,12 +36,12 @@ public class LeaveController {
     }
     @PreAuthorize("hasAuthority('student_leave:insert') and hasAuthority('student_leave_audit:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importStudentLeave(@RequestBody List<StudentLeave> studentLeaves) {
+    public <T> BaseResponse<T> importStudentLeave(@RequestBody @Validated({InsertGroup.class}) LeaveList studentLeaves) {
         return leaveService.importStudentLeave(studentLeaves);
     }
     @PreAuthorize("hasAuthority('student_leave:insert') and hasAuthority('student_leave_audit:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertStudentLeave(@RequestBody StudentLeave studentLeave) {
+    public <T> BaseResponse<T> insertStudentLeave(@RequestBody @Validated({InsertGroup.class}) StudentLeave studentLeave) {
         return leaveService.insertStudentLeave(studentLeave);
     }
     @PreAuthorize("hasAuthority('student_leave_audit:update')")

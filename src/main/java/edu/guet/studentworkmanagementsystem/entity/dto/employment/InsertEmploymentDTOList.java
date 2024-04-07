@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NotNull
-public class InsertDTOList {
+public class InsertEmploymentDTOList {
     @Valid
     private List<InsertStudentEmploymentDTO> insertStudentEmploymentDTOList;
 }

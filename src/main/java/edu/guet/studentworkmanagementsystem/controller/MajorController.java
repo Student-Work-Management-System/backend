@@ -1,10 +1,13 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.po.major.Major;
 import edu.guet.studentworkmanagementsystem.service.major.MajorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +24,7 @@ public class MajorController {
     }
     @PreAuthorize("hasAuthority('major:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateMajor(Major major) {
+    public <T> BaseResponse<T> updateMajor(@RequestBody @Validated({UpdateGroup.class}) Major major) {
         return majorService.updateMajor(major);
     }
     @PreAuthorize("hasAuthority('major:delete')")
@@ -31,7 +34,7 @@ public class MajorController {
     }
     @PreAuthorize("hasAuthority('major:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> addMajor(@RequestBody Major major) {
+    public <T> BaseResponse<T> addMajor(@RequestBody @Validated({InsertGroup.class}) Major major) {
         return majorService.addMajor(major);
     }
 }

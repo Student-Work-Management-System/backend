@@ -6,6 +6,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveList;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
@@ -41,7 +42,8 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
     private StudentLeaveAuditMapper studentLeaveAuditMapper;
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentLeave(List<StudentLeave> studentLeaves) {
+    public <T> BaseResponse<T> importStudentLeave(LeaveList studentLeaveList) {
+        List<StudentLeave> studentLeaves = studentLeaveList.getStudentLeaves();
         int i = mapper.insertBatch(studentLeaves);
         if (i == studentLeaves.size())
             return ResponseUtil.success();

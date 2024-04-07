@@ -6,7 +6,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
@@ -38,9 +38,9 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     private StudentEmploymentMapper studentEmploymentMapper;
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentEmployment(InsertDTOList insertDTOList) {
-        int size = insertDTOList.getInsertStudentEmploymentDTOList().size();
-        List<StudentEmployment> studentEmploymentList = insertDTOList.getInsertStudentEmploymentDTOList()
+    public <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList) {
+        int size = insertEmploymentDTOList.getInsertStudentEmploymentDTOList().size();
+        List<StudentEmployment> studentEmploymentList = insertEmploymentDTOList.getInsertStudentEmploymentDTOList()
                 .stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());

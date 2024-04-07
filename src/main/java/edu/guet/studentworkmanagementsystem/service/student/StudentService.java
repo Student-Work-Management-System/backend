@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
@@ -13,9 +14,9 @@ import java.util.List;
 public interface StudentService extends IService<Student> {
     /**
      * 批量导入学生
-     * @param students 学生列表
+     * @param studentList 学生列表
      */
-    <T> BaseResponse<T> importStudent(List<Student> students);
+    <T> BaseResponse<T> importStudent(StudentList studentList);
     /**
      * 单个导入学生
      * @param student 学生对象

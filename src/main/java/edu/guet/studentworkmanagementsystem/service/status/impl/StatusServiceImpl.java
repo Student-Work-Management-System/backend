@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusList;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
@@ -32,7 +33,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentStatus> implements StatusService {
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentStatus(List<StudentStatus> studentStatuses) {
+    public <T> BaseResponse<T> importStudentStatus(StatusList statusList) {
+        List<StudentStatus> studentStatuses = statusList.getStatusList();
         int size = studentStatuses.size();
         int i = mapper.insertBatch(studentStatuses);
         if (i == size)
@@ -56,8 +58,8 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                 .set(StudentStatus::getState, studentStatus.getState(), StringUtils.hasLength(studentStatus.getState()))
                 .set(StudentStatus::getHandle, studentStatus.getHandle(), StringUtils.hasLength(studentStatus.getHandle()))
                 .set(StudentStatus::getChangedDate, LocalDate.now())
+                .set(StudentStatus::getStudentId, studentStatus.getStudentId(), StringUtils::hasLength)
                 .where(StudentStatus::getStudentStatusId).eq(studentStatus.getStudentStatusId())
-                .where(StudentStatus::getStudentId).eq(studentStatus.getStudentId())
                 .update();
         if (update)
             return ResponseUtil.success();

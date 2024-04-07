@@ -2,15 +2,16 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateScholarshipOwner;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateStudentScholarshipType;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.*;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
 import edu.guet.studentworkmanagementsystem.service.scholarship.ScholarshipService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,17 +22,17 @@ public class ScholarshipController {
     private ScholarshipService scholarshipService;
     @PreAuthorize("hasAuthority('scholarship:insert')")
     @PostMapping("/scholarship/add")
-    public <T> BaseResponse<T> addScholarship(@RequestBody Scholarship scholarship) {
+    public <T> BaseResponse<T> addScholarship(@RequestBody @Validated({InsertGroup.class}) Scholarship scholarship) {
         return scholarshipService.insertScholarship(scholarship);
     }
     @PreAuthorize("hasAuthority('scholarship:insert')")
     @PostMapping("/scholarship/adds")
-    public <T> BaseResponse<T> addScholarships(@RequestBody List<Scholarship> scholarships) {
+    public <T> BaseResponse<T> addScholarships(@RequestBody @Validated({InsertGroup.class}) ScholarshipList scholarships) {
         return scholarshipService.importScholarship(scholarships);
     }
     @PreAuthorize("hasAuthority('scholarship:update')")
     @PutMapping("/scholarship/update")
-    public <T> BaseResponse<T> updateScholarship(@RequestBody Scholarship scholarship) {
+    public <T> BaseResponse<T> updateScholarship(@RequestBody @Validated({UpdateGroup.class}) Scholarship scholarship) {
         return scholarshipService.updateScholarship(scholarship);
     }
     @PreAuthorize("hasAuthority('scholarship:delete')")
@@ -56,23 +57,13 @@ public class ScholarshipController {
     }
     @PreAuthorize("hasAuthority('student_scholarship:insert')")
     @PostMapping("/student_scholarship/add")
-    public <T> BaseResponse<T> arrangeStudentScholarship(@RequestBody StudentScholarshipDTO studentScholarshipDTO) {
+    public <T> BaseResponse<T> arrangeStudentScholarship(@RequestBody @Validated({InsertGroup.class}) StudentScholarshipDTO studentScholarshipDTO) {
         return scholarshipService.arrangeStudentScholarship(studentScholarshipDTO);
     }
     @PreAuthorize("hasAuthority('student_scholarship:update')")
     @PutMapping("/student_scholarship/update")
-    public <T> BaseResponse<T> updateStudentScholarshipInfo(@RequestBody StudentScholarshipDTO studentScholarshipDTO) {
-        return scholarshipService.updateStudentScholarshipInfo(studentScholarshipDTO);
-    }
-    @PreAuthorize("hasAuthority('student_scholarship:update')")
-    @PutMapping("/student_scholarship/update/type")
-    public <T> BaseResponse<T> updateStudentScholarshipType(@RequestBody UpdateStudentScholarshipType updateStudentScholarshipType) {
-        return scholarshipService.updateStudentScholarshipType(updateStudentScholarshipType);
-    }
-    @PreAuthorize("hasAuthority('student_scholarship:update')")
-    @PutMapping("/student_scholarship/update/owner")
-    public <T> BaseResponse<T> updateStudentScholarshipOwner(@RequestBody UpdateScholarshipOwner updateScholarshipOwner) {
-        return scholarshipService.updateStudentScholarshipOwner(updateScholarshipOwner);
+    public <T> BaseResponse<T> updateStudentScholarshipInfo(@RequestBody @Validated({UpdateGroup.class}) StudentScholarshipDTO studentScholarshipDTO) {
+        return scholarshipService.updateStudentScholarship(studentScholarshipDTO);
     }
     @PreAuthorize("hasAuthority('student_scholarship:delete')")
     @DeleteMapping("/student_scholarship/delete/{studentScholarshipId}")

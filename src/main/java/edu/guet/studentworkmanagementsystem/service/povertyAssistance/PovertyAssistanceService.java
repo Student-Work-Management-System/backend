@@ -3,10 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.povertyAssistance;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.InsertStudentPovertyAssistanceDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.StudentStudentPovertyAssistanceVO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.UpdateStudentPovertyAssistanceDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
 
@@ -19,7 +16,7 @@ public interface PovertyAssistanceService extends IService<StudentPovertyAssista
      * @param povertyAssistanceList 贫困信息列表
      * @return 存入数据库中的贫困补助记录
      */
-    <T> BaseResponse<T> importPovertyAssistance(List<PovertyAssistance> povertyAssistanceList);
+    <T> BaseResponse<T> importPovertyAssistance(PovertyAssistanceList povertyAssistanceList);
     /**
      * 对象添加贫困信息记录
      * @param povertyAssistance 贫困补助记录对象

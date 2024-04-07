@@ -5,10 +5,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.InsertStudentPovertyAssistanceDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.StudentStudentPovertyAssistanceVO;
-import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.UpdateStudentPovertyAssistanceDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
@@ -41,9 +38,9 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> importPovertyAssistance(List<PovertyAssistance> povertyAssistanceList) {
-        int size = povertyAssistanceList.size();
-        int i = povertyAssistanceMapper.insertBatch(povertyAssistanceList);
+    public <T> BaseResponse<T> importPovertyAssistance(PovertyAssistanceList povertyAssistanceList) {
+        int size = povertyAssistanceList.getPovertyAssistanceList().size();
+        int i = povertyAssistanceMapper.insertBatch(povertyAssistanceList.getPovertyAssistanceList());
         if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);

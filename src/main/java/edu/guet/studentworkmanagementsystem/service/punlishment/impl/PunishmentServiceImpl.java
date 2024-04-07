@@ -5,8 +5,9 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.punlishment.StudentPunishmentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -30,9 +31,10 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class PunishmentServiceImpl extends ServiceImpl<PunishmentMapper, StudentPunishment> implements PunishmentService {
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentPunishment(List<StudentPunishment> studentPunishmentList) {
-        int size = studentPunishmentList.size();
-        int i = mapper.insertBatch(studentPunishmentList);
+    public <T> BaseResponse<T> importStudentPunishment(PunishmentList punishmentList) {
+        List<StudentPunishment> punishments = punishmentList.getPunishments();
+        int size = punishments.size();
+        int i = mapper.insertBatch(punishments);
         if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);

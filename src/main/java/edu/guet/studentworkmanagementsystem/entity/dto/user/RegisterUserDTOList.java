@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.dto.cet;
+package edu.guet.studentworkmanagementsystem.entity.dto.user;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InsertDTOList implements Serializable {
+public class RegisterUserDTOList implements Serializable {
     @Valid
-    private List<InsertStudentCetDTO> insertStudentCetDTOList;
+    private List<RegisterUserDTO> registerUserDTOList;
 }

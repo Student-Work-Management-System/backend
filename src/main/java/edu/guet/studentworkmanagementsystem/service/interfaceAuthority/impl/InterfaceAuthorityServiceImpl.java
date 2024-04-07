@@ -26,6 +26,7 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add("school_precaution");
         add("employment");
         add("cet");
+        add("enrollment");
     }};
     private static final ArrayList<InterfaceAuthority> userAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/user/login", null));
@@ -84,8 +85,6 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/student_scholarship/gets", List.of("scholarship:select", "student_scholarship:select", "student:select", "major:select")));
         add(new InterfaceAuthority("/student_scholarship/add", List.of("student_scholarship:insert")));
         add(new InterfaceAuthority("/student_scholarship/update", List.of("student_scholarship:update")));
-        add(new InterfaceAuthority("/student_scholarship/update/type", List.of("student_scholarship:update")));
-        add(new InterfaceAuthority("/student_scholarship/update/owner", List.of("student_scholarship:update")));
         add(new InterfaceAuthority("/student_scholarship/delete/{studentScholarshipId}", List.of("student_scholarship:delete")));
     }};
     private static final ArrayList<InterfaceAuthority> povertyAssistanceAuthority = new ArrayList<>(){{
@@ -127,6 +126,12 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/cet/adds", List.of("student_cet:insert")));
         add(new InterfaceAuthority("/cet/update", List.of("student_cet:update")));
         add(new InterfaceAuthority("/cet/delete/{studentCetId}", List.of("student_cet:delete")));
+    }};
+    private static final ArrayList<InterfaceAuthority> enrollmentAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/enrollment/gets", List.of("enrollment_info:select")));
+        add(new InterfaceAuthority("/enrollment/add", List.of("enrollment_info:insert")));
+        add(new InterfaceAuthority("/enrollment/update", List.of("enrollment_info:update")));
+        add(new InterfaceAuthority("/enrollment/delete/{enrollmentInfoId}", List.of("enrollment_info:delete")));
     }};
     @Override
     public BaseResponse<List<InterfaceAuthority>> getInterfaceAuthorities(String prefix) {

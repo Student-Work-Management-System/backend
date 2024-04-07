@@ -3,10 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.scholarship;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateScholarshipOwner;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateStudentScholarshipType;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.*;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
@@ -19,7 +16,7 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * @param scholarships 奖学金信息列表
      * @return 存入数据库中的奖学金记录
      */
-    <T> BaseResponse<T> importScholarship(List<Scholarship> scholarships);
+    <T> BaseResponse<T> importScholarship(ScholarshipList scholarshipList);
     /**
      * 对象添加奖学金记录
      * @param scholarship 奖学金记录对象
@@ -52,20 +49,10 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      */
     <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipDTO studentScholarshipDTO);
     /**
-     * 修改学生获得奖学金时间(不能修改获得的奖学金类型,若需变动实现下方)
+     * 修改学生获得奖学金时间
      * @param studentScholarshipDTO 修改需要传递的对象, 某一为空则不修改该属性
      */
-    <T> BaseResponse<T> updateStudentScholarshipInfo(StudentScholarshipDTO studentScholarshipDTO);
-    /**
-     * 奖学金类型修正(获得的奖学金类型)
-     * @param updateStudentScholarshipType 修改学生奖学金对象
-     */
-    <T> BaseResponse<T> updateStudentScholarshipType(UpdateStudentScholarshipType updateStudentScholarshipType);
-    /**
-     * 奖学金类型修正(奖学金获得者)
-     * @param updateScholarshipOwner 修改学生奖学金对象
-     */
-    <T> BaseResponse<T> updateStudentScholarshipOwner(UpdateScholarshipOwner updateScholarshipOwner);
+    <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipDTO studentScholarshipDTO);
     /**
      * 删除学生获得奖学金记录
      * @param studentId 学号

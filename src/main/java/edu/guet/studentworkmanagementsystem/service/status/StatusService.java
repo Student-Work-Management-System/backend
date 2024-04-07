@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.status;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusList;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
@@ -16,7 +17,7 @@ public interface StatusService extends IService<StudentStatus> {
      * 批量导入学生学籍变动信息记录
      * @param studentStatuses 学生学籍信息列表
      */
-    <T> BaseResponse<T> importStudentStatus(List<StudentStatus> studentStatuses);
+    <T> BaseResponse<T> importStudentStatus(StatusList statusList);
     /**
      * 添加学生学籍变动记录
      * @param studentStatus 学籍变动信息

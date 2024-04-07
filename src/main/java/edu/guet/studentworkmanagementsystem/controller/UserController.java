@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
@@ -35,7 +36,7 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> addUsers(@RequestBody List<RegisterUserDTO> registerUserDTOList) {
+    public <T> BaseResponse<T> addUsers(@RequestBody RegisterUserDTOList registerUserDTOList) {
         return userService.addUsers(registerUserDTOList);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")

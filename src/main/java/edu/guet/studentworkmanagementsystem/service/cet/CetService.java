@@ -4,7 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
@@ -15,9 +15,9 @@ import java.util.List;
 public interface CetService extends IService<StudentCet> {
     /**
      * 批量导入CET成绩
-     * @param insertDTOList 学生CET成绩
+     * @param insertCetDTOList 学生CET成绩
      */
-    <T> BaseResponse<T> importCETScore(InsertDTOList insertDTOList);
+    <T> BaseResponse<T> importCETScore(InsertCetDTOList insertCetDTOList);
     /**
      * 单个插入CET成绩
      * @param insertStudentCetDTO 学生CET成绩

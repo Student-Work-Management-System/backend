@@ -2,10 +2,8 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.UpdateStudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
@@ -13,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,12 +22,12 @@ public class CadreController {
     CadreService cadreService ;
     @PreAuthorize("hasAuthority('cadre:insert')")
     @PostMapping("/cadre/adds")
-    public BaseResponse<List<Cadre>> addCadres(@RequestBody List<Cadre> cadres) {
-        return cadreService.importCadres(cadres);
+    public BaseResponse<List<Cadre>> addCadres(@RequestBody @Validated({InsertGroup.class}) CadreList cadreList) {
+        return cadreService.importCadres(cadreList);
     }
     @PreAuthorize("hasAuthority('cadre:insert')")
     @PostMapping("/cadre/add")
-    public BaseResponse<Cadre> addCadre(@RequestBody Cadre cadre) {
+    public BaseResponse<Cadre> addCadre(@RequestBody @Validated({InsertGroup.class}) Cadre cadre) {
         return cadreService.insertCadre(cadre);
     }
     @PreAuthorize("hasAuthority('cadre:update')")

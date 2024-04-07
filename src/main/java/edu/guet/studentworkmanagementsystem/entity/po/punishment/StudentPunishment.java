@@ -8,6 +8,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,14 +36,17 @@ public class StudentPunishment implements Serializable {
     @Id(keyType = KeyType.Auto)
     private String studentPunishmentId;
     @Id
+    @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
     private String studentId;
     /**
      * 处分级别：警告、严重警告、记过、留校查看、开除学籍
      */
+    @NotBlank(message = "处分级别不能为空", groups = {InsertGroup.class})
     private String punishmentLevel;
     /**
      * 处分理由
      */
+    @NotBlank(message = "处分原因不能为空", groups = {InsertGroup.class})
     private String punishmentReason;
     /**
      * 处分日期

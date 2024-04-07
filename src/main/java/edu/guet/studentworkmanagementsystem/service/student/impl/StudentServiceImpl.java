@@ -6,8 +6,10 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -37,7 +39,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private PasswordEncoder passwordEncoder;
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudent(List<Student> students) {
+    public <T> BaseResponse<T> importStudent(StudentList studentList) {
+        List<Student> students = studentList.getStudents();
         int i = mapper.insertBatch(students);
         if (i == students.size()) {
             ArrayList<RegisterUserDTO> registerUserDTOS = new ArrayList<>();
@@ -46,7 +49,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 RegisterUserDTO registerUserDTO = new RegisterUserDTO(item.getStudentId(), item.getName(), item.getStudentId(), password, null);
                 registerUserDTOS.add(registerUserDTO);
             });
-            return userService.addUsers(registerUserDTOS);
+            return userService.addUsers(new RegisterUserDTOList(registerUserDTOS));
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }

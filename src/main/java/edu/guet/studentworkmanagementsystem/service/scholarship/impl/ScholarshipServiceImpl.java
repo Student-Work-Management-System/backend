@@ -6,10 +6,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateScholarshipOwner;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.UpdateStudentScholarshipType;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.*;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
@@ -39,7 +36,8 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
     private ScholarshipMapper scholarshipMapper;
     @Override
     @Transactional
-    public <T> BaseResponse<T> importScholarship(List<Scholarship> scholarships) {
+    public <T> BaseResponse<T> importScholarship(ScholarshipList scholarshipList) {
+        List<Scholarship> scholarships = scholarshipList.getScholarships();
         int i = scholarshipMapper.insertBatch(scholarships);
         if (i > 0)
             return ResponseUtil.success();
@@ -58,8 +56,6 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
     @Override
     @Transactional
     public <T> BaseResponse<T> updateScholarship(Scholarship scholarship) {
-        if (Objects.isNull(scholarship.getScholarshipId()))
-            throw new ServiceException(ServiceExceptionEnum.KEY_ARGUMENT_NOT_INPUT);
         boolean update = UpdateChain.of(Scholarship.class)
                 .set(Scholarship::getScholarshipName, scholarship.getScholarshipName(), StringUtils.hasLength(scholarship.getScholarshipName()))
                 .set(Scholarship::getScholarshipLevel, scholarship.getScholarshipLevel(), StringUtils.hasLength(scholarship.getScholarshipLevel()))
@@ -69,14 +65,11 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     @Override
     public BaseResponse<List<Scholarship>> getScholarships() {
-        List<Scholarship> scholarships = QueryChain.of(Scholarship.class)
-                .list();
+        List<Scholarship> scholarships = QueryChain.of(Scholarship.class).list();
         return ResponseUtil.success(scholarships);
     }
-
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteScholarship(String scholarshipId) {
@@ -85,7 +78,6 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     @Override
     public BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
@@ -102,7 +94,6 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
                 .pageAs(Page.of(pageNo, pageSize), StudentScholarshipVO.class);
         return ResponseUtil.success(studentScholarshipVOPage);
     }
-
     @Override
     @Transactional
     public <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipDTO studentScholarshipDTO) {
@@ -112,46 +103,19 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentScholarshipInfo(StudentScholarshipDTO studentScholarshipDTO) {
+    public <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipDTO studentScholarshipDTO) {
         boolean update = UpdateChain.of(StudentScholarship.class)
-                .set(StudentScholarship::getAwardYear, studentScholarshipDTO.getAwardYear(), StringUtils.hasLength(studentScholarshipDTO.getAwardYear()))
-                .where(StudentScholarship::getStudentId).eq(studentScholarshipDTO.getStudentId())
-                .and(StudentScholarship::getScholarshipId).eq(studentScholarshipDTO.getScholarshipId())
+                .set(StudentScholarship::getAwardYear, studentScholarshipDTO.getAwardYear(), StringUtils::hasLength)
+                .set(StudentScholarship::getStudentId, studentScholarshipDTO.getStudentId(), StringUtils::hasLength)
+                .set(StudentScholarship::getScholarshipId, studentScholarshipDTO.getScholarshipId(), StringUtils::hasLength)
+                .where(StudentScholarship::getStudentScholarshipId).eq(studentScholarshipDTO.getStudentScholarshipId())
                 .update();
         if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> updateStudentScholarshipType(UpdateStudentScholarshipType updateStudentScholarshipType) {
-        boolean update = UpdateChain.of(StudentScholarship.class)
-                .set(StudentScholarship::getScholarshipId, updateStudentScholarshipType.getNewScholarshipId())
-                .where(STUDENT_SCHOLARSHIP.STUDENT_ID.eq(updateStudentScholarshipType.getStudentId()))
-                .where(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID.eq(updateStudentScholarshipType.getOldScholarshipId()))
-                .update();
-        if (update)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> updateStudentScholarshipOwner(UpdateScholarshipOwner updateScholarshipOwner) {
-        boolean update = UpdateChain.of(StudentScholarship.class)
-                .set(StudentScholarship::getStudentId, updateScholarshipOwner.getNewStudentId())
-                .where(STUDENT_SCHOLARSHIP.STUDENT_ID.eq(updateScholarshipOwner.getOldStudentId()))
-                .where(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID.eq(updateScholarshipOwner.getScholarshipId()))
-                .update();
-        if (update)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId) {

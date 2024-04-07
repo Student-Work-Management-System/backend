@@ -13,6 +13,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionD
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
@@ -119,7 +120,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUsers(List<RegisterUserDTO> registerUserDTOList) {
+    public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
+        List<RegisterUserDTO> registerUserDTOList = registerUserDTOS.getRegisterUserDTOList();
         ArrayList<User> users = new ArrayList<>();
         registerUserDTOList.forEach(item -> {
             item.setPassword(passwordEncoder.encode(item.getPassword()));

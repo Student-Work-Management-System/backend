@@ -17,6 +17,6 @@ public class InsertStudentPovertyAssistanceDTO implements Serializable {
     @NotBlank(message = "认证标准id不能为空")
     private String povertyAssistanceId;
     @NotBlank(message = "获资助年份不能为空")
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "请输入正确格式")
     private String assistanceYear;
 }

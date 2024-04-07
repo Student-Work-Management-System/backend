@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
@@ -22,8 +22,8 @@ public class CetController {
     private CetService cetService;
     @PreAuthorize("hasAuthority('student_cet:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importCETScore(@RequestBody @Valid InsertDTOList insertDTOList) {
-        return cetService.importCETScore(insertDTOList);
+    public <T> BaseResponse<T> importCETScore(@RequestBody @Valid InsertCetDTOList insertCetDTOList) {
+        return cetService.importCETScore(insertCetDTOList);
     }
     @PreAuthorize("hasAuthority('student_cet:insert')")
     @PostMapping("/add")

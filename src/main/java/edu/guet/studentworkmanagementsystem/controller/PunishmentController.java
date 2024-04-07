@@ -2,8 +2,9 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.punlishment.StudentPunishmentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
 import edu.guet.studentworkmanagementsystem.service.punlishment.PunishmentService;
@@ -26,12 +27,12 @@ public class PunishmentController {
     }
     @PreAuthorize("hasAuthority('student_punishment:insert')")
     @PostMapping("/adds")
-    public  <T> BaseResponse<T> importStudentPunishment(@RequestBody List<StudentPunishment> studentPunishmentList) {
-        return punishmentService.importStudentPunishment(studentPunishmentList);
+    public <T> BaseResponse<T> importStudentPunishment(@RequestBody @Valid PunishmentList punishmentList) {
+        return punishmentService.importStudentPunishment(punishmentList);
     }
     @PreAuthorize("hasAuthority('student_punishment:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertStudentPunishment(@RequestBody StudentPunishment studentPunishment) {
+    public <T> BaseResponse<T> insertStudentPunishment(@RequestBody @Valid StudentPunishment studentPunishment) {
         return punishmentService.insertStudentPunishment(studentPunishment);
     }
     @PreAuthorize("hasAuthority('student_punishment:update')")

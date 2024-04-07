@@ -6,6 +6,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
@@ -29,7 +30,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, StudentSchoolPrecaution> implements PrecautionService {
     @Override
     @Transactional
-    public <T> BaseResponse<T> importSchoolPrecaution(List<StudentSchoolPrecaution> schoolPrecautions) {
+    public <T> BaseResponse<T> importSchoolPrecaution(PrecautionList schoolPrecautionList) {
+        List<StudentSchoolPrecaution> schoolPrecautions = schoolPrecautionList.getPrecautions();
         int size = schoolPrecautions.size();
         int i = mapper.insertBatch(schoolPrecautions);
         if (i == size)
