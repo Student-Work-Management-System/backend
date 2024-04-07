@@ -9,7 +9,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionLi
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Members;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 
