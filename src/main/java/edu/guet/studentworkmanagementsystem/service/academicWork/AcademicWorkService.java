@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkAuditDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkList;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
@@ -18,9 +19,9 @@ import java.util.List;
 public interface AcademicWorkService extends IService<StudentAcademicWork> {
      /**
      * 批量导入学生学术作品
-      * @param studentAcademicWorkDTOList 学生学术作品列表
+      * @param studentAcademicWorkList 学生学术作品列表
      */
-    <T> BaseResponse<T> importStudentAcademicWork(List<StudentAcademicWorkDTO> studentAcademicWorkDTOList);
+    <T> BaseResponse<T> importStudentAcademicWork(StudentAcademicWorkList studentAcademicWorkList);
     /**
      * 单个上传学生学术著作,其中存在{@link AcademicWork 学术著作类型}
      * <br/>
@@ -33,12 +34,12 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @param academicWork 学术作品详细信息
      * @return 插入成功后对应表的id
      */
-    Long insertAcademicWork(AcademicWork academicWork);
+    Long insertAcademicWork(AcademicWork academicWork, String typeId);
     /**
      * 删除学术作品(需要考虑外检约束: 类型->学术作品id->学术作品记录、认领表记录)
      * @param studentAcademicWorkId 学术作品记录id
      */
-    <T> BaseResponse<T> deleteStudentAcademicWork(String studentAcademicWorkId, String studentId);
+    <T> BaseResponse<T> deleteStudentAcademicWork(String studentAcademicWorkId);
     /**
      * 学生查询自己上报的学术作品记录
      * @param studentId 查询学生学号
@@ -59,11 +60,10 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * 应在插入前筛选出合法的学号(本系统仅关注 本校 的 学生 )<br/>
      * 教师不在本系统关注范围内
      * @param authors 作者
-     * @param uploadStudentId 上报者id
      * @param studentAcademicWorkId 学生学术作品id
      * @return 表中修改的行数(判断是否全部插入)
      */
-    long insertStudentAcademicWorkAudit(Authors authors, String uploadStudentId, String studentAcademicWorkId);
+    <T> BaseResponse<T> insertStudentAcademicWorkAudit(Authors authors, String studentAcademicWorkId);
     /**
      * (审核人用)分页查询学生上报记录, 默认只查询状态为 待审核 的上报记录
      * <br/>
@@ -72,5 +72,4 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @return 上报结果
      */
     BaseResponse<Page<StudentCompetitionVO>> getAllStudentAcademicWork(AcademicWorkQuery query);
-
 }
