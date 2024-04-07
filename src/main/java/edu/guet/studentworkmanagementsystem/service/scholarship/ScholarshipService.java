@@ -13,7 +13,7 @@ import java.util.List;
 public interface ScholarshipService extends IService<StudentScholarship> {
     /**
      * 批量导入奖学金信息记录
-     * @param scholarships 奖学金信息列表
+     * @param scholarshipList 奖学金信息列表
      * @return 存入数据库中的奖学金记录
      */
     <T> BaseResponse<T> importScholarship(ScholarshipList scholarshipList);
@@ -55,8 +55,7 @@ public interface ScholarshipService extends IService<StudentScholarship> {
     <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipDTO studentScholarshipDTO);
     /**
      * 删除学生获得奖学金记录
-     * @param studentId 学号
-     * @param scholarshipId 贫困信息记录id
+     * @param studentScholarshipId 学生奖学金记录id
      */
     <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId);
 }

@@ -172,6 +172,9 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
             case "cet" -> {
                 return getCet();
             }
+            case "enrollment" -> {
+                return getEnrollment();
+            }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }
     }
@@ -214,5 +217,8 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
     }
     private BaseResponse<List<InterfaceAuthority>> getCet() {
         return ResponseUtil.success(cetAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getEnrollment() {
+        return ResponseUtil.success(enrollmentAuthority);
     }
 }

@@ -8,7 +8,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollmentInfo.Enrollment
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.EnrollmentInfo;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 
-import java.util.List;
 
 public interface EnrollmentInfoService extends IService<EnrollmentInfo> {
     /**

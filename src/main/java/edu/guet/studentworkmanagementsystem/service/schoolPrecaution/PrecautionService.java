@@ -9,13 +9,12 @@ import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentS
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
 
-import java.util.List;
 
 
 public interface PrecautionService extends IService<StudentSchoolPrecaution> {
     /**
      * 批量导入学业预警信息记录
-     * @param schoolPrecautions 学业预警信息列表
+     * @param schoolPrecautionList 学业预警信息列表
      */
     <T> BaseResponse<T> importSchoolPrecaution(PrecautionList schoolPrecautionList);
     /**

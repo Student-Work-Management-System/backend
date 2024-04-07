@@ -9,7 +9,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishm
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
 
-import java.util.List;
 
 public interface PunishmentService extends IService<StudentPunishment> {
     /**

@@ -10,7 +10,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
 
-import java.util.List;
 
 public interface LeaveService extends IService<StudentLeave> {
     /**
