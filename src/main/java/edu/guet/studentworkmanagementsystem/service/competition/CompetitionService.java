@@ -18,7 +18,7 @@ import java.util.List;
 public interface CompetitionService extends IService<StudentCompetition> {
     /**
      * 批量导入竞赛信息
-     * @param competitions 竞赛列表
+     * @param competitionList 竞赛列表
      * @return 存入数据库中的竞赛信息(包含id返回)
      */
     BaseResponse<List<Competition>> importCompetition(CompetitionList competitionList);
