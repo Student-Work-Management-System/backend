@@ -2,8 +2,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.StudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import jakarta.validation.Valid;
@@ -11,42 +10,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/employment")
 public class EmploymentController {
-
     @Autowired
     private EmploymentService employmentService;
-
-    @PreAuthorize("hasAuthority('student_employment:select')")
+    @PreAuthorize("hasAuthority('student_employment:select') and hasAnyAuthority('student:select') and hasAnyAuthority('major:select')")
     @PostMapping("/gets")
     public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(@RequestBody EmploymentQuery query) {
         return employmentService.getStudentEmployment(query);
     }
-
     @PreAuthorize("hasAuthority('student_employment:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importStudentEmployment(@RequestBody List<StudentEmploymentDTO> studentEmploymentDTOList) {
-        return employmentService.importStudentEmployment(studentEmploymentDTOList);
+    public <T> BaseResponse<T> importStudentEmployment(@RequestBody @Valid InsertDTOList insertDTOList) {
+        return employmentService.importStudentEmployment(insertDTOList);
     }
-
     @PreAuthorize("hasAuthority('student_employment:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertStudentEmployment(@RequestBody @Valid StudentEmploymentDTO studentEmploymentDTO) {
-        return employmentService.insertStudentEmployment(studentEmploymentDTO);
+    public <T> BaseResponse<T> insertStudentEmployment(@RequestBody @Valid InsertStudentEmploymentDTO insertStudentEmploymentDTO) {
+        return employmentService.insertStudentEmployment(insertStudentEmploymentDTO);
     }
-
     @PreAuthorize("hasAuthority('student_employment:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudentEmployment(@RequestBody @Valid StudentEmploymentDTO studentEmploymentDTO) {
-        return employmentService.updateStudentEmployment(studentEmploymentDTO);
+    public <T> BaseResponse<T> updateStudentEmployment(@RequestBody @Valid UpdateStudentEmploymentDTO updateStudentEmploymentDTO) {
+        return employmentService.updateStudentEmployment(updateStudentEmploymentDTO);
     }
-
     @PreAuthorize("hasAuthority('student_employment:delete')")
-    @DeleteMapping("/delete/{studentId}")
-    public <T> BaseResponse<T> deleteStudentEmployment(@PathVariable String studentId) {
-        return employmentService.deleteStudentEmployment(studentId);
+    @DeleteMapping("/delete/{studentEmploymentId}")
+    public <T> BaseResponse<T> deleteStudentEmployment(@PathVariable String studentEmploymentId) {
+        return employmentService.deleteStudentEmployment(studentEmploymentId);
     }
 }

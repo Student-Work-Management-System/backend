@@ -3,11 +3,9 @@ package edu.guet.studentworkmanagementsystem.service.employment.impl;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.StudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
@@ -20,12 +18,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
@@ -35,30 +36,28 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     private StudentEmploymentMapper studentEmploymentMapper;
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentEmployment(List<StudentEmploymentDTO> studentEmploymentDTOList) {
-        List<StudentEmployment> studentEmploymentList = studentEmploymentDTOList.stream()
+    public <T> BaseResponse<T> importStudentEmployment(InsertDTOList insertDTOList) {
+        int size = insertDTOList.getInsertStudentEmploymentDTOList().size();
+        List<StudentEmployment> studentEmploymentList = insertDTOList.getInsertStudentEmploymentDTOList().stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());
         System.out.println(studentEmploymentList);
         int i = mapper.insertBatch(studentEmploymentList);
-        if (i == studentEmploymentDTOList.size())
+        if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
-    private StudentEmployment convertToEntity(StudentEmploymentDTO dto) {
+    private StudentEmployment convertToEntity(InsertStudentEmploymentDTO dto) {
         StudentEmployment entity = new StudentEmployment();
         BeanUtils.copyProperties(dto, entity);
-        if (dto.getGraduationYear() != null) {
-            entity.setGraduationYear(dto.getGraduationYear().toLocalDate());
-        }
         return entity;
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> insertStudentEmployment(StudentEmploymentDTO studentEmploymentDTO) {
+    public <T> BaseResponse<T> insertStudentEmployment(InsertStudentEmploymentDTO insertStudentEmploymentDTO) {
         StudentEmployment studentEmployment = new StudentEmployment();
-        BeanUtils.copyProperties(studentEmploymentDTO, studentEmployment);
+        BeanUtils.copyProperties(insertStudentEmploymentDTO, studentEmployment);
         int i = mapper.insert(studentEmployment);
         if (i > 0)
             return ResponseUtil.success();
@@ -71,45 +70,39 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
 
         Page<StudentEmploymentVO> page = QueryChain.of(StudentEmployment.class)
-                .select(STUDENT_EMPLOYMENT.ALL_COLUMNS) // 假设存在一个常量包含所有列
+                .select(STUDENT_EMPLOYMENT.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_EMPLOYMENT)
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
-                .where(Student::getMajorId).eq(query.getMajorId()) // 假设要根据专业ID查询
-                .and(Student::getGrade).eq(query.getGrade()) // 假设要根据年级查询
+                .where(Student::getMajorId).eq(query.getMajorId())
+                .and(Student::getGrade).eq(query.getGrade())
                 .pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
         return ResponseUtil.success(page);
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentEmployment(StudentEmploymentDTO studentEmploymentDTO) {
+    public <T> BaseResponse<T> updateStudentEmployment(UpdateStudentEmploymentDTO updateStudentEmploymentDTO) {
         StudentEmployment studentEmployment = new StudentEmployment();
-        BeanUtils.copyProperties(studentEmploymentDTO, studentEmployment);
-        if (studentEmploymentDTO.getGraduationYear() != null) {
-            studentEmployment.setGraduationYear(studentEmploymentDTO.getGraduationYear().toLocalDate());
-        }
-
-        boolean i = UpdateChain.of(StudentEmployment.class)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, studentEmployment.getGraduationState())
-                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear())
-                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, studentEmployment.getWhereabouts())
-                .set(STUDENT_EMPLOYMENT.JOB_NATURE, studentEmployment.getJobNature())
-                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, studentEmployment.getJobIndustry())
-                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, studentEmployment.getJobLocation())
-                .set(STUDENT_EMPLOYMENT.CATEGORY, studentEmployment.getCategory())
-                .set(STUDENT_EMPLOYMENT.SALARY, studentEmployment.getSalary())
-                .where(STUDENT_EMPLOYMENT.STUDENT_ID.eq(studentEmployment.getStudentId())
-                        .and(STUDENT_EMPLOYMENT.STUDENT_EMPLOYMENT_ID.eq(studentEmployment.getStudentEmploymentId())))
+        BeanUtils.copyProperties(updateStudentEmploymentDTO, studentEmployment);
+        boolean update = UpdateChain.of(StudentEmployment.class)
+                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, studentEmployment.getGraduationState(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear(), Objects::nonNull)
+                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, studentEmployment.getWhereabouts(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_NATURE, studentEmployment.getJobNature(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, studentEmployment.getJobIndustry(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, studentEmployment.getJobLocation(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.CATEGORY, studentEmployment.getCategory(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.SALARY, studentEmployment.getSalary(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.STUDENT_ID, studentEmployment.getStudentId(), StringUtils::hasLength)
+                .and(STUDENT_EMPLOYMENT.STUDENT_EMPLOYMENT_ID.eq(studentEmployment.getStudentEmploymentId()))
                 .update();
-        if (i)
+        if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     @Override
     @Transactional
-    public <T> BaseResponse<T> deleteStudentEmployment(String studentId) {
-        QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_EMPLOYMENT.STUDENT_ID.eq(studentId));
-        int i = studentEmploymentMapper.deleteByQuery(wrapper);
+    public <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId) {
+        int i = studentEmploymentMapper.deleteById(studentEmploymentId);
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
