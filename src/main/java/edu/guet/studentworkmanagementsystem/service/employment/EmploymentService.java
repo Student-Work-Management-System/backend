@@ -3,7 +3,10 @@ package edu.guet.studentworkmanagementsystem.service.employment;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 

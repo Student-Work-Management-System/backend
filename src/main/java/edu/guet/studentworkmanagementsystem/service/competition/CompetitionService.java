@@ -10,7 +10,6 @@ import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Members;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

@@ -12,7 +12,9 @@ import java.io.Serializable;
 public class CETQuery implements Serializable {
     private String majorId;
     private String grade;
-    private String classNo;
+    private Long score;
+    private String examDate;
+    private String examType;
     private Integer pageNo;
     private Integer pageSize;
 }

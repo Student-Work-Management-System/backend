@@ -2,7 +2,10 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.UpdateStudentCadreDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;

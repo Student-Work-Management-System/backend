@@ -6,7 +6,6 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollmentInfo.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.EnrollmentInfo;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

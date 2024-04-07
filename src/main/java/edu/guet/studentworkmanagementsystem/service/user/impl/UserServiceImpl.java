@@ -50,8 +50,8 @@ import java.util.stream.Collectors;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
-import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {

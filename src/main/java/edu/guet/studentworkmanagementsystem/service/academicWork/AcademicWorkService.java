@@ -11,7 +11,6 @@ import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

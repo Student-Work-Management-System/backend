@@ -2,20 +2,17 @@ package edu.guet.studentworkmanagementsystem.service.cadre.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.row.Db;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cadre.UpdateStudentCadreDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
-
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
-
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
-
-
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.CadreMapper;

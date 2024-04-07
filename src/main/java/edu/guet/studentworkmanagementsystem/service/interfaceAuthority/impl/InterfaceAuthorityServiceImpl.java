@@ -25,6 +25,7 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add("poverty_assistance");
         add("school_precaution");
         add("employment");
+        add("cet");
     }};
     private static final ArrayList<InterfaceAuthority> userAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/user/login", null));
@@ -119,6 +120,14 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/employment/update", List.of("student_employment:update")));
         add(new InterfaceAuthority("/employment/delete/{studentEmploymentId}", List.of("student_employment:delete")));
     }};
+    private static final ArrayList<InterfaceAuthority> cetAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/cet/gets", List.of("student_cet:select", "student:select", "major:select")));
+        add(new InterfaceAuthority("/cet/get/optional_exam_date", List.of("student_cet:select")));
+        add(new InterfaceAuthority("/cet/add", List.of("student_cet:insert")));
+        add(new InterfaceAuthority("/cet/adds", List.of("student_cet:insert")));
+        add(new InterfaceAuthority("/cet/update", List.of("student_cet:update")));
+        add(new InterfaceAuthority("/cet/delete/{studentCetId}", List.of("student_cet:delete")));
+    }};
     @Override
     public BaseResponse<List<InterfaceAuthority>> getInterfaceAuthorities(String prefix) {
         switch (prefix) {
@@ -154,6 +163,9 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
             }
             case "employment" -> {
                 return getEmployment();
+            }
+            case "cet" -> {
+                return getCet();
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }
@@ -194,5 +206,8 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
     }
     private BaseResponse<List<InterfaceAuthority>> getEmployment() {
         return ResponseUtil.success(employAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getCet() {
+        return ResponseUtil.success(cetAuthority);
     }
 }
