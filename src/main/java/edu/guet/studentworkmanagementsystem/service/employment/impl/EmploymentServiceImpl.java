@@ -31,14 +31,14 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 
 @Service
 public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper, StudentEmployment> implements EmploymentService {
-
     @Autowired
     private StudentEmploymentMapper studentEmploymentMapper;
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentEmployment(InsertDTOList insertDTOList) {
         int size = insertDTOList.getInsertStudentEmploymentDTOList().size();
-        List<StudentEmployment> studentEmploymentList = insertDTOList.getInsertStudentEmploymentDTOList().stream()
+        List<StudentEmployment> studentEmploymentList = insertDTOList.getInsertStudentEmploymentDTOList()
+                .stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());
         System.out.println(studentEmploymentList);
@@ -47,7 +47,6 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     private StudentEmployment convertToEntity(InsertStudentEmploymentDTO dto) {
         StudentEmployment entity = new StudentEmployment();
         BeanUtils.copyProperties(dto, entity);
@@ -68,11 +67,11 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-
         Page<StudentEmploymentVO> page = QueryChain.of(StudentEmployment.class)
                 .select(STUDENT_EMPLOYMENT.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_EMPLOYMENT)
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
+                .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(STUDENT.MAJOR_ID))
                 .where(Student::getMajorId).eq(query.getMajorId())
                 .and(Student::getGrade).eq(query.getGrade())
                 .pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
