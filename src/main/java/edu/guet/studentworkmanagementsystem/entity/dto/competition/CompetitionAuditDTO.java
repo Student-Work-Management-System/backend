@@ -12,10 +12,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompetitionAuditDTO implements Serializable {
-    @NotNull(message = "竞赛id不能为空")
-    private String competitionId;
-    @NotBlank(message = "学号不能为空")
-    private String headerId;
+    @NotBlank(message = "学生竞赛id不能为空")
+    private String studentCompetitionId;
     private String reviewState;
     private String rejectReason;
     private String auditorId;

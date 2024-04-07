@@ -28,7 +28,7 @@ public class StudentCompetitionClaim implements Serializable {
      * 学生上报参与的竞赛id
      */
     @Id
-    private Long studentCompetitionId;
+    private String studentCompetitionId;
     /**
      * 要认领的学生id
      */

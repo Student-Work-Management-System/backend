@@ -1,9 +1,11 @@
 package edu.guet.studentworkmanagementsystem.service.competition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAuditDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
@@ -19,7 +21,7 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * @param competitions 竞赛列表
      * @return 存入数据库中的竞赛信息(包含id返回)
      */
-    BaseResponse<List<Competition>> importCompetition(List<Competition> competitions);
+    BaseResponse<List<Competition>> importCompetition(CompetitionList competitionList);
     /**
      * 对象添加竞赛
      * @param competition 竞赛记录对象
@@ -34,7 +36,7 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * 获取所有的竞赛
      * @return 竞赛清单
      */
-    BaseResponse<List<Competition>> getAllCompetitions();
+    BaseResponse<Page<Competition>> getAllCompetitions(int pageNo, int pageSize);
     /**
      * 删除竞赛(需要考虑外检约束)
      * @param competitionId 竞赛记录id
@@ -49,7 +51,7 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * 若后续审核通过则从数据库取出(json), 再转换为对象取出学号存入认领表
      * @param studentCompetitionDTO 学生上报获奖
      */
-    <T> BaseResponse<T> insertStudentCompetition(StudentCompetitionDTO studentCompetitionDTO);
+    <T> BaseResponse<T> insertStudentCompetition(StudentCompetitionDTO studentCompetitionDTO) throws JsonProcessingException;
     /**
      * 学生获取自己上报的奖项记录(包括所有状态的上报记录)
      * @param studentId 学号
@@ -68,11 +70,10 @@ public interface CompetitionService extends IService<StudentCompetition> {
     /**
      * 审核通过后调用插入竞赛结果认领表(包括队长一齐存入认领表)
      * @param members 团队成员
-     * @param headerId 队长id
-     * @param competitionId 竞赛id
+     * @param studentCompetitionId 学生竞赛id
      * @return 表中修改的行数(判断是否全部插入)
      */
-    long insertStudentCompetitionAudit(Members members, String headerId, String competitionId);
+    boolean insertStudentCompetitionAudit(Members members, String studentCompetitionId);
     /**
      * 删除学生获奖记录(同时要删除在认领表中的记录)
      * @param competitionId 竞赛id
