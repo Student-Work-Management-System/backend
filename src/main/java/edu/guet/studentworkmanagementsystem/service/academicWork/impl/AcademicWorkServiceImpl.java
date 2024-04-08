@@ -13,7 +13,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcade
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkList;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.academicWork.*;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkClaimTableDef.STUDENT_ACADEMIC_WORK_CLAIM;
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkTableDef.STUDENT_ACADEMIC_WORK;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 

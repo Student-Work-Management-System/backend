@@ -3,7 +3,6 @@ package edu.guet.studentworkmanagementsystem.entity.vo.academicWork;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;

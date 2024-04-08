@@ -12,7 +12,6 @@ import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 
 import java.util.List;
 
