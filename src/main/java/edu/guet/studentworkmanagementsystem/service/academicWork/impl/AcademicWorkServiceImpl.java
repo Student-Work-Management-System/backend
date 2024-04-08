@@ -211,15 +211,9 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     private void deleteAcademicWork(String additionalInfoId, String typeId) {
         int i;
         switch (typeId) {
-            case "1" -> {
-                i = paperMapper.deleteById(additionalInfoId);
-            }
-            case "2" -> {
-                i = patentMapper.deleteById(additionalInfoId);
-            }
-            case "3" -> {
-                i = softMapper.deleteById(additionalInfoId);
-            }
+            case "1" -> i = paperMapper.deleteById(additionalInfoId);
+            case "2" -> i = patentMapper.deleteById(additionalInfoId);
+            case "3" -> i = softMapper.deleteById(additionalInfoId);
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }
         if (i > 0)
