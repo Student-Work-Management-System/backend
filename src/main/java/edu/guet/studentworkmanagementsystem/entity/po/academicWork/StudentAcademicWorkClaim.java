@@ -25,7 +25,7 @@ public class StudentAcademicWorkClaim implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id
-    private Long studentAcademicWorkId;
+    private String studentAcademicWorkId;
     @Id
     private String studentId;
 }

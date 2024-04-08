@@ -137,11 +137,11 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_COMPETITION_CLAIM.STUDENT_COMPETITION_ID.eq(studentCompetitionId));
         long claimNumber = claimMapper.selectCountByQuery(wrapper);
         int i = claimMapper.deleteByQuery(wrapper);
-        if (i != claimNumber)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        int j = mapper.deleteById(studentCompetitionId);
-        if (j > 0)
-            return ResponseUtil.success();
+        if (i == claimNumber) {
+            int j = mapper.deleteById(studentCompetitionId);
+            if (j > 0)
+                return ResponseUtil.success();
+        }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override

@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.service.academicWork;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -54,7 +55,7 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * 通过 -> 修改状态 并 存入认领表
      * @param academicWorkAuditDTO 学术作品审核
      */
-    <T> BaseResponse<T> auditStudentAcademicWork(AcademicWorkAuditDTO academicWorkAuditDTO);
+    <T> BaseResponse<T> auditStudentAcademicWork(AcademicWorkAuditDTO academicWorkAuditDTO) throws JsonProcessingException;
     /**
      * 审核通过后调用插入学术认证结果认领表(包括上报者一齐存入认领表)<br/>
      * 应在插入前筛选出合法的学号(本系统仅关注 本校 的 学生 )<br/>
@@ -71,5 +72,5 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @param query 查询参数
      * @return 上报结果
      */
-    BaseResponse<Page<StudentCompetitionVO>> getAllStudentAcademicWork(AcademicWorkQuery query);
+    BaseResponse<Page<StudentAcademicWorkVO>> getAllStudentAcademicWork(AcademicWorkQuery query);
 }

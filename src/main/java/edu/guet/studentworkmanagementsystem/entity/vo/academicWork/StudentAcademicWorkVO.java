@@ -15,8 +15,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentAcademicWorkVO implements Serializable {
-    private Long studentAcademicWorkId;
+    private String studentAcademicWorkId;
     private String studentId;
+    private String name;
     /**
      * 著作名称
      */
@@ -25,6 +26,7 @@ public class StudentAcademicWorkVO implements Serializable {
      * 著作类型：论文(1)、专利(2)和软著(3)
      */
     private String academicWorkType;
+    private String additionalInfoId;
     /**
      * 学术作品, 根据academic_work_type字段的不同关联不同的表(论文、软著或专利表)
      */
@@ -45,15 +47,7 @@ public class StudentAcademicWorkVO implements Serializable {
      * 拒绝理由
      */
     private String reason;
-    public StudentAcademicWorkVO(StudentAcademicWork studentAcademicWork, AcademicWork academicWork) throws JsonProcessingException {
-        this.studentAcademicWorkId = studentAcademicWork.getStudentAcademicWorkId();
-        this.studentId = studentAcademicWork.getStudentId();
-        this.academicWorkName = studentAcademicWork.getAcademicWorkName();
-        this.academicWorkType = studentAcademicWork.getAcademicWorkType();
-        this.academicWork = academicWork;
-        this.authors = JsonUtil.mapper.readValue(studentAcademicWork.getAuthors(), Authors.class);
-        this.evidence = studentAcademicWork.getEvidence();
-        this.auditState = studentAcademicWork.getAuditState();
-        this.reason = studentAcademicWork.getReason();
+    public void setAuthors(String authorsStr) throws JsonProcessingException {
+        JsonUtil.mapper.readValue(authorsStr, Authors.class);
     }
 }

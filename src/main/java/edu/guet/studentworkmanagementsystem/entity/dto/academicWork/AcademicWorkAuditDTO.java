@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AcademicWorkAuditDTO implements Serializable {
     @NotNull(message = "学术作品id不能为空")
-    private Long studentAcademicWorkId;
+    private String studentAcademicWorkId;
     /**
      * 上报后审核状态
      */

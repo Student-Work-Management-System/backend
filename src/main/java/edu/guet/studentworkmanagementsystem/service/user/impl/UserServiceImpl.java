@@ -84,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
-            ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
+            ResponseUtil.failure(ServiceExceptionEnum.JSON_ERROR);
         }
         LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(loginUserVO);

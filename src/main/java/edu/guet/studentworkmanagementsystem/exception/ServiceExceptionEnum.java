@@ -15,6 +15,7 @@ public enum ServiceExceptionEnum {
     TOKEN_ERROR(-208, "Token异常"),
     NOT_FOUND(-209, "未找到目标"),
     UN_LOGIN(-210, "还未登录或Token过期"),
+    JSON_ERROR(-211, "JSON解析出错"),
     SELECT_NOT_IN(-212, "该选项不存在"),
     METHOD_NOT_SUPPORT(-2000, "方法不支持"),
     UNKNOWN_ERROR(-2001, "未知异常"),
