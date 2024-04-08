@@ -20,12 +20,12 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * @param competitionList 竞赛列表
      * @return 存入数据库中的竞赛信息(包含id返回)
      */
-    BaseResponse<List<Competition>> importCompetition(CompetitionList competitionList);
+    <T> BaseResponse<T> importCompetition(CompetitionList competitionList);
     /**
      * 对象添加竞赛
      * @param competition 竞赛记录对象
      */
-    BaseResponse<Competition> insertCompetition(Competition competition);
+    <T> BaseResponse<T> insertCompetition(Competition competition);
     /**
      * 修改竞赛的信息
      * @param competition 待修改的竞赛信息

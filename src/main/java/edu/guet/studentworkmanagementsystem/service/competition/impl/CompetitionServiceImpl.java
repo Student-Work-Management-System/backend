@@ -46,7 +46,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     private StudentCompetitionClaimMapper claimMapper;
     @Override
     @Transactional
-    public BaseResponse<List<Competition>> importCompetition(CompetitionList competitionList) {
+    public <T> BaseResponse<T> importCompetition(CompetitionList competitionList) {
         int size = competitionList.getCompetitions().size();
         int i = competitionMapper.insertBatch(competitionList.getCompetitions());
         if (i == size)
@@ -55,7 +55,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
     @Override
     @Transactional
-    public BaseResponse<Competition> insertCompetition(Competition competition) {
+    public <T> BaseResponse<T> insertCompetition(Competition competition) {
         int i = competitionMapper.insert(competition);
         if (i > 0)
             return ResponseUtil.success();
@@ -103,6 +103,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .listAs(StudentCompetitionVO.class);
         return ResponseUtil.success(studentCompetitionVOS);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> auditStudentCompetition(CompetitionAuditDTO competitionAuditDTO) throws JsonProcessingException {
@@ -113,12 +114,17 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .set(STUDENT_COMPETITION.AUDITOR_ID, competitionAuditDTO.getAuditorId(), StringUtils::hasLength)
                 .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(studentCompetitionId))
                 .update();
+        Boolean flag = stateHandler(competitionAuditDTO.getReviewState());
         if (update) {
-            String membersJson = mapper.selectOneById(studentCompetitionId).getMembers();
-            return insertStudentCompetitionAudit(convertToEntity(membersJson), studentCompetitionId);
+            if (flag) {
+                String membersJson = mapper.selectOneById(studentCompetitionId).getMembers();
+                return insertStudentCompetitionAudit(convertToEntity(membersJson), studentCompetitionId);
+            }
+            return ResponseUtil.success();
         }
-        return null;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     public <T> BaseResponse<T> insertStudentCompetitionAudit(Members members, String studentCompetitionId) {
         ArrayList<StudentCompetitionClaim> claims = new ArrayList<>();
@@ -131,6 +137,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentCompetition(String studentCompetitionId) {
@@ -144,6 +151,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<Page<StudentCompetitionVO>> getAllStudentCompetition(CompetitionQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
@@ -160,7 +168,20 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .pageAs(Page.of(pageNo, pageSize), StudentCompetitionVO.class);
         return ResponseUtil.success(studentCompetitionVOPage);
     }
+
     private Members convertToEntity(String membersJson) throws JsonProcessingException {
         return JsonUtil.mapper.readValue(membersJson, Members.class);
+    }
+
+    private Boolean stateHandler(String reviewState) {
+        switch (reviewState) {
+            case "已通过" -> {
+                return true;
+            }
+            case "已拒绝" -> {
+                return false;
+            }
+            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
+        }
     }
 }

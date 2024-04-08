@@ -117,6 +117,8 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         long claimNumber = claimMapper.selectCountByQuery(wrapper);
         int i = claimMapper.deleteByQuery(wrapper);
         if (i == claimNumber) {
+            StudentAcademicWork studentAcademicWork = mapper.selectOneById(studentAcademicWorkId);
+            deleteAcademicWork(studentAcademicWork.getAdditionalInfoId(), studentAcademicWork.getAcademicWorkType());
             int j = mapper.deleteById(studentAcademicWorkId);
             if (j > 0)
                 return ResponseUtil.success();
@@ -147,7 +149,10 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                 .set(STUDENT_ACADEMIC_WORK.REASON, academicWorkAuditDTO.getReason(), StringUtils::hasLength)
                 .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId))
                 .update();
+        Boolean flag = stateHandler(academicWorkAuditDTO.getAuditState());
         if (update) {
+            if (!flag)
+                return ResponseUtil.success();
             String authorsStr = mapper.selectOneById(studentAcademicWorkId).getAuthors();
             Authors authors = JsonUtil.mapper.readValue(authorsStr, Authors.class);
             return insertStudentAcademicWorkAudit(authors, studentAcademicWorkId);
@@ -198,6 +203,37 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             }
             case "3" -> {
                 return softMapper.selectOneById(additionalInfoId);
+            }
+            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
+        }
+    }
+
+    private void deleteAcademicWork(String additionalInfoId, String typeId) {
+        int i;
+        switch (typeId) {
+            case "1" -> {
+                i = paperMapper.deleteById(additionalInfoId);
+            }
+            case "2" -> {
+                i = patentMapper.deleteById(additionalInfoId);
+            }
+            case "3" -> {
+                i = softMapper.deleteById(additionalInfoId);
+            }
+            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
+        }
+        if (i > 0)
+            return;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    private Boolean stateHandler(String state) {
+        switch (state) {
+            case "已通过" -> {
+                return true;
+            }
+            case "已拒绝" -> {
+                return false;
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }

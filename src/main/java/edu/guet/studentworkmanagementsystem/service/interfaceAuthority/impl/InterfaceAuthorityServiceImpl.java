@@ -27,6 +27,8 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add("employment");
         add("cet");
         add("enrollment");
+        add("competition");
+        add("academic");
     }};
     private static final ArrayList<InterfaceAuthority> userAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/user/login", null));
@@ -133,6 +135,25 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/enrollment/update", List.of("enrollment_info:update")));
         add(new InterfaceAuthority("/enrollment/delete/{enrollmentInfoId}", List.of("enrollment_info:delete")));
     }};
+    private static final ArrayList<InterfaceAuthority> competitionAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/competition/gets", List.of("competition:select")));
+        add(new InterfaceAuthority("/competition/add", List.of("competition:insert")));
+        add(new InterfaceAuthority("/competition/update", List.of("competition:update")));
+        add(new InterfaceAuthority("/competition/delete/{competitionId}", List.of("competition:delete")));
+        add(new InterfaceAuthority("/student_competition/gets", List.of("student_competition:select", "student:select")));
+        add(new InterfaceAuthority("/student_competition/get/{studentId}", List.of("student_competition:select", "student:select")));
+        add(new InterfaceAuthority("/student_competition/add", List.of("student_competition:insert", "student_competition_claim:insert")));
+        add(new InterfaceAuthority("/student_competition/audit", List.of("student_competition:update")));
+        add(new InterfaceAuthority("/student_competition/delete/{studentCompetitionId}", List.of("student_competition:delete", "student_competition_claim:delete")));
+    }};
+    private static final ArrayList<InterfaceAuthority> academicAuthority = new ArrayList<>(){{
+        add(new InterfaceAuthority("/academic_work/get/{studentId}", List.of("student_academic_work:select", "student:select", "academic:select")));
+        add(new InterfaceAuthority("/academic_work/gets", List.of("student_academic_work:select", "student:select", "academic:select")));
+        add(new InterfaceAuthority("/academic_work/add", List.of("student_academic_work:insert", "academic:insert")));
+        add(new InterfaceAuthority("/academic_work/adds", List.of("student_academic_work:insert", "academic:insert")));
+        add(new InterfaceAuthority("/academic_work/audit", List.of("student_academic_work:update", "student_academic_work_claim:insert")));
+        add(new InterfaceAuthority("/academic_work/delete/{studentAcademicWorkId}", List.of("student_academic_work:delete", "student_academic_work_claim:delete", "academic:delete")));
+    }};
     @Override
     public BaseResponse<List<InterfaceAuthority>> getInterfaceAuthorities(String prefix) {
         switch (prefix) {
@@ -174,6 +195,12 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
             }
             case "enrollment" -> {
                 return getEnrollment();
+            }
+            case "competition" -> {
+                return getCompetition();
+            }
+            case "academic" -> {
+                return getAcademic();
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }
@@ -220,5 +247,11 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
     }
     private BaseResponse<List<InterfaceAuthority>> getEnrollment() {
         return ResponseUtil.success(enrollmentAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getCompetition() {
+        return ResponseUtil.success(competitionAuthority);
+    }
+    private BaseResponse<List<InterfaceAuthority>> getAcademic() {
+        return ResponseUtil.success(academicAuthority);
     }
 }
