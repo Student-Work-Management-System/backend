@@ -208,7 +208,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         }
     }
 
-    private void deleteAcademicWork(String additionalInfoId, String typeId) {
+    private void deleteAcademicWork(Long additionalInfoId, String typeId) {
         int i;
         switch (typeId) {
             case "1" -> i = paperMapper.deleteById(additionalInfoId);
