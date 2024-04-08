@@ -1,0 +1,19 @@
+package edu.guet.studentworkmanagementsystem.entity.dto.status;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class StatusQuery implements Serializable {
+    private String grade;
+    private String majorId;
+    private String state;
+    private String handle;
+    private Integer pageNo;
+    private Integer pageSize;
+}

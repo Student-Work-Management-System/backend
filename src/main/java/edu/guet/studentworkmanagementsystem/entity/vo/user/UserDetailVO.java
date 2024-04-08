@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.mybatisflex.annotation.RelationOneToMany;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class UserDetailVO implements Serializable {
     private String uid;
     private String username;
     private String realName;
-    private String phone;
+    private String email;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -33,7 +32,7 @@ public class UserDetailVO implements Serializable {
         this.uid = user.getUid();
         this.username = user.getUsername();
         this.realName = user.getRealName();
-        this.phone = user.getPhone();
+        this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
     }
 }

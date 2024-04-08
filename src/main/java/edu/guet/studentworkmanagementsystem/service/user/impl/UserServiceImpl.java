@@ -1,18 +1,25 @@
 package edu.guet.studentworkmanagementsystem.service.user.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.authority.RolePermissionMapper;
@@ -35,7 +42,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +52,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.user.table.Permissi
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -70,44 +80,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
         String redisKey = "uid:" + securityUser.getUser().getUid();
-        String token = JWT.create()
-                .setPayload("uid", redisKey)
-                .setKey(key.getBytes())
-                .sign();
+        String token = createToken(redisKey, key);
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
-            ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
+            ResponseUtil.failure(ServiceExceptionEnum.JSON_ERROR);
         }
         LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(loginUserVO);
+    }
+    private boolean RoleNotNullOrEmpty(List<String> roles) {
+        return !Objects.isNull(roles) && !roles.isEmpty();
+    }
+    private void addUserRole(List<String> roles, String uid) {
+        ArrayList<UserRole> userRoles = new ArrayList<>();
+        if (roles.size() == 1)
+            userRoles.add(new UserRole(uid, roles.getFirst()));
+        else
+            roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
+        int i = userRoleMapper.insertBatch(userRoles);
+        if (i == roles.size())
+            return;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Transactional
     @Override
     public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
         registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
         User user = new User(registerUserDTO);
-        ArrayList<UserRole> userRoles = new ArrayList<>();
         int i = mapper.insert(user);
         if (i > 0) {
             List<String> roles = registerUserDTO.getRoles();
             String uid = user.getUid();
-            if (roles.size() == 1)
-                userRoles.add(new UserRole(uid, registerUserDTO.getRoles().getFirst()));
-            else
-                roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
-            int j = userRoleMapper.insertBatch(userRoles);
-            if (j == roles.size())
-                return ResponseUtil.success();
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            if (RoleNotNullOrEmpty(roles))
+                addUserRole(roles, uid);
+            return ResponseUtil.success();
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUsers(List<RegisterUserDTO> registerUserDTOList) {
+    public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
+        List<RegisterUserDTO> registerUserDTOList = registerUserDTOS.getRegisterUserDTOList();
         ArrayList<User> users = new ArrayList<>();
-        ArrayList<UserRole> userRoles = new ArrayList<>();
         registerUserDTOList.forEach(item -> {
             item.setPassword(passwordEncoder.encode(item.getPassword()));
             users.add(new User(item));
@@ -118,16 +133,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             for(int j = 0; j < size; j++) {
                 String uid = users.get(j).getUid();
                 List<String> roles = registerUserDTOList.get(j).getRoles();
-                if (roles.size() == 1)
-                    userRoles.add(new UserRole(uid, roles.getFirst()));
-                else
-                    roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
+                if (RoleNotNullOrEmpty(roles))
+                    addUserRole(roles, uid);
             }
-            int roleSize = userRoles.size();
-            int j = userRoleMapper.insertBatch(userRoles);
-            if (roleSize == j)
-                return ResponseUtil.success();
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            return ResponseUtil.success();
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
@@ -136,46 +145,82 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserDetailVO userDetailVO = new UserDetailVO(mapper.getUserByUsername(username));
         String uid = userDetailVO.getUid();
         List<Role> userRole = userRoleMapper.getUserRole(uid);
-        userDetailVO.setRoles(userRole);
+        if (!Objects.isNull(userRole))
+            userDetailVO.setRoles(userRole);
         return ResponseUtil.success(userDetailVO);
+    }
+    private <T> boolean listHandler(List<T> list) {
+        return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
     }
     @Transactional
     @Override
     public <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO) {
         String uid = userRoleDTO.getUid();
-        Set<String> roleSetFromDB = userRoleMapper.getUserRole(uid).stream()
-                .map(Role::getRid)
-                .collect(Collectors.toSet());
-        Set<String> roleSetFromWeb = userRoleDTO.getRoles();
-        List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
-        delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
-        List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
-        insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
+        List<Role> roles = userRoleMapper.getUserRole(uid);
+        if (listHandler(roles)) {
+            addUserRole(userRoleDTO.getRoles().stream().toList(), uid);
+        } else {
+            Set<String> roleSetFromDB = roles.stream()
+                    .map(Role::getRid)
+                    .filter(StringUtils::hasLength)
+                    .collect(Collectors.toSet());
+            Set<String> roleSetFromWeb = userRoleDTO.getRoles();
+            List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
+            delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
+            List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
+            insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
+        }
         userRoleUpdateHandler(uid);
         return ResponseUtil.success();
+    }
+    private void addRolePermission(List<String> permissions, String rid) {
+        ArrayList<RolePermission> rolePermission = new ArrayList<>();
+        if (permissions.size() == 1)
+            rolePermission.add(new RolePermission(rid, permissions.getFirst()));
+        else
+            permissions.forEach(item -> rolePermission.add(new RolePermission(rid, item)));
+        int i = rolePermissionMapper.insertBatch(rolePermission);
+        if (i == permissions.size())
+            return;
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Transactional
     @Override
     public <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO) {
         String rid = rolePermissionDTO.getRid();
-        Set<String> permissionSetFromDB = rolePermissionMapper.getRolePermission(rid).stream()
-                .map(Permission::getPermissionName)
-                .collect(Collectors.toSet());
-        Set<String> permissionSetFromWeb = rolePermissionDTO.getPermissions();
-        List<String> delete = getDelete(permissionSetFromWeb, permissionSetFromDB).stream().toList();
-        delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
-        List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
-        insert.forEach(item -> rolePermissionMapper.insert(new RolePermission(rid, item)));
+        List<Permission> permissions = rolePermissionMapper.getRolePermission(rid);
+        if (listHandler(permissions)) {
+            addRolePermission(rolePermissionDTO.getPermissions().stream().toList(), rid);
+        } else {
+            Set<String> permissionSetFromDB = permissions.stream()
+                    .map(Permission::getPid)
+                    .filter(StringUtils::hasLength)
+                    .collect(Collectors.toSet());
+            Set<String> permissionSetFromWeb = rolePermissionDTO.getPermissions();
+            List<String> delete = getDelete(permissionSetFromWeb, permissionSetFromDB).stream().toList();
+            delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
+            List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
+            insert.forEach(item -> rolePermissionMapper.insert(new RolePermission(rid, item)));
+        }
         rolePermissionUpdateHandler(rid);
         return ResponseUtil.success();
     }
     @Transactional
     @Override
-    public <T> BaseResponse<T> addRole(Role role) {
+    public <T> BaseResponse<T> addRole(RoleDTO roleDTO) {
+        Role role = new Role(roleDTO);
         int i = roleMapper.insert(role);
-        if (i > 0)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (i <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (!Objects.isNull(roleDTO.getPermissions()) && !roleDTO.getPermissions().isEmpty()) {
+            ArrayList<RolePermission> rolePermissions = new ArrayList<>();
+            String rid = role.getRid();
+            roleDTO.getPermissions().forEach(item -> rolePermissions.add(new RolePermission(rid, item.getPid())));
+            int j = rolePermissionMapper.insertBatch(rolePermissions);
+            if (j != rolePermissions.size())
+                throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+        return ResponseUtil.success();
     }
     @Transactional
     @Override
@@ -192,6 +237,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper userRoleWrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
         long rolePermissionNumber = rolePermissionMapper.selectCountByQuery(rolePermissionWrapper);
         long userRoleNumber = userRoleMapper.selectCountByQuery(userRoleWrapper);
+        userRoleDeleteHandler(userRoleWrapper);
         if (rolePermissionNumber != 0) {
             int i = rolePermissionMapper.deleteByQuery(rolePermissionWrapper);
             if (i != rolePermissionNumber)
@@ -199,7 +245,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         if (userRoleNumber != 0) {
             int i = userRoleMapper.deleteByQuery(userRoleWrapper);
-            if (i != rolePermissionNumber)
+            if (i != userRoleNumber)
                 throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         }
         QueryWrapper roleWrapper = QueryWrapper.create().from(ROLE).where(ROLE.RID.eq(rid));
@@ -214,6 +260,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper rolePermissionWrapper = QueryWrapper.create().from(ROLE_PERMISSION).where(ROLE_PERMISSION.PID.eq(pid));
         QueryWrapper permissionWrapper = QueryWrapper.create().from(PERMISSION).where(PERMISSION.PID.eq(pid));
         long rolePermissionNumber = rolePermissionMapper.selectCountByQuery(rolePermissionWrapper);
+        rolePermissionDeleteHandler(rolePermissionWrapper);
         if (rolePermissionNumber != 0) {
             int i = rolePermissionMapper.deleteByQuery(rolePermissionWrapper);
             if (i != rolePermissionNumber)
@@ -229,8 +276,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<Role> roles = roleMapper.selectAll();
         ArrayList<RolePermissionVO> rolePermissionList = new ArrayList<>();
         roles.forEach(item -> {
-            List<Permission> permission = rolePermissionMapper.getRolePermission(item.getRid());
-            rolePermissionList.add(new RolePermissionVO(item, permission));
+            List<Permission> permissions = rolePermissionMapper.getRolePermission(item.getRid());
+            rolePermissionList.add(new RolePermissionVO(item, permissions));
         });
         return ResponseUtil.success(rolePermissionList);
     }
@@ -242,8 +289,88 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisUtil.delete("uid:" + uid);
         return ResponseUtil.success();
     }
+    @Override
+    public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
+        Page<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
+                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
+                .from(USER)
+                .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
+                .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
+                .pageAs(Page.of(pageNo, pageSize), UserDetailVO.class);
+        return ResponseUtil.success(userDetailVOPage);
+    }
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> deleteUser(String uid) {
+        QueryWrapper wrapper = QueryWrapper.create().where(USER_ROLE.UID.eq(uid));
+        int i = userRoleMapper.deleteByQuery(wrapper);
+        if (i >= 0) {
+            int j = mapper.deleteById(uid);
+            if (j > 0)
+                return ResponseUtil.success();
+        }
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO) {
+        if (!Objects.isNull(updateUserDTO.getPassword()) && !updateUserDTO.getPassword().isEmpty())
+            updateUserDTO.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
+        User user = new User(updateUserDTO);
+        int update = mapper.update(user);
+        if (update > 0)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
+        List<Permission> permissions = permissionMapper.selectAll();
+        PermissionTreeVO root =
+                new PermissionTreeVO("root", "root", "root", new ArrayList<>());
+        for (Permission permission : permissions) {
+            PermissionTreeVO nowAt = root;
+            int beginIndex = 0;
+            String parentPrefix = "";
+            while (beginIndex != -1) {
+                String name, pid, desc;
+                int index = permission.getPermissionName().indexOf(':', beginIndex);
+                if (index == -1) {
+                    name = permission.getPermissionName();
+                    pid = permission.getPid();
+                    desc = permission.getPermissionDesc();
+                    beginIndex = -1;
+                } else {
+                    name = permission.getPermissionName().substring(beginIndex, index);
+                    desc = name;
+                    pid = parentPrefix + name + ':';
+                    parentPrefix = pid;
+                    beginIndex = index + 1;
+                }
+                PermissionTreeVO finalNowAt = nowAt;
+                nowAt = nowAt.getChildren().stream()
+                        .filter(tree -> tree.getPermissionName().equals(name))
+                        .findFirst()
+                        .orElseGet(()->{
+                            PermissionTreeVO permissionTreeVO = new PermissionTreeVO(pid, name, desc, new ArrayList<>());
+                            finalNowAt.getChildren().add(permissionTreeVO);
+                            return permissionTreeVO;
+                        }
+                );
+            }
+        }
+        return ResponseUtil.success(root.getChildren());
+    }
+    private void rolePermissionDeleteHandler(QueryWrapper rolePermissionWrapper) {
+        List<String> rids = rolePermissionMapper.selectListByQuery(rolePermissionWrapper).stream().map(RolePermission::getRid).toList();
+        rids.forEach(this::rolePermissionUpdateHandler);
+    }
+    private void userRoleDeleteHandler(QueryWrapper userRoleWrapper) {
+        List<String> uidList = userRoleMapper.selectListByQuery(userRoleWrapper).stream().map(UserRole::getUid).toList();
+        uidList.forEach(this::userRoleUpdateHandler);
+    }
     private void userRoleUpdateHandler(String uid) {
-        redisUtil.delete("uid" + uid);
+        redisUtil.delete("uid:" + uid);
     }
     private void rolePermissionUpdateHandler(String rid) {
         QueryWrapper wrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
@@ -259,5 +386,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return roleSetFromDB.stream()
                 .filter(element -> !roleSetFromWeb.contains(element))
                 .collect(Collectors.toSet());
+    }
+    private String createToken(String redisKey, String key) {
+        String uuid = UUID.randomUUID().toString();
+        return JWT.create()
+                .setPayload("uid", redisKey)
+                .setJWTId(uuid)
+                .setSubject("StudentWorkManagementSystem")
+                .setIssuer("BridgeFishDev")
+                .setIssuedAt(DateUtil.date())
+                .setExpiresAt(Date.from(Instant.now().plusSeconds(604800)))
+                .setKey(key.getBytes())
+                .sign();
     }
 }

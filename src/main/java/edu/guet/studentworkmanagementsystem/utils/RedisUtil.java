@@ -1,7 +1,6 @@
 package edu.guet.studentworkmanagementsystem.utils;
 
 
-import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,6 +21,10 @@ public class RedisUtil {
        return redisTemplate.opsForValue().get(key);
     }
     public void delete(String key) {
-        redisTemplate.delete(key);
+        if (exists(key))
+            redisTemplate.delete(key);
+    }
+    public boolean exists(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 }

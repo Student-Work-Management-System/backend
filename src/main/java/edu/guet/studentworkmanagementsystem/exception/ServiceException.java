@@ -1,8 +1,11 @@
 package edu.guet.studentworkmanagementsystem.exception;
 
+import lombok.Getter;
+
+@Getter
 final public class ServiceException extends RuntimeException {
-    private int code;
-    private String msg;
+    private final int code;
+    private final String msg;
     public ServiceException(ServiceExceptionEnum serviceExceptionEnum) {
         this.code = serviceExceptionEnum.getCode();
         this.msg = serviceExceptionEnum.getMsg();
@@ -10,11 +13,5 @@ final public class ServiceException extends RuntimeException {
     public ServiceException(int code, String msg) {
         this.code = code;
         this.msg = msg;
-    }
-    public int getCode() {
-        return code;
-    }
-    public String getMsg() {
-        return msg;
     }
 }

@@ -4,7 +4,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qx310320
-    url: jdbc:mysql://127.0.0.1/swms?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/swms?useUnicode=true&characterEncoding=UTF-8
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
@@ -18,6 +18,7 @@ spring:
           max-wait: -1
           max-idle: 8
           min-idle: 0
+      password: Qx310320.n
 mybatis-flex:
   mapper-locations: classpath:/mapper/*.xml
   configuration:
@@ -31,4 +32,13 @@ logging:
     edu.guet.studentworkmanagementsystem.mapper: trace
 jwt:
   expire-time: 7
-  key: edu.guet
+  key: $2a$10$EOWyTIhOPiIDaO40I7znfuTmttRRCe3rEzDM9aS9/pWcLe8ZT5fSO
+
+minio:
+  access-key: root
+  endpoint: http://121.41.115.29:9000
+  secret-key: qx310320
+springdoc:
+  swagger-ui:
+    enabled: true
+

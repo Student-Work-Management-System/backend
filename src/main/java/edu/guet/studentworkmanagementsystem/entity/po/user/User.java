@@ -1,7 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.po.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -10,7 +9,7 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import jakarta.validation.constraints.Size;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,7 @@ public class User {
     private String uid;
     private String username;
     private String realName;
-    private String phone;
+    private String email;
     private String password;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -35,8 +34,17 @@ public class User {
     public User(RegisterUserDTO registerUserDTO) {
         this.username = registerUserDTO.getUsername();
         this.realName = registerUserDTO.getRealName();
-        this.phone = registerUserDTO.getPhone();
+        this.email = registerUserDTO.getEmail();
         this.password = registerUserDTO.getPassword();
         this.createdAt = LocalDate.now();
+    }
+
+    public User(UpdateUserDTO updateUserDTO) {
+        this.uid = updateUserDTO.getUid();
+        this.username = null;
+        this.realName = updateUserDTO.getRealName();
+        this.email = updateUserDTO.getEmail();
+        this.password = updateUserDTO.getPassword();
+        this.createdAt = null;
     }
 }

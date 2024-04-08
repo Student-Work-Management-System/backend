@@ -1,8 +1,6 @@
 package edu.guet.studentworkmanagementsystem.securiy;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;

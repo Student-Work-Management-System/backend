@@ -2,7 +2,6 @@ package edu.guet.studentworkmanagementsystem.filter;
 
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTException;
-import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
@@ -42,10 +41,10 @@ final public class AuthenticationFilter extends OncePerRequestFilter {
         try {
             JWT jwt = JWT.of(token);
             boolean verify = jwt.setKey(keyStr.getBytes()).verify();
-            if (verify)
-                redisKey = jwt.getPayload("uid").toString();
-            else
+            if (!verify)
                 ResponseUtil.failure(response, ServiceExceptionEnum.TOKEN_ERROR);
+            else
+                redisKey = jwt.getPayload("uid").toString();
         } catch (JWTException jwtException) {
             ResponseUtil.failure(response, ServiceExceptionEnum.TOKEN_ERROR);
             return;

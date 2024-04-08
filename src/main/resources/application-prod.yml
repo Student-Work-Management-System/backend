@@ -1,1 +1,45 @@
 # 生产环境配置文件
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: qx310320
+    url: jdbc:mysql://swms-mysql:3306/swms?useUnicode=true&characterEncoding=UTF-8
+    type: com.zaxxer.hikari.HikariDataSource
+  data:
+    redis:
+      host: swms-redis
+      database: 0
+      port: 6379
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-wait: -1
+          max-idle: 8
+          min-idle: 0
+      password: qx310320
+
+mybatis-flex:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    print-banner: false
+  type-aliases-package: edu.guet.studentworkmanagementsystem.entity
+
+logging:
+  level:
+    edu.guet.studentworkmanagementsystem.mapper: trace
+jwt:
+  expire-time: 7
+  key: $2a$10$EOWyTIhOPiIDaO40I7znfuTmttRRCe3rEzDM9aS9/pWcLe8ZT5fSO
+
+minio:
+  access-key: root
+  endpoint: http://swms-oss:9000
+  secret-key: qx310320
+
+springdoc:
+  swagger-ui:
+    enabled: false

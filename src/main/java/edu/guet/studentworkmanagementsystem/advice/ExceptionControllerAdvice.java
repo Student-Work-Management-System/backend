@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +18,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -53,6 +55,14 @@ public class ExceptionControllerAdvice {
     public <T> BaseResponse<T> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
         return ResponseUtil.failure(ServiceExceptionEnum.METHOD_ARGUMENT_NOT_VALID.getCode(),
                 ServiceExceptionEnum.METHOD_ARGUMENT_NOT_VALID.getMsg() + getAllErrorMessage(exception));
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public <T> BaseResponse<T> noResourceFoundException(NoResourceFoundException exception) {
+        return ResponseUtil.failure(ServiceExceptionEnum.NOT_RESOURCE.getCode(), ServiceExceptionEnum.NOT_RESOURCE.getMsg() + exception.getMessage());
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public <T> BaseResponse<T> dataIntegrityViolationException() {
+        return ResponseUtil.failure(ServiceExceptionEnum.RELATE_FAILURE);
     }
     @ExceptionHandler(NullPointerException.class)
     public <T> BaseResponse<T> nullPointerExceptionHandler(NullPointerException exception) {
