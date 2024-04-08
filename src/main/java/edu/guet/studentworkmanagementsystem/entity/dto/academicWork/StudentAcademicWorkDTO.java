@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import edu.guet.studentworkmanagementsystem.common.InsertGroup;
-import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +13,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -30,7 +27,7 @@ public class StudentAcademicWorkDTO implements Serializable {
     private String academicWorkName;
     @Pattern(regexp = "^(123)$", message = "仅支持三种类型: 论文(1)、专利(2)和软著(3)")
     private String academicWorkType;
-    private String additionalInfoId;
+    private Long additionalInfoId;
     @NotNull(message = "作者不能为空")
     private Authors authors;
     @NotBlank(message = "证明材料地址不能为空")

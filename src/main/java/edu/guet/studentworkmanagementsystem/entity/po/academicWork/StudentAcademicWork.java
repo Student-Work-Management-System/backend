@@ -49,7 +49,7 @@ public class StudentAcademicWork implements Serializable {
     /**
      * 补充信息, 根据academic_work_type字段的不同关联不同的表(论文、软著或专利表)
      */
-    private String additionalInfoId;
+    private Long additionalInfoId;
     /**
      * 作者顺序,应填入格式：[{ order: 1, studentId:"",authorName:""}...`.]
      */
