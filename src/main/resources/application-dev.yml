@@ -4,13 +4,13 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: qx310320
-    url: jdbc:mysql://127.0.0.1:3306/swms?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://121.41.115.29:5506/swms?useUnicode=true&characterEncoding=UTF-8
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
-      host: 127.0.0.1
+      host: 121.41.115.29
       database: 0
-      port: 6379
+      port: 9379
       timeout: 3000ms
       lettuce:
         pool:
@@ -51,7 +51,7 @@ jwt:
 
 minio:
   access-key: root
-  endpoint: http://121.41.115.29:9000
+  endpoint: http://121.41.115.29:19000
   secret-key: qx310320
 
 springdoc:

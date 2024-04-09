@@ -51,7 +51,7 @@ jwt:
 
 minio:
   access-key: root
-  endpoint: http://swms-oss:9000
+  endpoint: http://minio:9000
   secret-key: qx310320
 
 springdoc:
