@@ -71,7 +71,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         Page<StudentVO> studentPage = QueryChain.of(Student.class)
                 .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(Student::getName).like(query.getName())
+                .where(STUDENT.STUDENT_ID.like(query.getSearch())).or(STUDENT.NAME.like(query.getSearch()))
                 .and(Student::getNativePlace).like(query.getNativePlace())
                 .and(Student::getNation).like(query.getNation())
                 .and(Student::getGender).eq(query.getGender())

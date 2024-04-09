@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentQuery implements Serializable {
-    private String name;
+    private String search;
     private String gender;
     private String nativePlace;
     private String majorId;
