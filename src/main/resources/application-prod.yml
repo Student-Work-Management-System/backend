@@ -19,6 +19,20 @@ spring:
           max-idle: 8
           min-idle: 0
       password: qx310320
+  mail:
+    host: smtp.163.com
+    protocol: smtp
+    default-encoding: UTF-8
+    username: BridgeFishDev@163.com
+    password: EGAQESJVOQOITMBS
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enabled: true
+            required: true
 
 mybatis-flex:
   mapper-locations: classpath:/mapper/*.xml

@@ -37,4 +37,6 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deleteUser(String uid);
     <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO);
     BaseResponse<List<PermissionTreeVO>> getPermissionTree();
+    <T> BaseResponse<T> findBackPassword(String username);
+    <T> BaseResponse<T> updatePassword(String username, String password, String code);
 }

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -16,6 +13,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 
 @RestController
@@ -72,5 +71,15 @@ public class UserController {
     @DeleteMapping("/logout")
     public <T> BaseResponse<T> logout() {
         return userService.logout();
+    }
+    @PermitAll
+    @GetMapping("/findBackPassword/{username}")
+    public <T> BaseResponse<T> findBackPassword(@PathVariable String username) {
+        return userService.findBackPassword(username);
+    }
+    @PermitAll
+    @PostMapping("/updatePassword")
+    public <T> BaseResponse<T> updatePassword(@RequestBody @Valid UpdatePassword updatePassword) {
+        return userService.updatePassword(updatePassword.getUsername(), updatePassword.getPassword(), updatePassword.getCode());
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
@@ -29,6 +30,7 @@ import edu.guet.studentworkmanagementsystem.mapper.user.RoleMapper;
 import edu.guet.studentworkmanagementsystem.mapper.user.UserMapper;
 import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import edu.guet.studentworkmanagementsystem.securiy.SystemAuthority;
+import edu.guet.studentworkmanagementsystem.service.email.EmailService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
@@ -46,6 +48,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
@@ -70,8 +73,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserRoleMapper userRoleMapper;
     @Autowired
     private RolePermissionMapper rolePermissionMapper;
+    @Autowired
+    private EmailService emailService;
     @Value("${jwt.key}")
     private String key;
+
     @Override
     public BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
@@ -89,9 +95,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(loginUserVO);
     }
+
     private boolean RoleNotNullOrEmpty(List<String> roles) {
         return !Objects.isNull(roles) && !roles.isEmpty();
     }
+
     private void addUserRole(List<String> roles, String uid) {
         ArrayList<UserRole> userRoles = new ArrayList<>();
         if (roles.size() == 1)
@@ -103,6 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return;
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
@@ -118,6 +127,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
@@ -140,6 +150,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
         UserDetailVO userDetailVO = new UserDetailVO(mapper.getUserByUsername(username));
@@ -152,6 +163,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private <T> boolean listHandler(List<T> list) {
         return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO) {
@@ -173,6 +185,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userRoleUpdateHandler(uid);
         return ResponseUtil.success();
     }
+
     private void addRolePermission(List<String> permissions, String rid) {
         ArrayList<RolePermission> rolePermission = new ArrayList<>();
         if (permissions.size() == 1)
@@ -184,6 +197,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return;
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO) {
@@ -205,6 +219,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         rolePermissionUpdateHandler(rid);
         return ResponseUtil.success();
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> addRole(RoleDTO roleDTO) {
@@ -222,6 +237,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return ResponseUtil.success();
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> addPermission(Permission permission) {
@@ -230,6 +246,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> deleteRole(String rid) {
@@ -254,6 +271,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public <T> BaseResponse<T> deletePermission(String pid) {
@@ -271,6 +289,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<List<RolePermissionVO>> getAllRole() {
         List<Role> roles = roleMapper.selectAll();
@@ -281,6 +300,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         });
         return ResponseUtil.success(rolePermissionList);
     }
+
     @Override
     public <T> BaseResponse<T> logout() {
         String uid = SecurityUtil.getUserPrincipal();
@@ -289,6 +309,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisUtil.delete("uid:" + uid);
         return ResponseUtil.success();
     }
+
     @Override
     public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
         Page<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
@@ -300,6 +321,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .pageAs(Page.of(pageNo, pageSize), UserDetailVO.class);
         return ResponseUtil.success(userDetailVOPage);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteUser(String uid) {
@@ -312,6 +334,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO) {
@@ -324,6 +347,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
+    @Override
     public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
         List<Permission> permissions = permissionMapper.selectAll();
         PermissionTreeVO root =
@@ -361,6 +385,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return ResponseUtil.success(root.getChildren());
     }
+
+    @Override
+    public <T> BaseResponse<T> findBackPassword(String username) {
+        User user = QueryChain.of(User.class)
+                .select(USER.ALL_COLUMNS)
+                .where(USER.USERNAME.eq(username))
+                .one();
+        if (Objects.isNull(user))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
+        emailService.sendEmail(user.getEmail(), code);
+        redisUtil.setValue("code_by:" + username, code, 5);
+        return ResponseUtil.success();
+    }
+
+    @Override
+    public <T> BaseResponse<T> updatePassword(String username, String password, String code) {
+        String codeFromRedis = String.valueOf(redisUtil.getValue("code_by:" + username));
+        if (!code.equals(codeFromRedis))
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        boolean update = UpdateChain.of(User.class)
+                .set(USER.PASSWORD, passwordEncoder.encode(password))
+                .where(USER.USERNAME.eq(username))
+                .update();
+        if (update)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
     private void rolePermissionDeleteHandler(QueryWrapper rolePermissionWrapper) {
         List<String> rids = rolePermissionMapper.selectListByQuery(rolePermissionWrapper).stream().map(RolePermission::getRid).toList();
         rids.forEach(this::rolePermissionUpdateHandler);
