@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -43,8 +44,8 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @GetMapping("/gets")
-    public BaseResponse<Page<UserDetailVO>> gets(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNo, @RequestParam(defaultValue = "50") int pageSize) {
-        return userService.gets(keyword, pageNo, pageSize);
+    public BaseResponse<List<UserDetailVO>> gets(@RequestParam(defaultValue = "") String keyword) {
+        return userService.gets(keyword);
     }
     @PreAuthorize(
             "hasAuthority('user:update:all') " +

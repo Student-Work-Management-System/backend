@@ -33,7 +33,7 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deletePermission(String pid);
     BaseResponse<List<RolePermissionVO>> getAllRole();
     <T> BaseResponse<T> logout();
-    BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize);
+    BaseResponse<List<UserDetailVO>> gets(String keyWord);
     <T> BaseResponse<T> deleteUser(String uid);
     <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO);
     BaseResponse<List<PermissionTreeVO>> getPermissionTree();

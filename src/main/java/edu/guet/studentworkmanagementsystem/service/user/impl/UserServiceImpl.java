@@ -311,14 +311,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<Page<UserDetailVO>> gets(String keyWord, int pageNo, int pageSize) {
-        Page<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
+    public BaseResponse<List<UserDetailVO>> gets(String keyWord) {
+        List<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
                 .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                 .from(USER)
                 .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                 .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
                 .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
-                .pageAs(Page.of(pageNo, pageSize), UserDetailVO.class);
+                .listAs(UserDetailVO.class);
         return ResponseUtil.success(userDetailVOPage);
     }
 
