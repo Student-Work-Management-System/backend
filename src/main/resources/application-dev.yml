@@ -21,6 +21,7 @@ spring:
       password: Qx310320.n
   mail:
     host: smtp.163.com
+    port: 25
     protocol: smtp
     default-encoding: UTF-8
     username: BridgeFishDev@163.com

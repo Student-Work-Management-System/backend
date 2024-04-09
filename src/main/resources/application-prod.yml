@@ -18,10 +18,11 @@ spring:
           max-wait: -1
           max-idle: 8
           min-idle: 0
-      password: qx310320
+      password: Qx310320.n
   mail:
     host: smtp.163.com
-    protocol: smtp
+    port: 465
+    protocol: smtps
     default-encoding: UTF-8
     username: BridgeFishDev@163.com
     password: EGAQESJVOQOITMBS
