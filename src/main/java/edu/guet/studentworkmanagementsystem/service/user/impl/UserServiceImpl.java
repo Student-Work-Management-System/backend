@@ -18,6 +18,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -55,7 +56,6 @@ import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePerm
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
-
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Autowired
@@ -386,7 +386,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public <T> BaseResponse<T> findBackPassword(String username) {
+    public BaseResponse<FindBackPasswordVO> findBackPassword(String username) {
         User user = QueryChain.of(User.class)
                 .select(USER.ALL_COLUMNS)
                 .where(USER.USERNAME.eq(username))
@@ -396,7 +396,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
         emailService.sendEmail(user.getEmail(), code);
         redisUtil.setValue("code_by:" + username, code, 5);
-        return ResponseUtil.success();
+
+        String email = user.getEmail();
+        int idx = email.indexOf('@');
+        String suffix = email.substring(idx);
+        int maskLength = idx + 1 - 3 - 3;
+        String maskEmail = email.substring(0, 3) + String.valueOf('*').repeat(maskLength)
+                + email.substring(idx-3, idx) + suffix;
+        FindBackPasswordVO findBackPasswordVO = new FindBackPasswordVO(maskEmail);
+        return ResponseUtil.success(findBackPasswordVO);
     }
 
     @Override

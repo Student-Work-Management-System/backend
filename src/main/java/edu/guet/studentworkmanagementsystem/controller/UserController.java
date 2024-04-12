@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -73,7 +74,7 @@ public class UserController {
     }
     @PermitAll
     @GetMapping("/findBackPassword/{username}")
-    public <T> BaseResponse<T> findBackPassword(@PathVariable String username) {
+    public BaseResponse<FindBackPasswordVO> findBackPassword(@PathVariable String username) {
         return userService.findBackPassword(username);
     }
     @PermitAll
