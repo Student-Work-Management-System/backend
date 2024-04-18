@@ -42,10 +42,7 @@ public class StudentEmployment implements Serializable {
     /**
      * 毕业的年份
      */
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate graduationYear;
+    private String graduationYear;
     /**
      * 毕业去向
      */
