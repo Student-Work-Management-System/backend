@@ -14,6 +14,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
 
@@ -36,6 +37,6 @@ public interface UserService extends IService<User> {
     <T> BaseResponse<T> deleteUser(String uid);
     <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO);
     BaseResponse<List<PermissionTreeVO>> getPermissionTree();
-    <T> BaseResponse<T> findBackPassword(String username);
+    BaseResponse<FindBackPasswordVO> findBackPassword(String username);
     <T> BaseResponse<T> updatePassword(String username, String password, String code);
 }
