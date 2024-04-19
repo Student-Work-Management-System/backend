@@ -44,7 +44,6 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());
-        System.out.println(studentEmploymentList);
         int i = mapper.insertBatch(studentEmploymentList);
         if (i == size)
             return ResponseUtil.success();
