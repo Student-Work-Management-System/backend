@@ -34,7 +34,7 @@ public class Cadre implements Serializable {
     /**
      * 具体职位
      */
-    @NotBlank(message = "详细职位信息不能为空", groups = {InsertGroup.class})
+    @NotBlank(message = "职位名称不能为空", groups = {InsertGroup.class})
     private String cadrePosition;
     /**
      * 职位级别
