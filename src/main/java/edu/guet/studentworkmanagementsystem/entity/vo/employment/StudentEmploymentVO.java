@@ -23,10 +23,7 @@ public class StudentEmploymentVO implements Serializable {
     private String name;
     private String majorName;
     private String graduationState;
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate graduationYear;
+    private String graduationYear;
     private String whereabouts;
     private String jobNature;
     private String jobIndustry;
