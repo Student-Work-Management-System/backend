@@ -21,6 +21,7 @@ public class StudentEmploymentVO implements Serializable {
     private Long studentEmploymentId;
     private String studentId;
     private String name;
+    private String grade;
     private String majorName;
     private String graduationState;
     private String graduationYear;
