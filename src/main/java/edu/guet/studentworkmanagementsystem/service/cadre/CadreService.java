@@ -40,7 +40,8 @@ public interface CadreService extends IService<StudentCadre> {
      * 在导入完成职位信息后才能安排学生任职信息
      * @param insertStudentCadreDTO 学生任职记录对象
      */
-    BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreDTO insertStudentCadreDTO);
+    BaseResponse<StudentCadre> arrangePosition(InsertStudentCadreDTO insertStudentCadreDTO);
+    BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreList insertStudentCadreList);
     /**
      * 修改学生任职信息(不能变动职位,若需变动实现下方)
      * @param updateStudentCadreDTO 修改需要传递的对象, 某一为空则不修改该属性

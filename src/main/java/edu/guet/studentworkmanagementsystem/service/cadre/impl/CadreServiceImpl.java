@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -79,13 +80,28 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
     @Override
     @Transactional
-    public  BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreDTO insertStudentCadreDTO) {
+    public  BaseResponse<StudentCadre> arrangePosition(InsertStudentCadreDTO insertStudentCadreDTO) {
         StudentCadre studentCadre = new StudentCadre(insertStudentCadreDTO);
         int i = mapper.insert(studentCadre);
         if (i > 0)
             return ResponseUtil.success(studentCadre);
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+    @Transactional
+    @Override
+    public BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreList insertStudentCadreList) {
+        ArrayList<StudentCadre> studentCadres = new ArrayList<>();  
+        insertStudentCadreList.getInsertStudentCadreDTOList().forEach(item->{
+            StudentCadre studentCadre = new StudentCadre(item);
+            studentCadres.add(studentCadre);
+        });
+        int size = studentCadres.size();
+        int i = mapper.insertBatch(studentCadres);
+        if (i == size)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudentCadre(UpdateStudentCadreDTO updateStudentCadreDTO) {

@@ -47,8 +47,13 @@ public class CadreController {
     }
     @PreAuthorize("hasAuthority('student_cadre:insert')")
     @PostMapping("/student_cadre/add")
+    public BaseResponse<StudentCadre> arrangePosition(@RequestBody @Valid InsertStudentCadreDTO insertStudentCadreDTO){
+        return cadreService.arrangePosition(insertStudentCadreDTO) ;
+    }
+    @PreAuthorize("hasAuthority('student_cadre:insert')")
+    @PostMapping("/student_cadre/adds")
     public BaseResponse<StudentCadre> arrangePositions(@RequestBody @Valid InsertStudentCadreDTO insertStudentCadreDTO){
-        return cadreService.arrangePositions(insertStudentCadreDTO) ;
+        return cadreService.arrangePosition(insertStudentCadreDTO) ;
     }
     @PreAuthorize("hasAuthority('student_cadre:update')")
     @PutMapping("/student_cadre/update")
