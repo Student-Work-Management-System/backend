@@ -16,4 +16,5 @@ public class EmploymentQuery implements Serializable {
     private String grade;
     private Integer pageNo;
     private Integer pageSize;
+    private String search;
 }

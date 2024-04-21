@@ -69,14 +69,27 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentEmploymentVO> page = QueryChain.of(StudentEmployment.class)
+
+        QueryChain<StudentEmployment> queryChain = QueryChain.of(StudentEmployment.class)
                 .select(STUDENT_EMPLOYMENT.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_EMPLOYMENT)
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
-                .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getGrade).eq(query.getGrade())
-                .pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
+                .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID));
+
+        if (query.getMajorId() != null) {
+            queryChain = queryChain.where(Student::getMajorId).eq(query.getMajorId());
+        }
+
+        if (query.getGrade() != null) {
+            queryChain = queryChain.where(Student::getGrade).eq(query.getGrade());
+        }
+
+        if (query.getMajorId() == null && query.getGrade() == null) {
+            queryChain = queryChain.where("1 = 1");
+        }
+        queryChain = queryChain.where(STUDENT.STUDENT_ID.like(query.getSearch())).or(STUDENT.NAME.like(query.getSearch()));
+
+        Page<StudentEmploymentVO> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
         return ResponseUtil.success(page);
     }
     @Override
