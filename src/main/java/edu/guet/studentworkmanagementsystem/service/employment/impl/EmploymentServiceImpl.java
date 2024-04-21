@@ -76,9 +76,9 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getGrade).eq(query.getGrade());
-
-        queryChain = queryChain.where(STUDENT.STUDENT_ID.like(query.getSearch())).or(STUDENT.NAME.like(query.getSearch()));
+                .and(Student::getGrade).eq(query.getGrade())
+                .and(STUDENT_EMPLOYMENT.GRADUATION_YEAR.eq(query.getGraduationYear()))
+                .and(STUDENT.STUDENT_ID.like(query.getSearch())).or(STUDENT.NAME.like(query.getSearch()));
 
         Page<StudentEmploymentVO> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
         return ResponseUtil.success(page);

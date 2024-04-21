@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class EmploymentQuery implements Serializable {
     private String majorId;
     private String grade;
+    private String graduationYear;
     private Integer pageNo;
     private Integer pageSize;
     private String search;
