@@ -15,13 +15,7 @@ class StudentWorkManagementSystemApplicationTests {
     private EmploymentService employmentService;
     @Test
     void contextLoads() {
-        EmploymentQuery query = new EmploymentQuery();
-        query.setSearch("");
-        query.setGraduationYear("2022");
-        query.setPageNo(1);
-        query.setPageSize(10);
-        BaseResponse<Page<StudentEmploymentVO>> studentEmployment = employmentService.getStudentEmployment(query);
-        Page<StudentEmploymentVO> data = studentEmployment.getData();
-        System.out.println(data);
+        BaseResponse<Object> response = employmentService.deleteStudentEmployment("4");
+        System.out.println(response);
     }
 }
