@@ -36,6 +36,6 @@ public interface EmploymentService extends IService<StudentEmployment> {
     /**
      * 删除学生就业信息
      */
-    <T> BaseResponse<T> deleteStudentEmployment(String studentId);
+    <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId);
     // todo: 统计就业信息
 }
