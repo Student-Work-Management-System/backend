@@ -32,7 +32,6 @@ public class StudentCadre implements Serializable {
     /**
      * 对应的职位id
      */
-    @Id
     private String cadreId;
     /**
      * 任职开始学期
