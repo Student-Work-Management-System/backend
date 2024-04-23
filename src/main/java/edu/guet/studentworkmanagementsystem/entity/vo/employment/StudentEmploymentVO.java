@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentEmploymentVO implements Serializable {
-    private Long studentEmploymentId;
+    private String studentEmploymentId;
     private String studentId;
     private String name;
     private String majorName;
