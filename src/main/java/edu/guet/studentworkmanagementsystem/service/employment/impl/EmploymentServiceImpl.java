@@ -87,19 +87,16 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudentEmployment(UpdateStudentEmploymentDTO updateStudentEmploymentDTO) {
-        StudentEmployment studentEmployment = new StudentEmployment();
-        BeanUtils.copyProperties(updateStudentEmploymentDTO, studentEmployment);
         boolean update = UpdateChain.of(StudentEmployment.class)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, studentEmployment.getGraduationState(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear(), Objects::nonNull)
-                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, studentEmployment.getWhereabouts(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_NATURE, studentEmployment.getJobNature(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, studentEmployment.getJobIndustry(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, studentEmployment.getJobLocation(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.CATEGORY, studentEmployment.getCategory(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.SALARY, studentEmployment.getSalary(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.STUDENT_ID, studentEmployment.getStudentId(), StringUtils::hasLength)
-                .and(STUDENT_EMPLOYMENT.STUDENT_EMPLOYMENT_ID.eq(studentEmployment.getStudentEmploymentId()))
+                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, updateStudentEmploymentDTO.getGraduationState(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, updateStudentEmploymentDTO.getGraduationYear(), Objects::nonNull)
+                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, updateStudentEmploymentDTO.getWhereabouts(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_NATURE, updateStudentEmploymentDTO.getJobNature(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, updateStudentEmploymentDTO.getJobIndustry(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, updateStudentEmploymentDTO.getJobLocation(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.CATEGORY, updateStudentEmploymentDTO.getCategory(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.SALARY, updateStudentEmploymentDTO.getSalary(), StringUtils::hasLength)
+                .where(StudentEmployment::getStudentEmploymentId).eq(updateStudentEmploymentDTO.getStudentEmploymentId())
                 .update();
         if (update)
             return ResponseUtil.success();
