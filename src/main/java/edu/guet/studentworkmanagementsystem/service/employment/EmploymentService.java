@@ -3,12 +3,12 @@ package edu.guet.studentworkmanagementsystem.service.employment;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.List;
 
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
@@ -37,5 +37,12 @@ public interface EmploymentService extends IService<StudentEmployment> {
      * 删除学生就业信息
      */
     <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId);
-    // todo: 统计就业信息
+    /**
+     * 就业信息(文件下载)
+     */
+    void download(EmploymentStatQuery query, HttpServletResponse response);
+    /**
+     * 统计就业信息
+     */
+    <T> BaseResponse<T> statistics(EmploymentStatQuery query);
 }

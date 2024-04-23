@@ -2,12 +2,10 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,5 +40,15 @@ public class EmploymentController {
     @DeleteMapping("/delete/{studentEmploymentId}")
     public <T> BaseResponse<T> deleteStudentEmployment(@PathVariable String studentEmploymentId) {
         return employmentService.deleteStudentEmployment(studentEmploymentId);
+    }
+    @PreAuthorize("hasAuthority('student_employment:select')")
+    @PostMapping("/download")
+    public void download(@RequestBody EmploymentStatQuery query, HttpServletResponse response) {
+        employmentService.download(query, response);
+    }
+    @PreAuthorize("hasAuthority('student:employment:select')")
+    @PostMapping("/download")
+    public <T> BaseResponse<T> statistics(@RequestBody EmploymentStatQuery query) {
+        return employmentService.statistics(query);
     }
 }

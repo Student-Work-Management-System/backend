@@ -5,25 +5,26 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.employment.StudentEmploymentMapper;
+import edu.guet.studentworkmanagementsystem.network.EmploymentFeign;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 @Service
 public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper, StudentEmployment> implements EmploymentService {
     @Autowired
-    private StudentEmploymentMapper studentEmploymentMapper;
+    private EmploymentFeign employmentFeign;
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList) {
@@ -107,9 +108,26 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId) {
-        int i = studentEmploymentMapper.deleteById(studentEmploymentId);
+        int i = mapper.deleteById(studentEmploymentId);
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Override
+    public void download(EmploymentStatQuery query, HttpServletResponse response) {
+        try {
+            byte[] excelBytes = employmentFeign.exportWithStat(query);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=学生就业信息统计.xlsx");
+            response.getOutputStream().write(excelBytes);
+        } catch (IOException exception) {
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+    }
+
+    @Override
+    public <T> BaseResponse<T> statistics(EmploymentStatQuery query) {
+        Map<String, Object> stringObjectMap = employmentFeign.exportOnlyStat(query);
+        return null;
     }
 }
