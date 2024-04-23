@@ -47,7 +47,7 @@ public class EmploymentController {
         employmentService.download(query, response);
     }
     @PreAuthorize("hasAuthority('student:employment:select')")
-    @PostMapping("/download")
+    @PostMapping("/statistics")
     public <T> BaseResponse<T> statistics(@RequestBody EmploymentStatQuery query) {
         return employmentService.statistics(query);
     }
