@@ -36,16 +36,6 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Autowired
     private CadreMapper cadreMapper ;
     @Override
-    @Transactional
-    public <T> BaseResponse<T> importCadres(CadreList cadreList) {
-        List<Cadre> cadres = cadreList.getCadres();
-        int size = cadres.size();
-        int i = cadreMapper.insertBatch(cadres);
-        if (i == size)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-    @Override
     public <T> BaseResponse<T> insertCadre(Cadre cadre) {
         int i = cadreMapper.insert(cadre);
         if (i > 0)

@@ -12,11 +12,6 @@ import java.util.List;
 
 public interface CadreService extends IService<StudentCadre> {
     /**
-     * 批量导入职位信息
-     * @param cadres 职位信息列表
-     */
-    <T> BaseResponse<T> importCadres(CadreList cadres);
-    /**
      * 对象添加职位
      * @param cadre 职位记录对象
      */

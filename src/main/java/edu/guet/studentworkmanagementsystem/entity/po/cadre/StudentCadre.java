@@ -29,7 +29,6 @@ public class StudentCadre implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentCadreId;
-    @Id
     private String studentId;
     /**
      * 对应的职位id
