@@ -10,9 +10,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CadreQuery implements Serializable {
-    private String search;
+    private String studentId;
+    private String name;
     private String grade;
     private String majorId;
+    private String cadrePosition;
     private String cadreLevel;
     private String appointmentStartTerm;
     private String appointmentEndTerm;
