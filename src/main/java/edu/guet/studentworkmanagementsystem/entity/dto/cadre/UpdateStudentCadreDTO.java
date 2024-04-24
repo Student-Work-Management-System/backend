@@ -17,10 +17,10 @@ public class UpdateStudentCadreDTO {
     private String studentId;
     private String cadreId;
     @Nullable
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职开始学期不能为空")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}_(1|2)$\n", message = "任职开始学期不能为空")
     private String appointmentStartTerm;
     @Nullable
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职结束学期不能为空")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}_(1|2)$\n", message = "任职结束学期不能为空")
     private String appointmentEndTerm;
     private String comment;
 }

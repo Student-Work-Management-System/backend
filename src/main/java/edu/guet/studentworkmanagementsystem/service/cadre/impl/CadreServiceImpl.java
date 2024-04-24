@@ -2,6 +2,7 @@ package edu.guet.studentworkmanagementsystem.service.cadre.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -120,7 +121,10 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentCadre(String studentCadreId) {
-        int i = mapper.deleteById(studentCadreId);
+//        int i = mapper.deleteById(studentCadreId);
+        QueryWrapper queryWrapper = QueryWrapper.create();
+        queryWrapper.where(STUDENT_CADRE.STUDENT_CADRE_ID.eq(studentCadreId));
+        int i = mapper.deleteByQuery(queryWrapper) ;
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
