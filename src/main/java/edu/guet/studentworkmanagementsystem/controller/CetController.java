@@ -2,10 +2,8 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.service.cet.CetService;
 import jakarta.validation.Valid;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -49,5 +48,10 @@ public class CetController {
     @DeleteMapping("/delete/{studentCetId}")
     public <T> BaseResponse<T> deleteStudentCET(@PathVariable String studentCetId) {
         return cetService.deleteStudentCET(studentCetId);
+    }
+    @PreAuthorize("hasAuthority('student_cet:select')")
+    @PostMapping("/stat")
+    public BaseResponse<HashMap<String, CetStatistics>> stat(@RequestBody CetStatQuery query) {
+        return cetService.getCetStatistics(query);
     }
 }

@@ -3,13 +3,12 @@ package edu.guet.studentworkmanagementsystem.service.cet;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
+import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface CetService extends IService<StudentCet> {
@@ -43,5 +42,8 @@ public interface CetService extends IService<StudentCet> {
      * @param studentCetId 考试成绩记录
      */
     <T> BaseResponse<T> deleteStudentCET(String studentCetId);
-    // todo: 统计、分析CET成绩
+    /**
+     * cet成绩统计
+     */
+    BaseResponse<HashMap<String, CetStatistics>> getCetStatistics(CetStatQuery query);
 }

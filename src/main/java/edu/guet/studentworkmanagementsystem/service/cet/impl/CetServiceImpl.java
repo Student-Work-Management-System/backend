@@ -5,32 +5,33 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.CETQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertCetDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.InsertStudentCetDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.cet.UpdateStudentCetDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
+import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cet.StudentCetMapper;
+import edu.guet.studentworkmanagementsystem.network.CetFeign;
 import edu.guet.studentworkmanagementsystem.service.cet.CetService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
+import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.cet.table.StudentCetTableDef.STUDENT_CET;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
 public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> implements CetService {
+    @Autowired
+    private CetFeign cetFeign;
     @Override
     @Transactional
     public <T> BaseResponse<T> importCETScore(InsertCetDTOList insertCetDTOList) {
@@ -104,6 +105,32 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
+    @Override
+    public BaseResponse<HashMap<String, CetStatistics>> getCetStatistics(CetStatQuery query) {
+        List<String> majorIds = query.getMajorIds();
+        if (majorIds.isEmpty()) {
+            int key = 1;
+            while (key <= 6) {
+                majorIds.add(String.valueOf(key));
+                key++;
+            }
+        }
+        Map<String, Object> map = cetFeign.exportOnlyStat(query);
+        Set<String> keys = majorName2MajorId.keySet();
+        HashMap<String, CetStatistics> result = new HashMap<>();
+        keys.forEach(item -> {
+            if (map.containsKey(item)) {
+                CetStatistics cetStatistics = new CetStatistics();
+                HashMap<String, Object> dataMap = (HashMap<String, Object>) map.get(item);
+                cetStatistics.setCet4((HashMap<String, Object>) dataMap.get("cet4"));
+                cetStatistics.setCet6((HashMap<String, Object>) dataMap.get("cet6"));
+                result.put(item, cetStatistics);
+            }
+        });
+        return ResponseUtil.success(result);
+    }
+
     private StudentCet convertToEntity(InsertStudentCetDTO insertStudentCetDTO) {
         StudentCet studentCet = new StudentCet();
         BeanUtils.copyProperties(insertStudentCetDTO, studentCet);
