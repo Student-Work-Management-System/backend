@@ -173,7 +173,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 tmp.setSalary(String.valueOf(salaryMap.get(key)));
             }
             if (graduationStatus.containsKey(key) || jobLocation.containsKey(key) || jobIndustry.containsKey(key) || salaryMap.containsKey(key)) {
-                statisticsHashMap.put(majorName2MajorId.get(key), tmp);
+                statisticsHashMap.put(key, tmp);
             }
         });
         return ResponseUtil.success(statisticsHashMap);
