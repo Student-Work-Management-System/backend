@@ -27,7 +27,7 @@ public class StudentPatent implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private String studentPatentId;
+    private Long studentPatentId;
     /**
      * 发表状态：受理、公开或授权
      */
