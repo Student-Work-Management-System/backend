@@ -13,7 +13,6 @@ import java.io.Serializable;
 public class UpdateStudentEmploymentDTO implements Serializable {
     @NotBlank(message = "学生就业信息id不能为空")
     private String studentEmploymentId;
-    private String studentId;
     private String graduationState;
     private String graduationYear;
     private String whereabouts;
