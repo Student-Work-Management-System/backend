@@ -21,7 +21,8 @@ public enum ServiceExceptionEnum {
     UNKNOWN_ERROR(-2001, "未知异常"),
     NOT_RESOURCE(-2002, "无此资源: "),
     RELATE_FAILURE(-2003, "找不到id对应记录"),
-    NULL_POINTER(-2004, "出现空指针异常");
+    NULL_POINTER(-2004, "出现空指针异常"),
+    DB_TIMEOUT(-2005, "数据库连接出现超时");
     private final int code;
     private final String msg;
     ServiceExceptionEnum(int code, String msg) {
