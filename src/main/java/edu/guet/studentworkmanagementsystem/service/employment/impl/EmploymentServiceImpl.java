@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
@@ -131,15 +132,6 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         }
     }
-
-    private static final HashMap<String, String> majorName2MajorId = new HashMap<>(){{
-        put("计算机科学与技术", "1");
-        put("软件工程", "2");
-        put("信息安全", "3");
-        put("物联网工程", "4");
-        put("智能科学与技术", "5");
-        put("网络空间安全", "6");
-    }};
 
     @Override
     public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query) {
