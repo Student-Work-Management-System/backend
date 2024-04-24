@@ -15,6 +15,7 @@ import java.io.Serializable;
 public class StudentCadreVO implements Serializable {
     private String studentCadreId;
     private String studentId;
+    private String cadreId;
     private String name;
     private String gender;
     private String majorName;

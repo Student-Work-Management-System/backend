@@ -16,9 +16,9 @@ public class InsertStudentCadreDTO {
     private String studentId;
     @NotBlank(message = "职位id不能为空")
     private String cadreId;
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职开始学期不能为空")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}_(1|2)$\n", message = "任职开始学期不能为空")
     private String appointmentStartTerm;
-    @Pattern(regexp = "^2\\d{3}-2\\d{3}$", message = "任职结束学期不能为空")
+    @Pattern(regexp = "^2\\d{3}-2\\d{3}_(1|2)$\n", message = "任职结束学期不能为空")
     private String appointmentEndTerm;
     private String comment;
 }
