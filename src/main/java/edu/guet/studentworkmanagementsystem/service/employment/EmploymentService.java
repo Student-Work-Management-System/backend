@@ -5,9 +5,11 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.HashMap;
 
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
@@ -43,5 +45,5 @@ public interface EmploymentService extends IService<StudentEmployment> {
     /**
      * 统计就业信息
      */
-    <T> BaseResponse<T> statistics(EmploymentStatQuery query);
+    BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query);
 }

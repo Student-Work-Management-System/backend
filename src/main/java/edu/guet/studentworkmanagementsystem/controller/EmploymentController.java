@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +11,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/employment")
@@ -46,9 +49,9 @@ public class EmploymentController {
     public void download(@RequestBody EmploymentStatQuery query, HttpServletResponse response) {
         employmentService.download(query, response);
     }
-    @PreAuthorize("hasAuthority('student:employment:select')")
-    @PostMapping("/statistics")
-    public <T> BaseResponse<T> statistics(@RequestBody EmploymentStatQuery query) {
+    @PreAuthorize("hasAuthority('student_employment:select')")
+    @PostMapping("/stat")
+    public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(@RequestBody EmploymentStatQuery query) {
         return employmentService.statistics(query);
     }
 }

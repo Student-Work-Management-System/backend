@@ -8,6 +8,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -23,10 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
@@ -116,18 +116,69 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     public void download(EmploymentStatQuery query, HttpServletResponse response) {
         try {
+            List<String> majorIds = query.getMajorIds();
+            if (majorIds.isEmpty()) {
+                int key = 1;
+                while (key <= 6) {
+                    majorIds.add(String.valueOf(key));
+                    key++;
+                }
+            }
             byte[] excelBytes = employmentFeign.exportWithStat(query);
+            String fileName = "学生就业信息统计.xlsx";
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=学生就业信息统计.xlsx");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
             response.getOutputStream().write(excelBytes);
         } catch (IOException exception) {
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         }
     }
 
+    private static final HashMap<String, String> majorName2MajorId = new HashMap<>(){{
+        put("计算机科学与技术", "1");
+        put("软件工程", "2");
+        put("信息安全", "3");
+        put("物联网工程", "4");
+        put("智能科学与技术", "5");
+        put("网络空间安全", "6");
+    }};
+
     @Override
-    public <T> BaseResponse<T> statistics(EmploymentStatQuery query) {
-        Map<String, Object> stringObjectMap = employmentFeign.exportOnlyStat(query);
-        return null;
+    public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query) {
+        List<String> majorIds = query.getMajorIds();
+        if (majorIds.isEmpty()) {
+            int key = 1;
+            while (key <= 6) {
+                majorIds.add(String.valueOf(key));
+                key++;
+            }
+        }
+        Map<String, Object> map = employmentFeign.exportOnlyStat(query);
+        Set<String> keys = majorName2MajorId.keySet();
+        HashMap<String, HashMap<String, Integer>> graduationStatus = (HashMap<String, HashMap<String, Integer>>) map.get("graduation_status");
+        HashMap<String, HashMap<String, Integer>> jobLocation = (HashMap<String, HashMap<String, Integer>>) map.get("job_location");
+        HashMap<String, HashMap<String, Integer>> jobIndustry = (HashMap<String, HashMap<String, Integer>>) map.get("job_industry");
+        HashMap<String, Double> salaryMap = (HashMap<String, Double>) map.get("salary");
+        HashMap<String, EmploymentStatistics> statisticsHashMap = new HashMap<>();
+        keys.forEach(key -> {
+            EmploymentStatistics tmp = new EmploymentStatistics();
+            if (graduationStatus.containsKey(key)) {
+                tmp.setGraduationStatus(graduationStatus.get(key));
+            }
+            if (jobLocation.containsKey(key)) {
+                tmp.setJobLocation(jobLocation.get(key));
+            }
+            if (jobIndustry.containsKey(key)) {
+                tmp.setJobIndustry(jobIndustry.get(key));
+            }
+            if (salaryMap.containsKey(key)) {
+                tmp.setSalary(String.valueOf(salaryMap.get(key)));
+            }
+            if (graduationStatus.containsKey(key) || jobLocation.containsKey(key) || jobIndustry.containsKey(key) || salaryMap.containsKey(key)) {
+                statisticsHashMap.put(majorName2MajorId.get(key), tmp);
+            }
+        });
+        return ResponseUtil.success(statisticsHashMap);
     }
 }
