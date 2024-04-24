@@ -41,9 +41,9 @@ public class LoggerInterceptor implements HandlerInterceptor {
                 logger.error("出现错误: {}", e.toString());
             }
         }
+        logger.info("接收到{}请求:{}, 来源:{}", method, servletPath, remoteAddr);
         if (StringUtils.hasLength(buffer.toString()))
             logger.info("参数: {}", buffer);
-        logger.info("接收到" + method +"请求:" + servletPath + ", 来源:" + remoteAddr);
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 }

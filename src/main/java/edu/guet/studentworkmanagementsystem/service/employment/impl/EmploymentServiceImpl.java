@@ -5,27 +5,28 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertEmploymentDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.InsertStudentEmploymentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.employment.UpdateStudentEmploymentDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.employment.StudentEmploymentMapper;
+import edu.guet.studentworkmanagementsystem.network.EmploymentFeign;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
@@ -35,7 +36,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 @Service
 public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper, StudentEmployment> implements EmploymentService {
     @Autowired
-    private StudentEmploymentMapper studentEmploymentMapper;
+    private EmploymentFeign employmentFeign;
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList) {
@@ -86,19 +87,16 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudentEmployment(UpdateStudentEmploymentDTO updateStudentEmploymentDTO) {
-        StudentEmployment studentEmployment = new StudentEmployment();
-        BeanUtils.copyProperties(updateStudentEmploymentDTO, studentEmployment);
         boolean update = UpdateChain.of(StudentEmployment.class)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, studentEmployment.getGraduationState(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear(), Objects::nonNull)
-                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, studentEmployment.getWhereabouts(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_NATURE, studentEmployment.getJobNature(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, studentEmployment.getJobIndustry(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, studentEmployment.getJobLocation(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.CATEGORY, studentEmployment.getCategory(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.SALARY, studentEmployment.getSalary(), StringUtils::hasLength)
-                .set(STUDENT_EMPLOYMENT.STUDENT_ID, studentEmployment.getStudentId(), StringUtils::hasLength)
-                .and(STUDENT_EMPLOYMENT.STUDENT_EMPLOYMENT_ID.eq(studentEmployment.getStudentEmploymentId()))
+                .set(STUDENT_EMPLOYMENT.GRADUATION_STATE, updateStudentEmploymentDTO.getGraduationState(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, updateStudentEmploymentDTO.getGraduationYear(), Objects::nonNull)
+                .set(STUDENT_EMPLOYMENT.WHEREABOUTS, updateStudentEmploymentDTO.getWhereabouts(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_NATURE, updateStudentEmploymentDTO.getJobNature(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_INDUSTRY, updateStudentEmploymentDTO.getJobIndustry(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.JOB_LOCATION, updateStudentEmploymentDTO.getJobLocation(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.CATEGORY, updateStudentEmploymentDTO.getCategory(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.SALARY, updateStudentEmploymentDTO.getSalary(), StringUtils::hasLength)
+                .where(StudentEmployment::getStudentEmploymentId).eq(updateStudentEmploymentDTO.getStudentEmploymentId())
                 .update();
         if (update)
             return ResponseUtil.success();
@@ -107,9 +105,77 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId) {
-        int i = studentEmploymentMapper.deleteById(studentEmploymentId);
+        int i = mapper.deleteById(studentEmploymentId);
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Override
+    public void download(EmploymentStatQuery query, HttpServletResponse response) {
+        try {
+            List<String> majorIds = query.getMajorIds();
+            if (majorIds.isEmpty()) {
+                int key = 1;
+                while (key <= 6) {
+                    majorIds.add(String.valueOf(key));
+                    key++;
+                }
+            }
+            byte[] excelBytes = employmentFeign.exportWithStat(query);
+            String fileName = "学生就业信息统计.xlsx";
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+            response.getOutputStream().write(excelBytes);
+        } catch (IOException exception) {
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+    }
+
+    private static final HashMap<String, String> majorName2MajorId = new HashMap<>(){{
+        put("计算机科学与技术", "1");
+        put("软件工程", "2");
+        put("信息安全", "3");
+        put("物联网工程", "4");
+        put("智能科学与技术", "5");
+        put("网络空间安全", "6");
+    }};
+
+    @Override
+    public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query) {
+        List<String> majorIds = query.getMajorIds();
+        if (majorIds.isEmpty()) {
+            int key = 1;
+            while (key <= 6) {
+                majorIds.add(String.valueOf(key));
+                key++;
+            }
+        }
+        Map<String, Object> map = employmentFeign.exportOnlyStat(query);
+        Set<String> keys = majorName2MajorId.keySet();
+        HashMap<String, HashMap<String, Integer>> graduationStatus = (HashMap<String, HashMap<String, Integer>>) map.get("graduation_status");
+        HashMap<String, HashMap<String, Integer>> jobLocation = (HashMap<String, HashMap<String, Integer>>) map.get("job_location");
+        HashMap<String, HashMap<String, Integer>> jobIndustry = (HashMap<String, HashMap<String, Integer>>) map.get("job_industry");
+        HashMap<String, Double> salaryMap = (HashMap<String, Double>) map.get("salary");
+        HashMap<String, EmploymentStatistics> statisticsHashMap = new HashMap<>();
+        keys.forEach(key -> {
+            EmploymentStatistics tmp = new EmploymentStatistics();
+            if (graduationStatus.containsKey(key)) {
+                tmp.setGraduationStatus(graduationStatus.get(key));
+            }
+            if (jobLocation.containsKey(key)) {
+                tmp.setJobLocation(jobLocation.get(key));
+            }
+            if (jobIndustry.containsKey(key)) {
+                tmp.setJobIndustry(jobIndustry.get(key));
+            }
+            if (salaryMap.containsKey(key)) {
+                tmp.setSalary(String.valueOf(salaryMap.get(key)));
+            }
+            if (graduationStatus.containsKey(key) || jobLocation.containsKey(key) || jobIndustry.containsKey(key) || salaryMap.containsKey(key)) {
+                statisticsHashMap.put(majorName2MajorId.get(key), tmp);
+            }
+        });
+        return ResponseUtil.success(statisticsHashMap);
     }
 }

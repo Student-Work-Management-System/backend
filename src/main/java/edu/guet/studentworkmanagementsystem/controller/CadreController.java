@@ -19,12 +19,7 @@ import java.util.List;
 @RestController
 public class CadreController {
     @Autowired
-    CadreService cadreService ;
-    @PreAuthorize("hasAuthority('cadre:insert')")
-    @PostMapping("/cadre/adds")
-    public BaseResponse<List<Cadre>> addCadres(@RequestBody @Validated({InsertGroup.class}) CadreList cadreList) {
-        return cadreService.importCadres(cadreList);
-    }
+    private CadreService cadreService;
     @PreAuthorize("hasAuthority('cadre:insert')")
     @PostMapping("/cadre/add")
     public BaseResponse<Cadre> addCadre(@RequestBody @Validated({InsertGroup.class}) Cadre cadre) {
