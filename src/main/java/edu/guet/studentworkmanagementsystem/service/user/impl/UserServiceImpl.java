@@ -102,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private void addUserRole(List<String> roles, String uid) {
         ArrayList<UserRole> userRoles = new ArrayList<>();
         if (roles.size() == 1)
-            userRoles.add(new UserRole(uid, roles.getFirst()));
+            userRoles.add(new UserRole(uid, roles.get(0)));
         else
             roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
         int i = userRoleMapper.insertBatch(userRoles);
@@ -160,7 +160,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return ResponseUtil.success(userDetailVO);
     }
     private <T> boolean listHandler(List<T> list) {
-        return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
+        return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.get(0)));
     }
 
     @Transactional
@@ -188,7 +188,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private void addRolePermission(List<String> permissions, String rid) {
         ArrayList<RolePermission> rolePermission = new ArrayList<>();
         if (permissions.size() == 1)
-            rolePermission.add(new RolePermission(rid, permissions.getFirst()));
+            rolePermission.add(new RolePermission(rid, permissions.get(0)));
         else
             permissions.forEach(item -> rolePermission.add(new RolePermission(rid, item)));
         int i = rolePermissionMapper.insertBatch(rolePermission);
