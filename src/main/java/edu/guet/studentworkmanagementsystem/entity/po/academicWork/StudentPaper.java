@@ -29,7 +29,7 @@ public class StudentPaper implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentPaperId;
+    private String studentPaperId;
     /**
      * 期刊名称
      */

@@ -26,7 +26,7 @@ public class StudentEmployment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentEmploymentId;
+    private String studentEmploymentId;
     private String studentId;
     /**
      * 毕业后的状态：就业、待就业、升学、地方/国家基层项目、科研/管理助理

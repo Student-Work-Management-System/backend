@@ -36,7 +36,6 @@ public class StudentAcademicWork implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentAcademicWorkId;
-    @Id
     private String studentId;
     /**
      * 著作名称

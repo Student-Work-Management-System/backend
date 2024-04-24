@@ -30,7 +30,6 @@ public class StudentSchoolPrecaution implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentSchoolPrecautionId;
-    @Id
     @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
     private String studentId;
     /**

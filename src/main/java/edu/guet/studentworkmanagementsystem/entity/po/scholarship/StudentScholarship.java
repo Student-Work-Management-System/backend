@@ -28,9 +28,7 @@ public class StudentScholarship implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentScholarshipId;
-    @Id
     private String studentId;
-    @Id
     private String scholarshipId;
     /**
      * 获奖学年, YYYY-YYYY

@@ -27,7 +27,6 @@ public class StudentCet implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentCetId;
-    @Id
     private String studentId;
     private Long score;
     /**

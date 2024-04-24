@@ -28,9 +28,7 @@ public class StudentPovertyAssistance implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentPovertyAssistanceId;
-    @Id
     private String studentId;
-    @Id
     private String povertyAssistanceId;
     /**
      * 认证学年, YYYY-YYYY

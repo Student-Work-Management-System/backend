@@ -36,8 +36,6 @@ public class StudentStatus implements Serializable {
     @Id(keyType = KeyType.Auto)
     @NotBlank(message = "学生学籍状态id不能为空", groups = {UpdateGroup.class})
     private String studentStatusId;
-    @Id
-    @NotBlank(message = "学号不能为空", groups = {UpdateGroup.class})
     private String studentId;
     /**
      * 学籍状态, 只有在校和离校这两种大类

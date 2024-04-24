@@ -36,12 +36,10 @@ public class StudentLeaveAudit implements Serializable {
     /**
      * 审批人id
      */
-    @Id
     private String auditorId;
     /**
      * 请假记录id
      */
-    @Id
     private String studentLeaveId;
     /**
      * 审批日期

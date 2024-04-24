@@ -36,11 +36,9 @@ public class Student implements Serializable {
     /**
      * 学生的身份证号
      */
-    @Id
     @NotBlank(message = "身份证号不能为空")
     @Size(min = 18, max = 18, message = "请输入正确的身份证号")
     private String idNumber;
-    @Id
     @NotBlank(message = "姓名不能为空")
     private String name;
     @NotBlank(message = "性别不能为空")
