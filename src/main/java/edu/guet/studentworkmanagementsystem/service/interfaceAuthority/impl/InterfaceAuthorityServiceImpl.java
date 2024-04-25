@@ -130,10 +130,10 @@ public class InterfaceAuthorityServiceImpl implements InterfaceAuthorityService 
         add(new InterfaceAuthority("/cet/delete/{studentCetId}", List.of("student_cet:delete")));
     }};
     private static final ArrayList<InterfaceAuthority> enrollmentAuthority = new ArrayList<>(){{
-        add(new InterfaceAuthority("/enrollment/gets", List.of("enrollment_info:select")));
-        add(new InterfaceAuthority("/enrollment/add", List.of("enrollment_info:insert")));
-        add(new InterfaceAuthority("/enrollment/update", List.of("enrollment_info:update")));
-        add(new InterfaceAuthority("/enrollment/delete/{enrollmentInfoId}", List.of("enrollment_info:delete")));
+        add(new InterfaceAuthority("/enrollment/gets", List.of("enrollment:select")));
+        add(new InterfaceAuthority("/enrollment/add", List.of("enrollment:insert")));
+        add(new InterfaceAuthority("/enrollment/update", List.of("enrollment:update")));
+        add(new InterfaceAuthority("/enrollment/delete/{enrollmentId}", List.of("enrollment:delete")));
     }};
     private static final ArrayList<InterfaceAuthority> competitionAuthority = new ArrayList<>(){{
         add(new InterfaceAuthority("/competition/gets", List.of("competition:select")));
