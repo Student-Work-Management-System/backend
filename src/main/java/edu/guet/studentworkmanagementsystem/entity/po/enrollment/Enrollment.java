@@ -65,7 +65,6 @@ public class Enrollment implements Serializable {
     /**
      * 高考总分
      */
-    @NotNull(message = "高考分数不能为空", groups = {InsertGroup.class})
-    @Column("NCEE_score")
-    private Long NCEEScore;
+    @NotBlank(message = "高考分数不能为空", groups = {InsertGroup.class})
+    private String score;
 }

@@ -52,7 +52,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .set(ENROLLMENT.FIRST_MAJOR, enrollment.getFirstMajor(), StringUtils::hasLength)
                 .set(ENROLLMENT.ORIGIN, enrollment.getOrigin(), StringUtils::hasLength)
                 .set(ENROLLMENT.ENROLL_SCHOOL, enrollment.getEnrollSchool(), StringUtils::hasLength)
-                .set(ENROLLMENT.N_C_E_E_SCORE, enrollment.getNCEEScore(), Objects::nonNull)
+                .set(ENROLLMENT.SCORE, enrollment.getScore(), StringUtils::hasLength)
                 .set(ENROLLMENT.ENROLL_MAJOR, enrollment.getEnrollMajor(), StringUtils::hasLength)
                 .where(ENROLLMENT.ENROLLMENT_ID.eq(enrollment.getEnrollmentId()))
                 .update();
