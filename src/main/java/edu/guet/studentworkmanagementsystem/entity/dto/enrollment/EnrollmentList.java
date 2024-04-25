@@ -1,6 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.enrollment;
 
-import edu.guet.studentworkmanagementsystem.entity.po.enrollment.EnrollmentInfo;
+import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EnrollmentInfoList implements Serializable {
+public class EnrollmentList implements Serializable {
     @Valid
-    private List<EnrollmentInfo> enrollmentInfoList;
+    private List<Enrollment> enrollmentList;
 }

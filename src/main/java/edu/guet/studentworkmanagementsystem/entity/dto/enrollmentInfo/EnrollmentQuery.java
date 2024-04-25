@@ -10,8 +10,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EnrollmentQuery implements Serializable {
-    private String from;
-    private String enrollCollege;
+    private String origin;
+    private String enrollSchool;
     private String enrollMajor;
     private String firstMajor;
     private Integer pageNo;

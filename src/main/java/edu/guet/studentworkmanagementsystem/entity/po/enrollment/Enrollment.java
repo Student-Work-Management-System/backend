@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.po.enrollment;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -25,17 +26,17 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "enrollment_info")
-public class EnrollmentInfo implements Serializable {
+@Table(value = "enrollment")
+public class Enrollment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     @NotBlank(message = "招新信息id不能为空", groups = {UpdateGroup.class})
-    private String enrollmentInfoId;
+    private String enrollmentId;
     @NotBlank(message = "准考证号不能为空", groups = {InsertGroup.class})
-    private String examId;
+    private String examineeId;
     @NotBlank(message = "身份证号不能为空", groups = {InsertGroup.class})
-    private String idNumber;
+    private String id;
     /**
      * 考生姓名
      */
@@ -45,12 +46,12 @@ public class EnrollmentInfo implements Serializable {
      * 生源地
      */
     @NotBlank(message = "生源地不能为空", groups = {InsertGroup.class})
-    private String from;
+    private String origin;
     /**
      * 录取学院
      */
     @NotBlank(message = "录取学院不能为空", groups = {InsertGroup.class})
-    private String enrollCollege;
+    private String enrollSchool;
     /**
      * 录取专业
      */
@@ -65,5 +66,6 @@ public class EnrollmentInfo implements Serializable {
      * 高考总分
      */
     @NotNull(message = "高考分数不能为空", groups = {InsertGroup.class})
-    private Long score;
+    @Column("NCEE_score")
+    private Long NCEEScore;
 }
