@@ -97,11 +97,11 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Transactional
     public <T> BaseResponse<T> updateStudentCadre(UpdateStudentCadreDTO updateStudentCadreDTO) {
            boolean update = UpdateChain.of(StudentCadre.class)
-                   .set(StudentCadre::getStudentId, updateStudentCadreDTO.getStudentId(), StringUtils.hasLength(updateStudentCadreDTO.getStudentId()))
-                   .set(StudentCadre::getCadreId, updateStudentCadreDTO.getCadreId(), StringUtils.hasLength(updateStudentCadreDTO.getCadreId()))
-                   .set(StudentCadre::getAppointmentStartTerm, updateStudentCadreDTO.getAppointmentStartTerm(), StringUtils.hasLength(updateStudentCadreDTO.getAppointmentStartTerm()))
-                   .set(StudentCadre::getAppointmentEndTerm, updateStudentCadreDTO.getAppointmentEndTerm(), StringUtils.hasLength(updateStudentCadreDTO.getAppointmentEndTerm()))
-                   .set(StudentCadre::getComment, updateStudentCadreDTO.getComment(), StringUtils.hasLength(updateStudentCadreDTO.getComment()))
+                   .set(StudentCadre::getStudentId, updateStudentCadreDTO.getStudentId(), StringUtils::hasLength)
+                   .set(StudentCadre::getCadreId, updateStudentCadreDTO.getCadreId(), StringUtils::hasLength)
+                   .set(StudentCadre::getAppointmentStartTerm, updateStudentCadreDTO.getAppointmentStartTerm(), StringUtils::hasLength)
+                   .set(StudentCadre::getAppointmentEndTerm, updateStudentCadreDTO.getAppointmentEndTerm(), StringUtils::hasLength)
+                   .set(StudentCadre::getComment, updateStudentCadreDTO.getComment(), StringUtils::hasLength)
                    .where(StudentCadre::getStudentCadreId).eq(updateStudentCadreDTO.getStudentCadreId())
                    .update();
            if (update)
@@ -111,10 +111,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentCadre(String studentCadreId) {
-//        int i = mapper.deleteById(studentCadreId);
-        QueryWrapper queryWrapper = QueryWrapper.create();
-        queryWrapper.where(STUDENT_CADRE.STUDENT_CADRE_ID.eq(studentCadreId));
-        int i = mapper.deleteByQuery(queryWrapper) ;
+        int i = mapper.deleteById(studentCadreId);
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
