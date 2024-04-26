@@ -6,7 +6,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
-import edu.guet.studentworkmanagementsystem.entity.dto.enrollmentInfo.EnrollmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
@@ -75,7 +74,8 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         Page<Enrollment> enrollmentInfoPage = QueryChain.of(Enrollment.class)
                 .select(ENROLLMENT.ALL_COLUMNS)
                 .from(ENROLLMENT)
-                .where(ENROLLMENT.ORIGIN.eq(query.getOrigin()))
+                .where(ENROLLMENT.NAME.like(query.getName()))
+                .and(ENROLLMENT.ORIGIN.eq(query.getOrigin()))
                 .and(ENROLLMENT.ENROLL_SCHOOL.eq(query.getEnrollSchool()))
                 .and(ENROLLMENT.ENROLL_MAJOR.eq(query.getEnrollMajor()))
                 .and(ENROLLMENT.FIRST_MAJOR.eq(query.getFirstMajor()))

@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.dto.enrollmentInfo;
+package edu.guet.studentworkmanagementsystem.entity.dto.enrollment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EnrollmentQuery implements Serializable {
+    private String name;
     private String origin;
     private String enrollSchool;
     private String enrollMajor;

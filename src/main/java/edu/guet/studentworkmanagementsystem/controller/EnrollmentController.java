@@ -5,7 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
-import edu.guet.studentworkmanagementsystem.entity.dto.enrollmentInfo.EnrollmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
