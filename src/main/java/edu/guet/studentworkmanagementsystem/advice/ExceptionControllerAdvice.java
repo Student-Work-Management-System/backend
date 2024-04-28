@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -65,7 +67,7 @@ public class ExceptionControllerAdvice {
     public <T> BaseResponse<T> dataIntegrityViolationException() {
         return ResponseUtil.failure(ServiceExceptionEnum.RELATE_FAILURE);
     }
-    @ExceptionHandler(QueryCreationException.class)
+    @ExceptionHandler(TransientDataAccessException.class)
     public <T> BaseResponse<T> queryCreationException() {
         return ResponseUtil.failure(ServiceExceptionEnum.DB_TIMEOUT);
     }
