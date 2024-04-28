@@ -11,6 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class EnrollmentQuery implements Serializable {
     private String name;
+    private String examineeId;
+    private String id;
     private String origin;
     private String enrollMajorId;
     private String firstMajor;
