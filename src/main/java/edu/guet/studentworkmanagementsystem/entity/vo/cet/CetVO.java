@@ -10,8 +10,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CetVO implements Serializable {
+    private String studentCetId;
     private Long score;
     private String examDate;
-    private String certificateNumber;
     private String examType;
+    private String certificateNumber;
 }

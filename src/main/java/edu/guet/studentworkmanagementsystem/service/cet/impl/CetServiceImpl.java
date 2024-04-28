@@ -2,12 +2,14 @@ package edu.guet.studentworkmanagementsystem.service.cet.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import static com.mybatisflex.core.query.QueryMethods.*;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
+import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -59,16 +61,22 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         Page<StudentCetVO> studentCetVOPage = QueryChain.of(StudentCet.class)
-                .select(STUDENT_CET.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
-                .from(STUDENT_CET)
-                .innerJoin(STUDENT).on(STUDENT_CET.STUDENT_ID.eq(STUDENT.STUDENT_ID))
+                .select(distinct(STUDENT.STUDENT_ID), STUDENT.NAME, STUDENT.GRADE, MAJOR.MAJOR_NAME)
+                .from(STUDENT)
+                .innerJoin(STUDENT_CET).on(STUDENT_CET.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .where(STUDENT_CET.SCORE.le(query.getScore()))
-                .and(STUDENT_CET.EXAM_TYPE.eq(query.getExamType()))
-                .and(STUDENT_CET.EXAM_DATE.eq(query.getExamDate()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .pageAs(Page.of(pageNo, pageSize), StudentCetVO.class);
+        studentCetVOPage.getRecords().forEach(item -> {
+            String studentId = item.getStudentId();
+            List<CetVO> list = QueryChain.of(StudentCet.class)
+                    .select(STUDENT_CET.ALL_COLUMNS)
+                    .from(STUDENT_CET)
+                    .where(STUDENT_CET.STUDENT_ID.eq(studentId))
+                    .listAs(CetVO.class);
+            item.setCets(list);
+        });
         return ResponseUtil.success(studentCetVOPage);
     }
     @Override
