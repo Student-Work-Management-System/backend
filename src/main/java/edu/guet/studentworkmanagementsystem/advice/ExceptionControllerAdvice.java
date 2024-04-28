@@ -4,6 +4,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -39,6 +40,10 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(DuplicateKeyException.class)
     public <T> BaseResponse<T> duplicateKeyExceptionHandler() {
         return ResponseUtil.failure(ServiceExceptionEnum.KEY_EXISTED);
+    }
+    @ExceptionHandler(PersistenceException.class)
+    public <T> BaseResponse<T> persistenceHandler() {
+        return ResponseUtil.failure(ServiceExceptionEnum.DUPLICATE);
     }
     @ExceptionHandler(AccessDeniedException.class)
     public <T> BaseResponse<T> accessDeniedExceptionHandler() {

@@ -1,10 +1,7 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.competition;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Members;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,8 +1,7 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.authority;
 
-import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
-import lombok.Data;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;

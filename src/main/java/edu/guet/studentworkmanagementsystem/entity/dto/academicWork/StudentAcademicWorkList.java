@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.academicWork;
 
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;

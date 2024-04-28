@@ -1,8 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.cadre;
 
-import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
-import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
