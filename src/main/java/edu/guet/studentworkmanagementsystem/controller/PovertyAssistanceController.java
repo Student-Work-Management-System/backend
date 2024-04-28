@@ -46,8 +46,13 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
     @PostMapping("/student_poverty_assistance/add")
-    public <T> BaseResponse<T> arrangeStudentPovertyAssistance(@RequestBody @Valid InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
-        return povertyAssistanceService.arrangeStudentPovertyAssistance(insertStudentPovertyAssistanceDTO);
+    public <T> BaseResponse<T> addStudentPovertyAssistance(@RequestBody @Valid InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
+        return povertyAssistanceService.addStudentPovertyAssistance(insertStudentPovertyAssistanceDTO);
+    }
+    @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
+    @PostMapping("/student_poverty_assistance/adds")
+    public <T> BaseResponse<T> importStudentPovertyAssistances(@RequestBody @Valid InsertStudentPovertyAssistanceList list) {
+        return povertyAssistanceService.importStudentPovertyAssistance(list);
     }
     @PreAuthorize(
             "hasAuthority('student_poverty_assistance:select') " +
@@ -64,7 +69,7 @@ public class PovertyAssistanceController {
     public <T> BaseResponse<T> updateStudentPovertyAssistance(@RequestBody @Valid UpdateStudentPovertyAssistanceDTO updateStudentPovertyAssistanceDTO) {
         return povertyAssistanceService.updateStudentPovertyAssistance(updateStudentPovertyAssistanceDTO);
     }
-    @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
+    @PreAuthorize("hasAuthority('student_poverty_assistance:delete')")
     @DeleteMapping("/student_poverty_assistance/delete/{studentPovertyAssistanceId}")
     public <T> BaseResponse<T> deleteStudentPovertyAssistance(@PathVariable String studentPovertyAssistanceId) {
         return povertyAssistanceService.deleteStudentPovertyAssistance(studentPovertyAssistanceId);

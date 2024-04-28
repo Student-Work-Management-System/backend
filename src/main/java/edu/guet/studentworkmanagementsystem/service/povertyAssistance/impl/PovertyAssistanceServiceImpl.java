@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,10 +79,24 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> arrangeStudentPovertyAssistance(InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
+    public <T> BaseResponse<T> addStudentPovertyAssistance(InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
         StudentPovertyAssistance studentPovertyAssistance = new StudentPovertyAssistance(insertStudentPovertyAssistanceDTO);
         int i = mapper.insert(studentPovertyAssistance);
         if (i > 0)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> importStudentPovertyAssistance(InsertStudentPovertyAssistanceList insertStudentPovertyAssistanceList) {
+        ArrayList<StudentPovertyAssistance> studentPovertyAssistances = new ArrayList<>();
+        insertStudentPovertyAssistanceList.getList().forEach(it -> {
+            StudentPovertyAssistance studentPovertyAssistance = new StudentPovertyAssistance(it);
+            studentPovertyAssistances.add(studentPovertyAssistance);
+        });
+        int size = studentPovertyAssistances.size();
+        int i = mapper.insertBatch(studentPovertyAssistances);
+        if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }

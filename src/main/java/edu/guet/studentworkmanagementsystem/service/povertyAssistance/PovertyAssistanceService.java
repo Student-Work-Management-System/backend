@@ -36,7 +36,12 @@ public interface PovertyAssistanceService extends IService<StudentPovertyAssista
      * 完成学生贫困认证记录
      * @param insertStudentPovertyAssistanceDTO 学生贫困认证记录对象
      */
-    <T> BaseResponse<T> arrangeStudentPovertyAssistance(InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO);
+    <T> BaseResponse<T> addStudentPovertyAssistance(InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO);
+    /**
+     * 批量插入学生贫困任职记录
+     * @param insertStudentPovertyAssistanceList 插入列表
+     */
+    <T> BaseResponse<T> importStudentPovertyAssistance(InsertStudentPovertyAssistanceList insertStudentPovertyAssistanceList);
     /**
      * 分页查询学生贫困信息
      * <br/>
