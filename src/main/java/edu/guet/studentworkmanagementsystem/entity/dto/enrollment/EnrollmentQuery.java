@@ -12,9 +12,9 @@ import java.io.Serializable;
 public class EnrollmentQuery implements Serializable {
     private String name;
     private String origin;
-    private String enrollSchool;
-    private String enrollMajor;
+    private String enrollMajorId;
     private String firstMajor;
+    private String enrollTime;
     private Integer pageNo;
     private Integer pageSize;
 }

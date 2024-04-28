@@ -46,13 +46,12 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
     public <T> BaseResponse<T> updateEnrollment(Enrollment enrollment) {
         boolean update = UpdateChain.of(Enrollment.class)
                 .set(ENROLLMENT.EXAMINEE_ID, enrollment.getExamineeId(), StringUtils::hasLength)
-                .set(ENROLLMENT.ID, enrollment.getId(), StringUtils::hasLength)
                 .set(ENROLLMENT.NAME, enrollment.getName(), StringUtils::hasLength)
+                .set(ENROLLMENT.ENROLL_MAJOR_ID, enrollment.getEnrollMajorId(), StringUtils::hasLength)
                 .set(ENROLLMENT.FIRST_MAJOR, enrollment.getFirstMajor(), StringUtils::hasLength)
                 .set(ENROLLMENT.ORIGIN, enrollment.getOrigin(), StringUtils::hasLength)
-                .set(ENROLLMENT.ENROLL_SCHOOL, enrollment.getEnrollSchool(), StringUtils::hasLength)
                 .set(ENROLLMENT.SCORE, enrollment.getScore(), StringUtils::hasLength)
-                .set(ENROLLMENT.ENROLL_MAJOR, enrollment.getEnrollMajor(), StringUtils::hasLength)
+                .set(ENROLLMENT.ENROLL_TIME, enrollment.getEnrollTime(), StringUtils::hasLength)
                 .where(ENROLLMENT.ENROLLMENT_ID.eq(enrollment.getEnrollmentId()))
                 .update();
         if (update)
@@ -76,9 +75,9 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .from(ENROLLMENT)
                 .where(ENROLLMENT.NAME.like(query.getName()))
                 .and(ENROLLMENT.ORIGIN.eq(query.getOrigin()))
-                .and(ENROLLMENT.ENROLL_SCHOOL.eq(query.getEnrollSchool()))
-                .and(ENROLLMENT.ENROLL_MAJOR.eq(query.getEnrollMajor()))
+                .and(ENROLLMENT.ENROLL_MAJOR_ID.eq(query.getEnrollMajorId()))
                 .and(ENROLLMENT.FIRST_MAJOR.eq(query.getFirstMajor()))
+                .and(ENROLLMENT.ENROLL_TIME.eq(query.getEnrollTime()))
                 .page(Page.of(pageNo, pageSize));
         return ResponseUtil.success(enrollmentInfoPage);
     }
