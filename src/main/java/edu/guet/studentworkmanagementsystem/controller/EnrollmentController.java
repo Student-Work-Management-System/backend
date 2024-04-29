@@ -6,13 +6,18 @@ import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/enrollment")
@@ -43,5 +48,15 @@ public class EnrollmentController {
     @PostMapping("/gets")
     public BaseResponse<Page<Enrollment>> getAllRecords(@RequestBody EnrollmentQuery query) {
         return enrollmentService.getAllRecords(query);
+    }
+    @PreAuthorize("hasAuthority('enrollment:select')")
+    @PostMapping("/download")
+    public void download(@RequestBody EnrollmentStatQuery query, HttpServletResponse response) {
+        enrollmentService.download(query, response);
+    }
+    @PreAuthorize("hasAuthority('enrollment:select')")
+    @PostMapping("/stat")
+    public BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(@RequestBody EnrollmentStatQuery query) {
+        return enrollmentService.statistics(query);
     }
 }

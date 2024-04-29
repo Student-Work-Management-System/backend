@@ -5,8 +5,13 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.HashMap;
 
 public interface EnrollmentService extends IService<Enrollment> {
     /**
@@ -35,4 +40,6 @@ public interface EnrollmentService extends IService<Enrollment> {
      * @param query 查询参数
      */
     BaseResponse<Page<Enrollment>> getAllRecords(EnrollmentQuery query);
+    void download(EnrollmentStatQuery query, HttpServletResponse response);
+    BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(EnrollmentStatQuery query);
 }
