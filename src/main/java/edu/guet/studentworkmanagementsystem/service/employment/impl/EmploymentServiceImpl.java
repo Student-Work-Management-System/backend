@@ -155,9 +155,11 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             }
         }
         Map<String, Object> map = employmentFeign.exportOnlyStat(query);
-        HashMap<String, HashMap<String, Integer>> graduationStatus = (HashMap<String, HashMap<String, Integer>>) map.get("毕业后状态");
-        HashMap<String, HashMap<String, Integer>> jobLocation = (HashMap<String, HashMap<String, Integer>>) map.get("单位所在地");
-        HashMap<String, HashMap<String, Integer>> jobIndustry = (HashMap<String, HashMap<String, Integer>>) map.get("单位所处行业");
+        if (map.isEmpty())
+            return ResponseUtil.success();
+        HashMap<String, HashMap<String, Object>> graduationStatus = (HashMap<String, HashMap<String, Object>>) map.get("毕业后状态");
+        HashMap<String, HashMap<String, Object>> jobLocation = (HashMap<String, HashMap<String, Object>>) map.get("单位所在地");
+        HashMap<String, HashMap<String, Object>> jobIndustry = (HashMap<String, HashMap<String, Object>>) map.get("单位所处行业");
         HashMap<String, Double> salaryMap = (HashMap<String, Double>) map.get("平均薪资");
         HashMap<String, EmploymentStatistics> statisticsHashMap = new HashMap<>();
         keys.forEach(key -> {

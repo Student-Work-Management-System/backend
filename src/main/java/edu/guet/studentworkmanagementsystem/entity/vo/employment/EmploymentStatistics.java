@@ -10,8 +10,8 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmploymentStatistics {
-    private HashMap<String, Integer> graduationStatus;
-    private HashMap<String, Integer> jobLocation;
-    private HashMap<String, Integer> jobIndustry;
+    private HashMap<String, Object> graduationStatus;
+    private HashMap<String, Object> jobLocation;
+    private HashMap<String, Object> jobIndustry;
     private String salary;
 }
