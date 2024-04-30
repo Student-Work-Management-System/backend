@@ -40,7 +40,7 @@ public interface EnrollmentService extends IService<Enrollment> {
      * <br/>
      * @param query 查询参数
      */
-    BaseResponse<Page<EnrollmentVO>> getAllRecords(EnrollmentQuery query);
+    BaseResponse<Page<EnrollmentVO>>  getAllRecords(EnrollmentQuery query);
     void download(EnrollmentStatQuery query, HttpServletResponse response);
     BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(EnrollmentStatQuery query);
 }
