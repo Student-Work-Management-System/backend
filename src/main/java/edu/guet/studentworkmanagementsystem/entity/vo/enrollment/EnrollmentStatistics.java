@@ -13,5 +13,5 @@ import java.util.HashMap;
 public class EnrollmentStatistics implements Serializable {
     private HashMap<String, Object> origin;
     private HashMap<String, Object> enrollmentState;
-    private HashMap<String, HashMap<String, Integer>> regionScores;
+    private HashMap<String, HashMap<String, Object>> regionScores;
 }

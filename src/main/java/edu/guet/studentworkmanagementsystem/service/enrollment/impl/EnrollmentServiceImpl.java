@@ -148,7 +148,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         HashMap<String, EnrollmentStatistics> ret = new HashMap<>();
         keys.forEach(key -> {
             EnrollmentStatistics enrollmentStatistics = new EnrollmentStatistics();
-            HashMap<String, HashMap<String, Integer>> reginScore = new HashMap<>();
+            HashMap<String, HashMap<String, Object>> reginScore = new HashMap<>();
             if (originMap.containsKey(key)) {
                 enrollmentStatistics.setOrigin(originMap.get(key));
             }
@@ -157,7 +157,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
             }
             Set<String> reginScoreKeys = reginScoreMap.keySet();
             reginScoreKeys.forEach(it -> {
-                HashMap<String, HashMap<String, Integer>> hashMap = (HashMap<String, HashMap<String, Integer>>) reginScoreMap.get(it);
+                HashMap<String, HashMap<String, Object>> hashMap = (HashMap<String, HashMap<String, Object>>) reginScoreMap.get(it);
                 if (hashMap.containsKey(key)) {
                     reginScore.put(it, hashMap.get(key));
                 }
