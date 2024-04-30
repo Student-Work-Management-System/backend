@@ -112,9 +112,9 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(Student::getGrade).eq(query.getGrade())
                 .and(Student::getMajorId).eq(query.getMajorId())
-                .and(PovertyAssistance::getPovertyType).eq(query.getPovertyType())
+                .or(PovertyAssistance::getPovertyType).like(query.getSearch())
+                .or(PovertyAssistance::getPovertyAssistanceStandard).like(query.getSearch())
                 .and(PovertyAssistance::getPovertyLevel).eq(query.getPovertyLevel())
-                .and(PovertyAssistance::getPovertyAssistanceStandard).eq(query.getPovertyAssistanceStandard())
                 .and(StudentPovertyAssistance::getAssistanceYear).eq(query.getAssistanceYear())
                 .pageAs(Page.of(pageNo, pageSize), StudentStudentPovertyAssistanceVO.class);
         return ResponseUtil.success(studentStudentPovertyAssistanceVOPage);

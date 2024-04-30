@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class StudentStudentPovertyAssistanceVO implements Serializable {
     private String studentPovertyAssistanceId;
     private String studentId;
+    private String povertyAssistanceId;
     private String name;
     private String grade;
     private String majorName;
