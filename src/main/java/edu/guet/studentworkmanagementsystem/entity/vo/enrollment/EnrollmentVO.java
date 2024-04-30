@@ -15,6 +15,7 @@ public class EnrollmentVO implements Serializable {
     private String name;
     private String origin;
     private String enrollMajor;
+    private String enrollMajorId;
     private String firstMajor;
     private String score;
     private String enrollTime;
