@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStat
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.enrollment.EnrollmentMapper;
@@ -30,6 +31,7 @@ import java.util.*;
 
 import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 
 @Service
 public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollment> implements EnrollmentService {
@@ -78,12 +80,13 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<Enrollment>> getAllRecords(EnrollmentQuery query) {
+    public BaseResponse<Page<EnrollmentVO>> getAllRecords(EnrollmentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<Enrollment> enrollmentInfoPage = QueryChain.of(Enrollment.class)
-                .select(ENROLLMENT.ALL_COLUMNS)
+        Page<EnrollmentVO> enrollmentInfoPage = QueryChain.of(Enrollment.class)
+                .select(ENROLLMENT.ALL_COLUMNS, MAJOR.MAJOR_NAME.as("enrollMajor"))
                 .from(ENROLLMENT)
+                .innerJoin(MAJOR).on(ENROLLMENT.ENROLL_MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(ENROLLMENT.NAME.like(query.getName())
                     .or(ENROLLMENT.EXAMINEE_ID.like(query.getExamineeId()))
                     .or(ENROLLMENT.ID.like(query.getId()))
@@ -91,7 +94,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .and(ENROLLMENT.ENROLL_MAJOR_ID.eq(query.getEnrollMajorId()))
                 .and(ENROLLMENT.FIRST_MAJOR.eq(query.getFirstMajor()))
                 .and(ENROLLMENT.ENROLL_TIME.eq(query.getEnrollTime()))
-                .page(Page.of(pageNo, pageSize));
+                .pageAs(Page.of(pageNo, pageSize), EnrollmentVO.class);
         return ResponseUtil.success(enrollmentInfoPage);
     }
 

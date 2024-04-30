@@ -10,6 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStat
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentVO;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class EnrollmentController {
     }
     @PreAuthorize("hasAuthority('enrollment:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<Enrollment>> getAllRecords(@RequestBody EnrollmentQuery query) {
+    public BaseResponse<Page<EnrollmentVO>> getAllRecords(@RequestBody EnrollmentQuery query) {
         return enrollmentService.getAllRecords(query);
     }
     @PreAuthorize("hasAuthority('enrollment:select')")
