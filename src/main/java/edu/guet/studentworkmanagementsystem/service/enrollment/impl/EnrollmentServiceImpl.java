@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Majors;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
@@ -122,16 +123,26 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
 
     @Override
     public BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(EnrollmentStatQuery query) {
+        Set<String> keys = new HashSet<>();
         List<String> majorIds = query.getMajorIds();
         if (majorIds.isEmpty()) {
             int key = 1;
             while (key <= 6) {
-                majorIds.add(String.valueOf(key));
+                String s = String.valueOf(key);
+                majorIds.add(s);
                 key++;
+            }
+            keys = majorName2MajorId.keySet();
+        } else {
+            for (String majorId : majorIds) {
+                for (String key : majorName2MajorId.keySet()) {
+                    if (majorName2MajorId.get(key).equals(majorId)) {
+                        keys.add(key);
+                    }
+                }
             }
         }
         Map<String, Object> map = enrollmentFeign.exportOnlyStat(query);
-        Set<String> keys = majorName2MajorId.keySet();
         HashMap<String, HashMap<String, Object>> originMap = (HashMap<String, HashMap<String, Object>>) map.get("生源地情况");
         HashMap<String, HashMap<String, Object>> enrollmentStateMap = (HashMap<String, HashMap<String, Object>>) map.get("录取情况");
         HashMap<String, Object> reginScoreMap = (HashMap<String, Object>) map.get("各生源地高考分数统计");

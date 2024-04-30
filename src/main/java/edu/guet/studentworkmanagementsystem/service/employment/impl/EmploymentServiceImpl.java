@@ -135,16 +135,26 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
 
     @Override
     public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query) {
+        Set<String> keys = new HashSet<>();
         List<String> majorIds = query.getMajorIds();
         if (majorIds.isEmpty()) {
             int key = 1;
             while (key <= 6) {
-                majorIds.add(String.valueOf(key));
+                String s = String.valueOf(key);
+                majorIds.add(s);
                 key++;
+            }
+            keys = majorName2MajorId.keySet();
+        } else {
+            for (String majorId : majorIds) {
+                for (String key : majorName2MajorId.keySet()) {
+                    if (majorName2MajorId.get(key).equals(majorId)) {
+                        keys.add(key);
+                    }
+                }
             }
         }
         Map<String, Object> map = employmentFeign.exportOnlyStat(query);
-        Set<String> keys = majorName2MajorId.keySet();
         HashMap<String, HashMap<String, Integer>> graduationStatus = (HashMap<String, HashMap<String, Integer>>) map.get("graduation_status");
         HashMap<String, HashMap<String, Integer>> jobLocation = (HashMap<String, HashMap<String, Integer>>) map.get("job_location");
         HashMap<String, HashMap<String, Integer>> jobIndustry = (HashMap<String, HashMap<String, Integer>>) map.get("job_industry");
