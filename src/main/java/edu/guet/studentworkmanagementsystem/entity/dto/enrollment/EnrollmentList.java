@@ -14,5 +14,5 @@ import java.util.List;
 @NoArgsConstructor
 public class EnrollmentList implements Serializable {
     @Valid
-    private List<Enrollment> enrollmentList;
+    private List<Enrollment> enrollments;
 }

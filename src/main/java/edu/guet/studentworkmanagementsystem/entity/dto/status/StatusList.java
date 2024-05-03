@@ -14,5 +14,5 @@ import java.util.List;
 @NoArgsConstructor
 public class StatusList implements Serializable {
     @Valid
-    private List<StudentStatus> statusList;
+    private List<StudentStatus> statuses;
 }
