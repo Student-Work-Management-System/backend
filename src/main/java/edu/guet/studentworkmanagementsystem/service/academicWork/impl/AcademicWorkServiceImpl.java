@@ -46,7 +46,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentAcademicWork(StudentAcademicWorkList studentAcademicWorkList) {
-        List<StudentAcademicWorkDTO> studentAcademicWorkDTOList = studentAcademicWorkList.getStudentAcademicWorkDTOList();
+        List<StudentAcademicWorkDTO> studentAcademicWorkDTOList = studentAcademicWorkList.getStudentAcademicWorks();
         int size = studentAcademicWorkDTOList.size();
         ArrayList<StudentAcademicWork> studentAcademicWorks = new ArrayList<>();
         studentAcademicWorkDTOList.forEach(item -> {

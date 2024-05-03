@@ -34,7 +34,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentStatus(StatusList statusList) {
-        List<StudentStatus> studentStatuses = statusList.getStatusList();
+        List<StudentStatus> studentStatuses = statusList.getStatuses();
         int size = studentStatuses.size();
         int i = mapper.insertBatch(studentStatuses);
         if (i == size)

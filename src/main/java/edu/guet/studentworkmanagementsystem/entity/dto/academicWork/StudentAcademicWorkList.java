@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class StudentAcademicWorkList implements Serializable {
     @Valid
-    private List<StudentAcademicWorkDTO> studentAcademicWorkDTOList;
+    private List<StudentAcademicWorkDTO> studentAcademicWorks;
 }

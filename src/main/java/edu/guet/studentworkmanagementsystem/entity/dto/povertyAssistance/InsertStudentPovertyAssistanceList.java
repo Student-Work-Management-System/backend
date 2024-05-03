@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 public class InsertStudentPovertyAssistanceList implements Serializable {
     @Valid
-    private List<InsertStudentPovertyAssistanceDTO> list;
+    private List<InsertStudentPovertyAssistanceDTO> studentPovertyAssistances;
 }

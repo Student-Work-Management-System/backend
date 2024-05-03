@@ -40,8 +40,8 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
     @Override
     @Transactional
     public <T> BaseResponse<T> importEnrollment(EnrollmentList enrollmentList) {
-        int size = enrollmentList.getEnrollmentList().size();
-        int i = mapper.insertBatch(enrollmentList.getEnrollmentList());
+        int size = enrollmentList.getEnrollments().size();
+        int i = mapper.insertBatch(enrollmentList.getEnrollments());
         if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);

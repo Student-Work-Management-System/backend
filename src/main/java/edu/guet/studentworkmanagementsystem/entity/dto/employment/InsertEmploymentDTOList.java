@@ -12,5 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class InsertEmploymentDTOList {
     @Valid
-    private List<InsertStudentEmploymentDTO> insertStudentEmploymentDTOList;
+    private List<InsertStudentEmploymentDTO> studentEmployments;
 }

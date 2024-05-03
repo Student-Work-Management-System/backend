@@ -14,5 +14,5 @@ import java.util.List;
 @NoArgsConstructor
 public class PovertyAssistanceList implements Serializable {
     @Valid
-    private List<PovertyAssistance> povertyAssistanceList;
+    private List<PovertyAssistance> povertyAssistances;
 }

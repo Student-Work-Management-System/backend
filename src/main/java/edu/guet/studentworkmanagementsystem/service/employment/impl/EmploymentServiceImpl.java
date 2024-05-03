@@ -41,8 +41,8 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList) {
-        int size = insertEmploymentDTOList.getInsertStudentEmploymentDTOList().size();
-        List<StudentEmployment> studentEmploymentList = insertEmploymentDTOList.getInsertStudentEmploymentDTOList()
+        int size = insertEmploymentDTOList.getStudentEmployments().size();
+        List<StudentEmployment> studentEmploymentList = insertEmploymentDTOList.getStudentEmployments()
                 .stream()
                 .map(this::convertToEntity)
                 .collect(Collectors.toList());

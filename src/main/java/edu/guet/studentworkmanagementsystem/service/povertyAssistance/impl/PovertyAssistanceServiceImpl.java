@@ -40,8 +40,8 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     @Override
     @Transactional
     public <T> BaseResponse<T> importPovertyAssistance(PovertyAssistanceList povertyAssistanceList) {
-        int size = povertyAssistanceList.getPovertyAssistanceList().size();
-        int i = povertyAssistanceMapper.insertBatch(povertyAssistanceList.getPovertyAssistanceList());
+        int size = povertyAssistanceList.getPovertyAssistances().size();
+        int i = povertyAssistanceMapper.insertBatch(povertyAssistanceList.getPovertyAssistances());
         if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -90,7 +90,7 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     @Transactional
     public <T> BaseResponse<T> importStudentPovertyAssistance(InsertStudentPovertyAssistanceList insertStudentPovertyAssistanceList) {
         ArrayList<StudentPovertyAssistance> studentPovertyAssistances = new ArrayList<>();
-        insertStudentPovertyAssistanceList.getList().forEach(it -> {
+        insertStudentPovertyAssistanceList.getStudentPovertyAssistances().forEach(it -> {
             StudentPovertyAssistance studentPovertyAssistance = new StudentPovertyAssistance(it);
             studentPovertyAssistances.add(studentPovertyAssistance);
         });
