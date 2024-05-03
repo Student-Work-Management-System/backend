@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.utils;
 
-import cn.hutool.core.io.FastByteArrayOutputStream;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import io.minio.*;
@@ -9,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
