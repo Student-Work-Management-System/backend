@@ -1,7 +1,8 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.competition;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Members;
+import com.fasterxml.jackson.core.type.TypeReference;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.Member;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -46,7 +48,7 @@ public class StudentCompetitionVO implements Serializable {
     /**
      * 团队成员, 单人比赛时为空。团队赛时应该填入的格式为 [{ order: 1, studentId:"",realName:""}....]
      */
-    private Members members;
+    private List<Member> members;
     /**
      * 上报后审核状态
      */
@@ -56,6 +58,6 @@ public class StudentCompetitionVO implements Serializable {
      */
     private String rejectReason;
     public void setMembers(String members) throws JsonProcessingException {
-        this.members = JsonUtil.mapper.readValue(members, Members.class);
+        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>(){});
     }
 }

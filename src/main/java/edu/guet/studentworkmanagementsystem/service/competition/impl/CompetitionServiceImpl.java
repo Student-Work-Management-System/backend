@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.service.competition.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -11,10 +12,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAu
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Members;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetitionClaim;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -126,9 +124,9 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
 
     @Transactional
-    public <T> BaseResponse<T> insertStudentCompetitionAudit(Members members, String studentCompetitionId) {
+    public <T> BaseResponse<T> insertStudentCompetitionAudit(List<Member> members, String studentCompetitionId) {
         ArrayList<StudentCompetitionClaim> claims = new ArrayList<>();
-        members.getMembers().forEach(member -> {
+        members.forEach(member -> {
             StudentCompetitionClaim studentCompetitionClaim = new StudentCompetitionClaim(studentCompetitionId, member.getStudentId());
             claims.add(studentCompetitionClaim);
         });
@@ -169,8 +167,8 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         return ResponseUtil.success(studentCompetitionVOPage);
     }
 
-    private Members convertToEntity(String membersJson) throws JsonProcessingException {
-        return JsonUtil.mapper.readValue(membersJson, Members.class);
+    private List<Member> convertToEntity(String membersJson) throws JsonProcessingException {
+        return JsonUtil.mapper.readValue(membersJson, new TypeReference<>(){});
     }
 
     private Boolean stateHandler(String reviewState) {

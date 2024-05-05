@@ -1,6 +1,7 @@
 package edu.guet.studentworkmanagementsystem.service.academicWork.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -154,7 +155,8 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             if (!flag)
                 return ResponseUtil.success();
             String authorsStr = mapper.selectOneById(studentAcademicWorkId).getAuthors();
-            Authors authors = JsonUtil.mapper.readValue(authorsStr, Authors.class);
+            List<Author> authors = JsonUtil.mapper.readValue(authorsStr, new TypeReference<>() {
+            });
             return insertStudentAcademicWorkAudit(authors, studentAcademicWorkId);
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -162,10 +164,10 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> insertStudentAcademicWorkAudit(Authors authors, String studentAcademicWorkId) {
+    public <T> BaseResponse<T> insertStudentAcademicWorkAudit(List<Author> authors, String studentAcademicWorkId) {
         ArrayList<StudentAcademicWorkClaim> studentAcademicWorkClaims = new ArrayList<>();
-        int size = authors.getAuthors().size();
-        authors.getAuthors().forEach(item -> {
+        int size = authors.size();
+        authors.forEach(item -> {
             StudentAcademicWorkClaim claim = new StudentAcademicWorkClaim(studentAcademicWorkId, item.getStudentId());
             studentAcademicWorkClaims.add(claim);
         });

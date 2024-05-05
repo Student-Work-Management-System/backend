@@ -1,14 +1,16 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.academicWork;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Authors;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Author;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +35,7 @@ public class StudentAcademicWorkVO implements Serializable {
     /**
      * 作者顺序,应填入格式：[{ order: 1, studentId:"",authorName:""}...`.]
      */
-    private Authors authors;
+    private List<Author> authors;
     /**
      * 证明材料，填写文件地址
      */
@@ -47,6 +49,6 @@ public class StudentAcademicWorkVO implements Serializable {
      */
     private String reason;
     public void setAuthors(String authorsStr) throws JsonProcessingException {
-        JsonUtil.mapper.readValue(authorsStr, Authors.class);
+        JsonUtil.mapper.readValue(authorsStr, new TypeReference<List<Author>>() {});
     }
 }
