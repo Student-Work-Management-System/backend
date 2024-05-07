@@ -63,7 +63,7 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @param studentAcademicWorkId 学生学术作品id
      * @return 表中修改的行数(判断是否全部插入)
      */
-    <T> BaseResponse<T> insertStudentAcademicWorkAudit(List<Author> authors, String studentAcademicWorkId);
+    <T> BaseResponse<T> insertStudentAcademicWorkAudit(Author[] authors, String studentAcademicWorkId);
     /**
      * (审核人用)分页查询学生上报记录, 默认只查询状态为 待审核 的上报记录
      * <br/>

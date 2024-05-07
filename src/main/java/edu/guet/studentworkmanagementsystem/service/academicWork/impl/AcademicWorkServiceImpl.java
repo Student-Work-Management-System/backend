@@ -155,7 +155,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             if (!flag)
                 return ResponseUtil.success();
             String authorsStr = mapper.selectOneById(studentAcademicWorkId).getAuthors();
-            List<Author> authors = JsonUtil.mapper.readValue(authorsStr, new TypeReference<>() {
+            Author[] authors = JsonUtil.mapper.readValue(authorsStr, new TypeReference<>() {
             });
             return insertStudentAcademicWorkAudit(authors, studentAcademicWorkId);
         }
@@ -164,13 +164,13 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> insertStudentAcademicWorkAudit(List<Author> authors, String studentAcademicWorkId) {
+    public <T> BaseResponse<T> insertStudentAcademicWorkAudit(Author[] authors, String studentAcademicWorkId) {
         ArrayList<StudentAcademicWorkClaim> studentAcademicWorkClaims = new ArrayList<>();
-        int size = authors.size();
-        authors.forEach(item -> {
-            StudentAcademicWorkClaim claim = new StudentAcademicWorkClaim(studentAcademicWorkId, item.getStudentId());
+        int size = authors.length;
+        for (Author author : authors) {
+            StudentAcademicWorkClaim claim = new StudentAcademicWorkClaim(studentAcademicWorkId, author.getStudentId());
             studentAcademicWorkClaims.add(claim);
-        });
+        }
         int i = claimMapper.insertBatch(studentAcademicWorkClaims);
         if (i == size)
             return ResponseUtil.success();

@@ -8,12 +8,12 @@ import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class StudentAcademicWorkVO implements Serializable {
     private String studentAcademicWorkId;
@@ -35,7 +35,7 @@ public class StudentAcademicWorkVO implements Serializable {
     /**
      * 作者顺序,应填入格式：[{ order: 1, studentId:"",authorName:""}...`.]
      */
-    private List<Author> authors;
+    private Author[] authors;
     /**
      * 证明材料，填写文件地址
      */
@@ -48,6 +48,29 @@ public class StudentAcademicWorkVO implements Serializable {
      * 拒绝理由
      */
     private String reason;
+    public StudentAcademicWorkVO(
+            String studentAcademicWorkId,
+            String studentId,
+            String name,
+            String academicWorkName,
+            String academicWorkType,
+            String additionalInfoId,
+            String authors,
+            String evidence,
+            String auditState,
+            String reason
+    ) throws JsonProcessingException {
+        this.studentAcademicWorkId = studentAcademicWorkId;
+        this.studentId = studentId;
+        this.name = name;
+        this.academicWorkName = academicWorkName;
+        this.academicWorkType = academicWorkType;
+        this.additionalInfoId = additionalInfoId;
+        this.authors = JsonUtil.mapper.readValue(authors, new TypeReference<>() {});
+        this.evidence = evidence;
+        this.auditState = auditState;
+        this.reason = reason;
+    }
     public void setAuthors(String authorsStr) throws JsonProcessingException {
         JsonUtil.mapper.readValue(authorsStr, new TypeReference<List<Author>>() {});
     }
