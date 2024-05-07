@@ -126,12 +126,12 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
 
     @Transactional
-    public <T> BaseResponse<T> insertStudentCompetitionAudit(List<Member> members, String studentCompetitionId) {
+    public <T> BaseResponse<T> insertStudentCompetitionAudit(Member[] members, String studentCompetitionId) {
         ArrayList<StudentCompetitionClaim> claims = new ArrayList<>();
-        members.forEach(member -> {
+        for(Member member : members) {
             StudentCompetitionClaim studentCompetitionClaim = new StudentCompetitionClaim(studentCompetitionId, member.getStudentId());
             claims.add(studentCompetitionClaim);
-        });
+        }
         int i = claimMapper.insertBatch(claims);
         if (i == claims.size())
             return ResponseUtil.success();
@@ -169,7 +169,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         return ResponseUtil.success(studentCompetitionVOPage);
     }
 
-    private List<Member> convertToEntity(String membersJson) throws JsonProcessingException {
+    private Member[] convertToEntity(String membersJson) throws JsonProcessingException {
         return JsonUtil.mapper.readValue(membersJson, new TypeReference<>(){});
     }
 

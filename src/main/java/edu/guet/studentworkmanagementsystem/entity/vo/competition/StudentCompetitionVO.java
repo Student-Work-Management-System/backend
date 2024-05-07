@@ -46,7 +46,7 @@ public class StudentCompetitionVO implements Serializable {
     /**
      * 团队成员, 单人比赛时为空。团队赛时应该填入的格式为 [{ order: 1, studentId:"",realName:""}....]
      */
-    private List<Member> members;
+    private Member[] members;
     /**
      * 上报后审核状态
      */
@@ -76,8 +76,11 @@ public class StudentCompetitionVO implements Serializable {
         this.evidence = evidence;
         this.awardLevel = awardLevel;
         this.awardDate = awardDate;
-        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>(){});
+        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>() {});
         this.reviewState = reviewState;
         this.rejectReason = rejectReason;
+    }
+    public void setMembers(String members) throws JsonProcessingException {
+        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>() {});
     }
 }
