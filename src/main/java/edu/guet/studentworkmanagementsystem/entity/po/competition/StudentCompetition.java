@@ -79,5 +79,8 @@ public class StudentCompetition implements Serializable {
         this.awardDate = studentCompetitionDTO.getAwardDate();
         this.awardLevel = studentCompetitionDTO.getAwardLevel();
         this.members = JsonUtil.mapper.writeValueAsString(studentCompetitionDTO.getMembers());
+        this.reviewState = "审核中";
+        this.rejectReason = null;
+        this.auditorId = null;
     }
 }
