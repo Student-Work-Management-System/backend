@@ -55,7 +55,19 @@ public class StudentCompetitionVO implements Serializable {
      * 仅当状态预修改为 已拒绝 时才可以填写
      */
     private String rejectReason;
-    public StudentCompetitionVO(String competitionName, String competitionNature, String competitionLevel, String headerId, String headerName, String evidence, String awardLevel, LocalDate awardDate, String members) throws JsonProcessingException {
+    public StudentCompetitionVO(
+            String competitionName,
+            String competitionNature,
+            String competitionLevel,
+            String headerId,
+            String headerName,
+            String evidence,
+            String awardLevel,
+            LocalDate awardDate,
+            String members,
+            String reviewState,
+            String rejectReason
+    ) throws JsonProcessingException {
         this.competitionName = competitionName;
         this.competitionNature = competitionNature;
         this.competitionLevel = competitionLevel;
@@ -65,5 +77,7 @@ public class StudentCompetitionVO implements Serializable {
         this.awardLevel = awardLevel;
         this.awardDate = awardDate;
         this.members = JsonUtil.mapper.readValue(members, new TypeReference<>(){});
+        this.reviewState = reviewState;
+        this.rejectReason = rejectReason;
     }
 }

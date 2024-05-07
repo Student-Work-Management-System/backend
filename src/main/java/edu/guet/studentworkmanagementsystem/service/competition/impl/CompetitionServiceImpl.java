@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.CompetitionTableDef.COMPETITION;
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionClaimTableDef.STUDENT_COMPETITION_CLAIM;
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionTableDef.STUDENT_COMPETITION;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
@@ -95,8 +96,9 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     @Override
     public BaseResponse<List<StudentCompetitionVO>> getOwnStudentCompetition(String studentId) {
         List<StudentCompetitionVO> studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
-                .select(STUDENT_COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
                 .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId))
                 .listAs(StudentCompetitionVO.class);
         return ResponseUtil.success(studentCompetitionVOS);
