@@ -49,7 +49,7 @@ public class CompetitionController {
     public <T> BaseResponse<T> updateCompetition(@PathVariable String competitionId) {
         return competitionService.deleteCompetition(competitionId);
     }
-    @PreAuthorize("hasAuthority('student_competition:select') and hasAuthority('student:select')")
+    @PreAuthorize("hasAuthority('student_competition:select')")
     @GetMapping("/student_competition/get/{studentId}")
     public BaseResponse<List<StudentCompetitionVO>> getOwnStudentCompetition(@PathVariable String studentId) {
         return competitionService.getOwnStudentCompetition(studentId);
