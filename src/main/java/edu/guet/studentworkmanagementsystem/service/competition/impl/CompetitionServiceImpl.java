@@ -95,7 +95,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     @Override
     public BaseResponse<List<StudentCompetitionVO>> getOwnStudentCompetition(String studentId) {
         List<StudentCompetitionVO> studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
-                .select(STUDENT_COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"), STUDENT.STUDENT_ID.as("headerId"))
+                .select(STUDENT_COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                 .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId))
                 .listAs(StudentCompetitionVO.class);
