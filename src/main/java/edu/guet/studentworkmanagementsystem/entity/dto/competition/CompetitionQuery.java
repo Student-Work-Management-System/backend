@@ -5,19 +5,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompetitionQuery implements Serializable {
-    private String studentId;
-    /**
-     * 姓名: 模糊查询参数
-     */
-    private String name;
+    private String search;
     private String grade;
     private String majorId;
-    private String awardDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Integer pageNo;
     private Integer pageSize;
 }

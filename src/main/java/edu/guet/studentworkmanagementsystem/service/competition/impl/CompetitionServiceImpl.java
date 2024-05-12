@@ -157,14 +157,14 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         Page<StudentCompetitionVO> studentCompetitionVOPage = QueryChain.of(StudentCompetition.class)
-                .select(STUDENT_COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"), STUDENT.STUDENT_ID.as("headerId"))
+                .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .where(STUDENT.STUDENT_ID.eq(query.getStudentId()))
-                .and(STUDENT.NAME.like(query.getName()))
+                .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
+                .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT_COMPETITION.AWARD_DATE.eq(query.getAwardDate()))
+                .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
                 .pageAs(Page.of(pageNo, pageSize), StudentCompetitionVO.class);
         return ResponseUtil.success(studentCompetitionVOPage);
     }
