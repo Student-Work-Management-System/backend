@@ -130,23 +130,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
         List<RegisterUserDTO> registerUserDTOList = registerUserDTOS.getRegisterUserDTOList();
-        ArrayList<User> users = new ArrayList<>();
-        registerUserDTOList.forEach(item -> {
-            item.setPassword(passwordEncoder.encode(item.getPassword()));
-            users.add(new User(item));
-        });
-        int size = users.size();
-        int i = mapper.insertBatch(users);
-        if (i == size) {
-            for(int j = 0; j < size; j++) {
-                String uid = users.get(j).getUid();
-                List<String> roles = registerUserDTOList.get(j).getRoles();
-                if (RoleNotNullOrEmpty(roles))
-                    addUserRole(roles, uid);
-            }
-            return ResponseUtil.success();
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        registerUserDTOList.forEach(this::addUser);
+        return ResponseUtil.success();
     }
 
     @Override
