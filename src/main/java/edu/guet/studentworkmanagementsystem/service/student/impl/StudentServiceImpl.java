@@ -46,7 +46,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             ArrayList<RegisterUserDTO> registerUserDTOS = new ArrayList<>();
             students.forEach(item -> {
                 String password = passwordEncoder.encode(createPassword(item.getIdNumber()));
-                RegisterUserDTO registerUserDTO = new RegisterUserDTO(item.getStudentId(), item.getName(), item.getStudentId(), password, null);
+                RegisterUserDTO registerUserDTO = new RegisterUserDTO(item.getStudentId(), item.getName(), item.getStudentId(), password, List.of("3"));
                 registerUserDTOS.add(registerUserDTO);
             });
             return userService.addUsers(new RegisterUserDTOList(registerUserDTOS));
@@ -59,7 +59,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         int i = mapper.insert(student);
         if (i > 0) {
             String password = passwordEncoder.encode(createPassword(student.getIdNumber()));
-            RegisterUserDTO registerUserDTO = new RegisterUserDTO(student.getStudentId(), student.getName(), student.getStudentId(), password, null);
+            RegisterUserDTO registerUserDTO = new RegisterUserDTO(student.getStudentId(), student.getName(), student.getStudentId(), password, List.of("3"));
             return userService.addUser(registerUserDTO);
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
