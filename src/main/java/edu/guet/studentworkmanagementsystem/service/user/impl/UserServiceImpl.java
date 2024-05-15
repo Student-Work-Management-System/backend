@@ -79,7 +79,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         if (Objects.isNull(authenticate))
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
@@ -102,10 +103,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public void addUserRole(List<String> roles, String uid) {
         ArrayList<UserRole> userRoles = new ArrayList<>();
-        if (roles.size() == 1)
-            userRoles.add(new UserRole(uid, roles.getFirst()));
-        else
-            roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
+        roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
         int i = userRoleMapper.insertBatch(userRoles);
         if (i == roles.size())
             return;

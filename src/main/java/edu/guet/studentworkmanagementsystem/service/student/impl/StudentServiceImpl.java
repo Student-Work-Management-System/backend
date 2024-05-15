@@ -45,9 +45,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (i == students.size()) {
             ArrayList<RegisterUserDTO> registerUserDTOS = new ArrayList<>();
             students.forEach(item -> {
-                String password = passwordEncoder.encode(createPassword(item.getIdNumber()));
-                RegisterUserDTO registerUserDTO = new RegisterUserDTO(item.getStudentId(), item.getName(), item.getStudentId(), password, List.of("3"));
-                registerUserDTOS.add(registerUserDTO);
+                RegisterUserDTO user = createUser(item.getStudentId(), item.getName(), createPassword(item.getIdNumber()));
+                registerUserDTOS.add(user);
             });
             return userService.addUsers(new RegisterUserDTOList(registerUserDTOS));
         }
@@ -58,11 +57,13 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public <T> BaseResponse<T> addStudent(Student student) {
         int i = mapper.insert(student);
         if (i > 0) {
-            String password = passwordEncoder.encode(createPassword(student.getIdNumber()));
-            RegisterUserDTO registerUserDTO = new RegisterUserDTO(student.getStudentId(), student.getName(), student.getStudentId(), password, List.of("3"));
-            return userService.addUser(registerUserDTO);
+            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()));
+            return userService.addUser(user);
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    private RegisterUserDTO createUser(String studentId, String name, String password) {
+        return new RegisterUserDTO(studentId, name, studentId, password, List.of("5"));
     }
     @Override
     public BaseResponse<Page<StudentVO>> getStudents(StudentQuery query) {
