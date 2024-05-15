@@ -13,5 +13,5 @@ import java.util.List;
 public class StudentCompetitionPassedRecord implements Serializable {
     private String studentId;
     private String studentName;
-    private List<StudentCompetitionVO> records;
+    private List<StudentCompetitionVO> awards;
 }

@@ -82,9 +82,7 @@ public interface CompetitionService extends IService<StudentCompetition> {
     BaseResponse<Page<StudentCompetitionVO>> getAllStudentCompetition(CompetitionQuery query);
     /**
      * 获取所有学生参加且通过审核竞赛记录
-     * @param pageNo 页号，默认1
-     * @param pageSize 页大小， 默认50
      */
-    BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(int pageNo, int pageSize);
+    BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(CompetitionQuery query);
 }
 

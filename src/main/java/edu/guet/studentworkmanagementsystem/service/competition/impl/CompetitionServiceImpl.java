@@ -102,41 +102,15 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
 
     @Override
     public BaseResponse<List<StudentCompetitionVO>> getOwnStudentCompetition(String studentId) {
-        List<String> studentCompetitionIds = QueryChain.of(StudentCompetitionClaim.class)
-                .select(QueryMethods.distinct(STUDENT_COMPETITION_CLAIM.STUDENT_COMPETITION_ID))
-                .where(STUDENT_COMPETITION_CLAIM.STUDENT_ID.eq(studentId))
-                .list()
-                .stream()
-                .filter(Objects::nonNull)
-                .map(StudentCompetitionClaim::getStudentCompetitionId)
-                .toList();
-        List<StudentCompetitionVO> studentCompetitionVOS;
-        if (studentCompetitionIds.isEmpty()) {
-            studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
-                    .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
-                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
-                    .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
-                    .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId).or(STUDENT_COMPETITION.MEMBERS.like(studentId)))
-                    .listAs(StudentCompetitionVO.class);
-        } else {
-            List<String> studentCompetitionIdsFromStudentId = QueryChain.of(StudentCompetition.class)
-                    .select(STUDENT_COMPETITION.STUDENT_COMPETITION_ID)
-                    .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId))
-                    .list()
-                    .stream()
-                    .map(StudentCompetition::getStudentCompetitionId)
-                    .toList();
-            HashSet<String> set = new HashSet<>();
-            set.addAll(studentCompetitionIds);
-            set.addAll(studentCompetitionIdsFromStudentId);
-            studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
-                    .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
-                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
-                    .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
-                    .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.in(set))
-                    .listAs(StudentCompetitionVO.class);
-        }
-        return ResponseUtil.success(studentCompetitionVOS);
+        List<StudentCompetitionVO> studentCompetitionVOList = QueryChain.of(Student.class)
+                .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                .from(STUDENT)
+                .innerJoin(STUDENT_COMPETITION).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                .innerJoin(STUDENT_COMPETITION_CLAIM).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION_CLAIM.STUDENT_ID))
+                .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
+                .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId).or(STUDENT_COMPETITION.MEMBERS.like(studentId)))
+                .listAs(StudentCompetitionVO.class);
+        return ResponseUtil.success(studentCompetitionVOList);
     }
 
     @Override
@@ -224,23 +198,28 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
 
     @Override
-    public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(int pageNo, int pageSize) {
-        List<String> studentIds = QueryChain.of(StudentCompetitionClaim.class)
-                .select(QueryMethods.distinct(STUDENT_COMPETITION_CLAIM.STUDENT_ID))
-                .list()
-                .stream()
-                .map(StudentCompetitionClaim::getStudentId)
-                .toList();
-        ArrayList<StudentCompetitionPassedRecord> list = new ArrayList<>();
-        studentIds.forEach(studentId -> {
-            StudentCompetitionPassedRecord record = QueryChain.of(Student.class)
-                    .select(STUDENT.STUDENT_ID, STUDENT.NAME.as("studentName"))
-                    .where(STUDENT.STUDENT_ID.eq(studentId))
-                    .oneAs(StudentCompetitionPassedRecord.class);
-            List<StudentCompetitionVO> data = this.getOwnStudentCompetition(studentId).getData();
-            List<StudentCompetitionVO> collect = data.stream().filter(item -> item.getReviewState().equals(PASS)).toList();
-            record.setRecords(collect);
-            list.add(record);
+    public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(CompetitionQuery query) {
+        int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+        int pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
+        List<StudentCompetitionPassedRecord> list = QueryChain.of(Student.class)
+                .select(STUDENT.STUDENT_ID, STUDENT.NAME.as("studentName"))
+                .from(STUDENT)
+                .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID)).and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
+                .innerJoin(STUDENT_COMPETITION_CLAIM).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION_CLAIM.STUDENT_ID))
+                .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                .and(STUDENT.GRADE.eq(query.getGrade()))
+                .listAs(StudentCompetitionPassedRecord.class);
+        list.forEach(item -> {
+            String studentId = item.getStudentId();
+            List<StudentCompetitionVO> studentCompetitionVOList = QueryChain.of(StudentCompetition.class)
+                    .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                    .where(STUDENT_COMPETITION.REVIEW_STATE.eq(PASS))
+                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                    .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
+                    .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId).or(STUDENT_COMPETITION.MEMBERS.like(studentId)))
+                    .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
+                    .listAs(StudentCompetitionVO.class);
+            item.setAwards(studentCompetitionVOList);
         });
         Page<StudentCompetitionPassedRecord> page = new Page<>(list, pageNo, pageSize, list.size());
         return ResponseUtil.success(page);
