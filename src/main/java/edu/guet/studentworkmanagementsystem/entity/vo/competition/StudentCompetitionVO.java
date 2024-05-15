@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class StudentCompetitionVO implements Serializable {
+    private String studentCompetitionId;
     /**
      * 竞赛名称
      */

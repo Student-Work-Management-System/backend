@@ -22,14 +22,13 @@ import edu.guet.studentworkmanagementsystem.mapper.competition.StudentCompetitio
 import edu.guet.studentworkmanagementsystem.service.competition.CompetitionService;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.CompetitionTableDef.COMPETITION;
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionClaimTableDef.STUDENT_COMPETITION_CLAIM;
@@ -108,17 +107,36 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     @Transactional
     public <T> BaseResponse<T> auditStudentCompetition(CompetitionAuditDTO competitionAuditDTO) throws JsonProcessingException {
         String studentCompetitionId = competitionAuditDTO.getStudentCompetitionId();
+        String uid = SecurityUtil.getUserCredentials().getUser().getUid();
         boolean update = UpdateChain.of(StudentCompetition.class)
                 .set(STUDENT_COMPETITION.REVIEW_STATE, competitionAuditDTO.getReviewState(), StringUtils::hasLength)
                 .set(STUDENT_COMPETITION.REJECT_REASON, competitionAuditDTO.getRejectReason(), StringUtils::hasLength)
-                .set(STUDENT_COMPETITION.AUDITOR_ID, competitionAuditDTO.getAuditorId(), StringUtils::hasLength)
+                .set(STUDENT_COMPETITION.AUDITOR_ID, uid, StringUtils::hasLength)
                 .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(studentCompetitionId))
                 .update();
+        HashMap<String, Object> map = QueryChain.of(Competition.class)
+                .select(COMPETITION.COMPETITION_NATURE, STUDENT_COMPETITION.HEADER_ID)
+                .from(COMPETITION)
+                .innerJoin(STUDENT_COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
+                .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(studentCompetitionId))
+                .oneAs(HashMap.class);
         Boolean flag = stateHandler(competitionAuditDTO.getReviewState());
+        String competitionNature = map.get("competition_nature").toString();
+        String headerId = map.get("header_id").toString();
         if (update) {
             if (flag) {
-                String membersJson = mapper.selectOneById(studentCompetitionId).getMembers();
-                return insertStudentCompetitionAudit(convertToEntity(membersJson), studentCompetitionId);
+                if (Objects.isNull(competitionNature))
+                    throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+                if (natureHandler(competitionNature)) {
+                    String memberJson = mapper.selectOneById(studentCompetitionId).getMembers();
+                    return insertStudentCompetitionAudit(convertToEntity(memberJson), studentCompetitionId);
+                } else {
+                    StudentCompetitionClaim studentCompetitionClaim = new StudentCompetitionClaim(studentCompetitionId, headerId);
+                    int i = claimMapper.insert(studentCompetitionClaim);
+                    if (i > 0)
+                        return ResponseUtil.success();
+                    throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+                }
             }
             return ResponseUtil.success();
         }
@@ -180,6 +198,17 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             }
             case "已拒绝" -> {
                 return false;
+            }
+            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
+        }
+    }
+    private Boolean natureHandler(String nature) {
+        switch (nature) {
+            case "单人" -> {
+                return false;
+            }
+            case "团队" -> {
+                return true;
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
         }

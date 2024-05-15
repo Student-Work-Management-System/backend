@@ -17,6 +17,4 @@ public class CompetitionAuditDTO implements Serializable {
     @Pattern(regexp = "^(已通过|已拒绝)$")
     private String reviewState;
     private String rejectReason;
-    @NotBlank(message = "审核人id不能不能为空")
-    private String auditorId;
 }

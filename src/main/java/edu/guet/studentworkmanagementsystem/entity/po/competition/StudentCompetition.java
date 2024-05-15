@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
@@ -32,6 +34,7 @@ import java.time.LocalDate;
 public class StudentCompetition implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    @Id(keyType = KeyType.Auto)
     private String studentCompetitionId;
     /**
      * 竞赛id
