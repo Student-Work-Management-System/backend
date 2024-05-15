@@ -61,14 +61,6 @@ public class ExceptionControllerAdvice {
     public <T> BaseResponse<T> noResourceFoundException(NoResourceFoundException exception) {
         return ResponseUtil.failure(ServiceExceptionEnum.NOT_RESOURCE.getCode(), ServiceExceptionEnum.NOT_RESOURCE.getMsg() + exception.getMessage());
     }
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public <T> BaseResponse<T> dataIntegrityViolationException() {
-        return ResponseUtil.failure(ServiceExceptionEnum.RELATE_FAILURE);
-    }
-    @ExceptionHandler(TransientDataAccessException.class)
-    public <T> BaseResponse<T> queryCreationException() {
-        return ResponseUtil.failure(ServiceExceptionEnum.DB_TIMEOUT);
-    }
     @ExceptionHandler(NullPointerException.class)
     public <T> BaseResponse<T> nullPointerExceptionHandler(NullPointerException exception) {
         logger.error("出现空指针异常:", exception);
