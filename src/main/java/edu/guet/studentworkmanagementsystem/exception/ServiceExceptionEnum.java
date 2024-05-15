@@ -20,7 +20,8 @@ public enum ServiceExceptionEnum {
     METHOD_NOT_SUPPORT(-2000, "方法不支持"),
     UNKNOWN_ERROR(-2001, "未知异常"),
     NOT_RESOURCE(-2002, "无此资源: "),
-    NULL_POINTER(-2003, "出现空指针异常");
+    NULL_POINTER(-2003, "出现空指针异常"),
+    TOO_MANY_REQUEST(-2004, "请求过于频繁");
     private final int code;
     private final String msg;
     ServiceExceptionEnum(int code, String msg) {
