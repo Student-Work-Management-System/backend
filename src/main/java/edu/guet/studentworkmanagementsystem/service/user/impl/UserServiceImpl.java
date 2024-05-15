@@ -99,7 +99,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return !Objects.isNull(roles) && !roles.isEmpty();
     }
 
-    private void addUserRole(List<String> roles, String uid) {
+    @Transactional
+    public void addUserRole(List<String> roles, String uid) {
         ArrayList<UserRole> userRoles = new ArrayList<>();
         if (roles.size() == 1)
             userRoles.add(new UserRole(uid, roles.getFirst()));
@@ -152,7 +153,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
-        UserDetailVO userDetailVO = new UserDetailVO(mapper.getUserByUsername(username));
+        User userByUsername = mapper.getUserByUsername(username);
+        if (Objects.isNull(userByUsername))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
+        UserDetailVO userDetailVO = new UserDetailVO(userByUsername);
         String uid = userDetailVO.getUid();
         List<Role> userRole = userRoleMapper.getUserRole(uid);
         if (!Objects.isNull(userRole))
@@ -185,7 +189,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return ResponseUtil.success();
     }
 
-    private void addRolePermission(List<String> permissions, String rid) {
+    @Transactional
+    public void addRolePermission(List<String> permissions, String rid) {
         ArrayList<RolePermission> rolePermission = new ArrayList<>();
         if (permissions.size() == 1)
             rolePermission.add(new RolePermission(rid, permissions.getFirst()));
@@ -395,7 +400,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
         emailService.sendEmail(user.getEmail(), code);
-        redisUtil.setValue("code_by:" + username, code, 5);
+        redisUtil.setValue("code_by: " + username, code, 5);
 
         String email = user.getEmail();
         int idx = email.indexOf('@');
@@ -413,7 +418,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!code.equals(codeFromRedis))
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         boolean update = UpdateChain.of(User.class)
-                .set(USER.PASSWORD, passwordEncoder.encode(password))
+                .set(USER.PASSWORD, passwordEncoder.encode(password), StringUtils::hasLength)
                 .where(USER.USERNAME.eq(username))
                 .update();
         if (update)
