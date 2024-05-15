@@ -42,6 +42,11 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     private CompetitionMapper competitionMapper;
     @Autowired
     private StudentCompetitionClaimMapper claimMapper;
+    private static final String REJECT = "已拒绝";
+    private static final String PASS = "已通过";
+    private static final String WAITING = "审核中";
+    private static final String SOLO = "担任";
+    private static final String TEAM = "团队";
     @Override
     @Transactional
     public <T> BaseResponse<T> importCompetition(CompetitionList competitionList) {
@@ -176,6 +181,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         Page<StudentCompetitionVO> studentCompetitionVOPage = QueryChain.of(StudentCompetition.class)
                 .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                .where(STUDENT_COMPETITION.REVIEW_STATE.eq(WAITING))
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
@@ -193,10 +199,10 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
 
     private Boolean stateHandler(String reviewState) {
         switch (reviewState) {
-            case "已通过" -> {
+            case PASS -> {
                 return true;
             }
-            case "已拒绝" -> {
+            case REJECT -> {
                 return false;
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
@@ -204,10 +210,10 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
     private Boolean natureHandler(String nature) {
         switch (nature) {
-            case "单人" -> {
+            case SOLO -> {
                 return false;
             }
-            case "团队" -> {
+            case TEAM -> {
                 return true;
             }
             default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
