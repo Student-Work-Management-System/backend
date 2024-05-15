@@ -39,9 +39,11 @@ public class LoggerInterceptor implements HandlerInterceptor {
         String remoteAddr = request.getRemoteAddr();
         String key = RATE_LIMIT_KEY_PREFIX + remoteAddr;
         Long count = redisTemplate.opsForValue().increment(key, 1);
-        if (count != null && count == 1)
+        if (Objects.isNull(count))
+            return;
+        if (count == 1)
             redisTemplate.expire(key, 1, TimeUnit.MINUTES);
-        if (count != null && count > MAX_REQUESTS_PER_MINUTE)
+        if (count > MAX_REQUESTS_PER_MINUTE)
             ResponseUtil.failure(response, ServiceExceptionEnum.TOO_MANY_REQUEST);
     }
     private void log(HttpServletRequest request) throws IOException {
