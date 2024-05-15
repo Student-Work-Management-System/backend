@@ -10,6 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionLi
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 import edu.guet.studentworkmanagementsystem.service.competition.CompetitionService;
 import jakarta.validation.Valid;
@@ -73,5 +74,13 @@ public class CompetitionController {
     @PostMapping("/student_competition/gets")
     public BaseResponse<Page<StudentCompetitionVO>> getAllStudentCompetition(@RequestBody CompetitionQuery query) {
         return competitionService.getAllStudentCompetition(query);
+    }
+    @PreAuthorize( "hasAuthority('student_competition:select')")
+    @GetMapping("/student_competition/gets/pass")
+    public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassStudentCompetition(
+            @RequestParam(defaultValue = "1") int pageNo,
+            @RequestParam(defaultValue = "50") int pageSize
+    ) {
+        return competitionService.getAllPassedStudentCompetition(pageNo, pageSize);
     }
 }

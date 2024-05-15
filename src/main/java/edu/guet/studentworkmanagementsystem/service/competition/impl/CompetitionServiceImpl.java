@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -13,6 +14,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionLi
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.*;
+import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -99,12 +102,40 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
 
     @Override
     public BaseResponse<List<StudentCompetitionVO>> getOwnStudentCompetition(String studentId) {
-        List<StudentCompetitionVO> studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
-                .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
-                .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
-                .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
-                .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId))
-                .listAs(StudentCompetitionVO.class);
+        List<String> studentCompetitionIds = QueryChain.of(StudentCompetitionClaim.class)
+                .select(QueryMethods.distinct(STUDENT_COMPETITION_CLAIM.STUDENT_COMPETITION_ID))
+                .where(STUDENT_COMPETITION_CLAIM.STUDENT_ID.eq(studentId))
+                .list()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(StudentCompetitionClaim::getStudentCompetitionId)
+                .toList();
+        List<StudentCompetitionVO> studentCompetitionVOS;
+        if (studentCompetitionIds.isEmpty()) {
+            studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
+                    .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                    .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
+                    .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId).or(STUDENT_COMPETITION.MEMBERS.like(studentId)))
+                    .listAs(StudentCompetitionVO.class);
+        } else {
+            List<String> studentCompetitionIdsFromStudentId = QueryChain.of(StudentCompetition.class)
+                    .select(STUDENT_COMPETITION.STUDENT_COMPETITION_ID)
+                    .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId))
+                    .list()
+                    .stream()
+                    .map(StudentCompetition::getStudentCompetitionId)
+                    .toList();
+            HashSet<String> set = new HashSet<>();
+            set.addAll(studentCompetitionIds);
+            set.addAll(studentCompetitionIdsFromStudentId);
+            studentCompetitionVOS = QueryChain.of(StudentCompetition.class)
+                    .select(STUDENT_COMPETITION.ALL_COLUMNS, COMPETITION.ALL_COLUMNS, STUDENT.NAME.as("headerName"))
+                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                    .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
+                    .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.in(set))
+                    .listAs(StudentCompetitionVO.class);
+        }
         return ResponseUtil.success(studentCompetitionVOS);
     }
 
@@ -125,11 +156,10 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .innerJoin(STUDENT_COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
                 .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(studentCompetitionId))
                 .oneAs(HashMap.class);
-        Boolean flag = stateHandler(competitionAuditDTO.getReviewState());
         String competitionNature = map.get("competition_nature").toString();
         String headerId = map.get("header_id").toString();
         if (update) {
-            if (flag) {
+            if (stateHandler(competitionAuditDTO.getReviewState())) {
                 if (Objects.isNull(competitionNature))
                     throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
                 if (natureHandler(competitionNature)) {
@@ -191,6 +221,29 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
                 .pageAs(Page.of(pageNo, pageSize), StudentCompetitionVO.class);
         return ResponseUtil.success(studentCompetitionVOPage);
+    }
+
+    @Override
+    public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(int pageNo, int pageSize) {
+        List<String> studentIds = QueryChain.of(StudentCompetitionClaim.class)
+                .select(QueryMethods.distinct(STUDENT_COMPETITION_CLAIM.STUDENT_ID))
+                .list()
+                .stream()
+                .map(StudentCompetitionClaim::getStudentId)
+                .toList();
+        ArrayList<StudentCompetitionPassedRecord> list = new ArrayList<>();
+        studentIds.forEach(studentId -> {
+            StudentCompetitionPassedRecord record = QueryChain.of(Student.class)
+                    .select(STUDENT.STUDENT_ID, STUDENT.NAME.as("studentName"))
+                    .where(STUDENT.STUDENT_ID.eq(studentId))
+                    .oneAs(StudentCompetitionPassedRecord.class);
+            List<StudentCompetitionVO> data = this.getOwnStudentCompetition(studentId).getData();
+            List<StudentCompetitionVO> collect = data.stream().filter(item -> item.getReviewState().equals(PASS)).toList();
+            record.setRecords(collect);
+            list.add(record);
+        });
+        Page<StudentCompetitionPassedRecord> page = new Page<>(list, pageNo, pageSize, list.size());
+        return ResponseUtil.success(page);
     }
 
     private Member[] convertToEntity(String membersJson) throws JsonProcessingException {

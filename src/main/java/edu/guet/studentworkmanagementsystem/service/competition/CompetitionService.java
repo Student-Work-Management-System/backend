@@ -10,6 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQu
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
 
 import java.util.List;
@@ -79,5 +80,11 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * @return 上报结果
      */
     BaseResponse<Page<StudentCompetitionVO>> getAllStudentCompetition(CompetitionQuery query);
+    /**
+     * 获取所有学生参加且通过审核竞赛记录
+     * @param pageNo 页号，默认1
+     * @param pageSize 页大小， 默认50
+     */
+    BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(int pageNo, int pageSize);
 }
 
