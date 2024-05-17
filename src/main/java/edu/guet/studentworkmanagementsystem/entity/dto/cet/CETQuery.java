@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CETQuery implements Serializable {
+    private String search;
     private String majorId;
     private String grade;
     private Long score;

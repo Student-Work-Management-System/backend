@@ -65,6 +65,7 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
                 .from(STUDENT)
                 .innerJoin(STUDENT_CET).on(STUDENT_CET.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
+                .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .pageAs(Page.of(pageNo, pageSize), StudentCetVO.class);
