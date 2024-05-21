@@ -16,12 +16,16 @@ import edu.guet.studentworkmanagementsystem.mapper.cet.StudentCetMapper;
 import edu.guet.studentworkmanagementsystem.network.CetFeign;
 import edu.guet.studentworkmanagementsystem.service.cet.CetService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cet.table.StudentCetTableDef.STUDENT_CET;
@@ -123,8 +127,32 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
                 key++;
             }
         }
+        query.setMajorIds(majorIds);
         HashMap<String, Object> map = cetFeign.exportOnlyStat(query);
         return ResponseUtil.success(map);
+    }
+
+    @Override
+    public void download(CetStatQuery query, HttpServletResponse response) {
+        try {
+            List<String> majorIds = query.getMajorIds();
+            if (majorIds.isEmpty()) {
+                int majorId = 1;
+                while (majorId <= 6) {
+                    majorIds.add(String.valueOf(majorId));
+                    majorId ++;
+                }
+            }
+            query.setMajorIds(majorIds);
+            byte[] excelBytes = cetFeign.exportWithStat(query);
+            String fileName = "学生cet成绩统计.xlsx";
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+            response.getOutputStream().write(excelBytes);
+        } catch (IOException exception) {
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
     }
 
     private StudentCet convertToEntity(InsertStudentCetDTO insertStudentCetDTO) {

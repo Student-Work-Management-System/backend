@@ -4,16 +4,20 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
 import edu.guet.studentworkmanagementsystem.service.schoolPrecaution.PrecautionService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 
 @RestController
@@ -45,5 +49,15 @@ public class PrecautionController {
     @PostMapping("/gets")
     public BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(@RequestBody PrecautionQuery query) {
         return precautionService.getAllRecords(query);
+    }
+    @PreAuthorize("hasAuthority('student_school_precaution:select')")
+    @PostMapping("/stat")
+    public BaseResponse<HashMap<String, Object>> stat(@RequestBody PrecautionStatQuery query) {
+        return precautionService.stat(query);
+    }
+    @PreAuthorize("hasAuthority('student_school_precaution:select')")
+    @PostMapping("/download")
+    public void download(@RequestBody PrecautionStatQuery query, HttpServletResponse response) {
+        precautionService.download(query, response);
     }
 }

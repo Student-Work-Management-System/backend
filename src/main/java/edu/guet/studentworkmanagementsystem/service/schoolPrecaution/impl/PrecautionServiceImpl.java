@@ -6,6 +6,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
@@ -13,12 +14,19 @@ import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSc
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.schoolPrecaution.PrecautionMapper;
+import edu.guet.studentworkmanagementsystem.network.PrecautionFeign;
 import edu.guet.studentworkmanagementsystem.service.schoolPrecaution.PrecautionService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +36,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 
 @Service
 public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, StudentSchoolPrecaution> implements PrecautionService {
+    @Autowired
+    private PrecautionFeign precautionFeign;
     @Override
     @Transactional
     public <T> BaseResponse<T> importSchoolPrecaution(PrecautionList schoolPrecautionList) {
@@ -87,5 +97,44 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
                 .and(STUDENT_SCHOOL_PRECAUTION.SCHOOL_PRECAUTION_LEVEL.eq(query.getSchoolPrecautionLevel()))
                 .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionVO.class);
         return ResponseUtil.success(studentSchoolPrecautionVOPage);
+    }
+
+    @Override
+    public BaseResponse<HashMap<String, Object>> stat(PrecautionStatQuery query) {
+        List<String> majorIds = query.getMajorIds();
+        if (majorIds.isEmpty()) {
+            int key = 1;
+            while (key <= 6) {
+                majorIds.add(String.valueOf(key));
+                key++;
+            }
+        }
+        query.setMajorIds(majorIds);
+        HashMap<String, Object> stringObjectHashMap = precautionFeign.exportOnlyStat(query);
+        HashMap<String, Object> o = (HashMap<String, Object>) stringObjectHashMap.get("学业预警情况");
+        return ResponseUtil.success(o);
+    }
+
+    @Override
+    public void download(PrecautionStatQuery query, HttpServletResponse response) {
+        try {
+            List<String> majorIds = query.getMajorIds();
+            if (majorIds.isEmpty()) {
+                int key = 1;
+                while (key <= 6) {
+                    majorIds.add(String.valueOf(key));
+                    key++;
+                }
+            }
+            query.setMajorIds(majorIds);
+            byte[] excelBytes = precautionFeign.exportWithStat(query);
+            String fileName = "学业预警统计.xlsx";
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
+            response.getOutputStream().write(excelBytes);
+        } catch (IOException exception) {
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
     }
 }

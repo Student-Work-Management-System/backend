@@ -5,6 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.service.cet.CetService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,5 +53,11 @@ public class CetController {
     @PostMapping("/stat")
     public BaseResponse<HashMap<String, Object>> stat(@RequestBody CetStatQuery query) {
         return cetService.getCetStatistics(query);
+    }
+
+    @PreAuthorize("hasAuthority('student_cet:select')")
+    @PostMapping("/download")
+    public void download(@RequestBody CetStatQuery query, HttpServletResponse response ) {
+        cetService.download(query, response);
     }
 }
