@@ -13,7 +13,6 @@ public class CETQuery implements Serializable {
     private String search;
     private String majorId;
     private String grade;
-    private Long score;
     private String examDate;
     private String examType;
     private Integer pageNo;

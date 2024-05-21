@@ -70,6 +70,8 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
                 .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
+                .and(STUDENT_CET.EXAM_TYPE.eq(query.getExamType()))
+                .and(STUDENT_CET.EXAM_DATE.eq(query.getExamDate()))
                 .pageAs(Page.of(pageNo, pageSize), StudentCetVO.class);
         studentCetVOPage.getRecords().forEach(item -> {
             String studentId = item.getStudentId();
