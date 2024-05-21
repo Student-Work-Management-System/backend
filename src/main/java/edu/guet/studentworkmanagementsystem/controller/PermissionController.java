@@ -43,7 +43,7 @@ public class PermissionController {
     }
     @PreAuthorize("hasAuthority('role:insert') and hasAuthority('role_permission:insert')")
     @PostMapping("/add/role")
-    public <T> BaseResponse<T> addRole(@RequestBody RoleDTO roleDTO) {
+    public <T> BaseResponse<T> addRole(@RequestBody @Valid RoleDTO roleDTO) {
         return userService.addRole(roleDTO);
     }
     @PreAuthorize("hasAuthority('permission:insert')")

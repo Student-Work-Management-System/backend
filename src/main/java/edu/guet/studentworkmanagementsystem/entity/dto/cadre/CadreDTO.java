@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CadreDTO implements Serializable {
     @NotNull(message = "职位id不能为空")
-    private Long cadreId;
+    private String cadreId;
     /**
      * 具体职位
      */

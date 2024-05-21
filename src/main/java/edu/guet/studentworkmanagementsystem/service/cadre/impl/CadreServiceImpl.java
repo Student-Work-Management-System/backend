@@ -23,7 +23,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.CadreTableDef.CADRE;
@@ -45,8 +44,6 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Override
     @Transactional
     public  <T> BaseResponse<T> updateCadre(CadreDTO cadreDTO) {
-        if (Objects.isNull(cadreDTO.getCadreId()))
-            throw new ServiceException(ServiceExceptionEnum.KEY_ARGUMENT_NOT_INPUT);
         boolean update = UpdateChain.of(Cadre.class)
                 .set(Cadre::getCadrePosition, cadreDTO.getCadrePosition(), StringUtils.hasLength(cadreDTO.getCadrePosition()))
                 .set(Cadre::getCadreLevel, cadreDTO.getCadreLevel(), StringUtils.hasLength(cadreDTO.getCadreLevel()))
@@ -125,14 +122,14 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID))
                 .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
                 .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
-                .where(Student::getStudentId).like(query.getSearch())
-                .or(Cadre::getCadrePosition).like(query.getSearch())
-                .or(Student::getName).like(query.getSearch())
+                .where(STUDENT.STUDENT_ID.like(query.getSearch())
+                        .or(STUDENT.NAME.like(query.getSearch()))
+                        .or(CADRE.CADRE_POSITION.like(query.getSearch())))
                 .and(Student::getMajorId).eq(query.getMajorId())
                 .and(Student::getGrade).eq(query.getGrade())
-                .and(Cadre::getCadreLevel).like(query.getCadreLevel())
-                .and(StudentCadre::getAppointmentStartTerm).like(query.getAppointmentStartTerm())
-                .and(StudentCadre::getAppointmentEndTerm).like(query.getAppointmentEndTerm())
+                .and(Cadre::getCadreLevel).eq(query.getCadreLevel())
+                .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())
+                .and(StudentCadre::getAppointmentEndTerm).eq(query.getAppointmentEndTerm())
                 .pageAs(Page.of(pageNo, pageSize), StudentCadreVO.class);
         return ResponseUtil.success(studentCadreVOPage);
     }

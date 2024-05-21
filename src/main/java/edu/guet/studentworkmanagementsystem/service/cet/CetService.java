@@ -9,7 +9,6 @@ import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
-import java.util.List;
 
 public interface CetService extends IService<StudentCet> {
     /**
@@ -27,15 +26,6 @@ public interface CetService extends IService<StudentCet> {
      * @param query 查询参数
      */
     BaseResponse<Page<StudentCetVO>> getAllRecord(CETQuery query);
-    /**
-     * 获取可选的考试学期
-     * @return 学期列表
-     */
-    BaseResponse<List<String>> getOptionalExamDate();
-    /**
-     * 修改CET考试记录信息
-     * @param updateStudentCetDTO 修改后和CET成绩记录
-     */
     <T> BaseResponse<T> updateStudentCET(UpdateStudentCetDTO updateStudentCetDTO);
     /**
      * 删除成绩记录

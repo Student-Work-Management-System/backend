@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Component
 @Slf4j
@@ -37,40 +36,62 @@ final public class AuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        String redisKey = null;
+
+        String redisKey = getRedisKeyFromToken(token, response);
+        if (redisKey == null) return;
+
+        String json = getJsonFromRedis(redisKey, response);
+        if (json == null) return;
+
+        SecurityUser securityUser = parseJsonToSecurityUser(json, response);
+        if (securityUser == null) return;
+
+        setAuthentication(securityUser);
+        filterChain.doFilter(request, response);
+    }
+
+    private String getRedisKeyFromToken(String token, HttpServletResponse response) throws IOException {
         try {
             JWT jwt = JWT.of(token);
             boolean verify = jwt.setKey(keyStr.getBytes()).verify();
-            if (!verify)
-                ResponseUtil.failure(response, ServiceExceptionEnum.TOKEN_ERROR);
-            else
-                redisKey = jwt.getPayload("uid").toString();
-        } catch (JWTException jwtException) {
-            ResponseUtil.failure(response, ServiceExceptionEnum.TOKEN_ERROR);
-            return;
+            if (!verify) {
+                respondWithFailure(response, ServiceExceptionEnum.TOKEN_ERROR);
+                return null;
+            }
+            return jwt.getPayload("uid").toString();
+        } catch (JWTException | IOException jwtException) {
+            respondWithFailure(response, ServiceExceptionEnum.TOKEN_ERROR);
+            return null;
         }
-        String json = null;
+    }
+
+    private String getJsonFromRedis(String redisKey, HttpServletResponse response) throws IOException {
         try {
-            json = (String) redisUtil.getValue(redisKey);
-        } catch (NullPointerException nullPointerException) {
-            ResponseUtil.failure(response, ServiceExceptionEnum.UN_LOGIN);
-            return;
+            return (String) redisUtil.getValue(redisKey);
+        } catch (NullPointerException e) {
+            log.error("空指针错误: {}", e.getMessage());
+            respondWithFailure(response, ServiceExceptionEnum.UN_LOGIN);
+            return null;
         }
-        SecurityUser securityUser = null;
+    }
+
+    private SecurityUser parseJsonToSecurityUser(String json, HttpServletResponse response) throws IOException {
         try {
-            securityUser = JsonUtil.mapper.readValue(json, SecurityUser.class);
-        } catch (Exception exception) {
-            log.error(exception.getMessage());
-            ResponseUtil.failure(response, ServiceExceptionEnum.UN_LOGIN);
-            return;
+            return JsonUtil.mapper.readValue(json, SecurityUser.class);
+        } catch (Exception e) {
+            log.error("出现异常(可能为json解析异常): {}", e.getMessage());
+            respondWithFailure(response, ServiceExceptionEnum.UN_LOGIN);
+            return null;
         }
-        if (Objects.isNull(securityUser)) {
-            ResponseUtil.failure(response, ServiceExceptionEnum.UN_LOGIN);
-            return;
-        }
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(securityUser.getUser().getUid(), securityUser, securityUser.getAuthorities());
+    }
+
+    private void setAuthentication(SecurityUser securityUser) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                securityUser.getUser().getUid(), securityUser, securityUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(request, response);
+    }
+
+    private void respondWithFailure(HttpServletResponse response, ServiceExceptionEnum exceptionEnum) throws IOException {
+        ResponseUtil.failure(response, exceptionEnum);
     }
 }

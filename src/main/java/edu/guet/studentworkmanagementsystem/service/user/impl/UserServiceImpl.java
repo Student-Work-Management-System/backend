@@ -36,6 +36,7 @@ import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,7 +57,9 @@ import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePerm
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
+
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -82,15 +85,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-        if (Objects.isNull(authenticate))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
         String redisKey = "uid:" + securityUser.getUser().getUid();
         String token = createToken(redisKey, key);
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
-            ResponseUtil.failure(ServiceExceptionEnum.JSON_ERROR);
+            log.error("UserServiceImpl#login(LoginUserDTO loginUserDTO)出现JSON解析异常: {}", jsonProcessingException.getMessage());
+            ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
         }
         LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
         return ResponseUtil.success(loginUserVO);
@@ -114,6 +116,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
         registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
+        String username = registerUserDTO.getUsername();
+        User userByUsername = mapper.getUserByUsername(username);
+        if (!Objects.isNull(userByUsername))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_EXISTED);
         User user = new User(registerUserDTO);
         int i = mapper.insert(user);
         if (i > 0) {

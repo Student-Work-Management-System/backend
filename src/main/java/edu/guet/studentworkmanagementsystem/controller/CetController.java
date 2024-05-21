@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/cet")
@@ -33,11 +32,6 @@ public class CetController {
     @PostMapping("/gets")
     public BaseResponse<Page<StudentCetVO>> getAllRecord(@RequestBody CETQuery query) {
         return cetService.getAllRecord(query);
-    }
-    @PreAuthorize("hasAuthority('student_cet:select')")
-    @GetMapping("/gets/optional_exam_date")
-    public BaseResponse<List<String>> getOptionalExamDate() {
-        return cetService.getOptionalExamDate();
     }
     @PreAuthorize("hasAuthority('student_cet:update')")
     @PutMapping("/update")

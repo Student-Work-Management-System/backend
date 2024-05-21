@@ -6,9 +6,6 @@ import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.TransientDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -36,17 +33,13 @@ public class ExceptionControllerAdvice {
         return ResponseUtil.failure(ServiceExceptionEnum.METHOD_NOT_SUPPORT.getCode(),
                 ServiceExceptionEnum.METHOD_NOT_SUPPORT.getMsg() + httpRequestMethodNotSupportedException.getMethod());
     }
-    @ExceptionHandler(DuplicateKeyException.class)
-    public <T> BaseResponse<T> duplicateKeyExceptionHandler() {
-        return ResponseUtil.failure(ServiceExceptionEnum.KEY_EXISTED);
-    }
     @ExceptionHandler(AccessDeniedException.class)
     public <T> BaseResponse<T> accessDeniedExceptionHandler() {
         return ResponseUtil.failure(ServiceExceptionEnum.INSUFFICIENT_PERMISSIONS);
     }
     @ExceptionHandler({BadCredentialsException.class, InternalAuthenticationServiceException.class})
     public <T> BaseResponse<T> authenticationExceptionHandler() {
-        return ResponseUtil.failure(ServiceExceptionEnum.EMAIL_NO_PASSWORD_WRONG);
+        return ResponseUtil.failure(ServiceExceptionEnum.ID_NO_PASSWORD_WRONG);
     }
     @ExceptionHandler(UsernameNotFoundException.class)
     public <T> BaseResponse<T> usernameNotFoundExceptionHandler() {

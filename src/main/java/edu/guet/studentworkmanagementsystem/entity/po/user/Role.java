@@ -18,7 +18,6 @@ public class Role {
     private String roleName;
     private String roleDesc;
     public Role(RoleDTO roleDTO) {
-        this.rid = roleDTO.getRid();
         this.roleName = roleDTO.getRoleName();
         this.roleDesc = roleDTO.getRoleDesc();
     }

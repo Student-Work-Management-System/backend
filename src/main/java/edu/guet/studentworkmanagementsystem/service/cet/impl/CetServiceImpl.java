@@ -53,6 +53,12 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
     @Transactional
     public <T> BaseResponse<T> insertStudentCet(InsertStudentCetDTO insertStudentCetDTO) {
         StudentCet studentCet = convertToEntity(insertStudentCetDTO);
+        String certificateNumber = QueryChain.of(StudentCet.class)
+                .where(STUDENT_CET.CERTIFICATE_NUMBER.eq(studentCet.getCertificateNumber()))
+                .one()
+                .getCertificateNumber();
+        if (!Objects.isNull(certificateNumber))
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         int i = mapper.insert(studentCet);
         if (i > 0)
             return ResponseUtil.success();
@@ -83,17 +89,6 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
             item.setCets(list);
         });
         return ResponseUtil.success(studentCetVOPage);
-    }
-    @Override
-    public BaseResponse<List<String>> getOptionalExamDate() {
-        List<String> collect = QueryChain.of(StudentCet.class)
-                .select(STUDENT_CET.EXAM_DATE)
-                .from(STUDENT_CET)
-                .list()
-                .stream()
-                .map(StudentCet::getExamDate)
-                .toList();
-        return ResponseUtil.success(collect);
     }
     @Override
     @Transactional

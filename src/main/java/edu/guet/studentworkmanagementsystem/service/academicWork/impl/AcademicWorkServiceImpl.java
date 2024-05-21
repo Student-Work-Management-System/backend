@@ -20,6 +20,7 @@ import edu.guet.studentworkmanagementsystem.mapper.academicWork.*;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
+@Slf4j
 public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapper, StudentAcademicWork> implements AcademicWorkService {
     @Autowired
     private StudentPaperMapper paperMapper;
@@ -50,19 +52,22 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         List<StudentAcademicWorkDTO> studentAcademicWorkDTOList = studentAcademicWorkList.getStudentAcademicWorks();
         int size = studentAcademicWorkDTOList.size();
         ArrayList<StudentAcademicWork> studentAcademicWorks = new ArrayList<>();
-        studentAcademicWorkDTOList.forEach(item -> {
+        for (StudentAcademicWorkDTO item : studentAcademicWorkDTOList) {
             Long id = insertAcademicWork(item.getAcademicWork(), item.getAcademicWorkType());
             item.setAdditionalInfoId(id);
             try {
                 studentAcademicWorks.add(new StudentAcademicWork(item));
             } catch (JsonProcessingException exception) {
+                log.error(
+                        "AcademicWorkServiceImpl#importStudentAcademicWork(StudentAcademicWorkList studentAcademicWorkList): " +
+                        "解析学术学术作品JSON时出现异常: {}", exception.getMessage());
                 throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
             }
-        });
+        }
         int i = mapper.insertBatch(studentAcademicWorks);
         if (i == size)
             return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.JSON_ERROR);
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
     @Override
@@ -77,7 +82,9 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                 return ResponseUtil.success();
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         } catch (JsonProcessingException exception) {
-            throw new ServiceException(ServiceExceptionEnum.JSON_ERROR);
+            log.error("AcademicWorkServiceImpl#insertStudentAcademicWork(StudentAcademicWorkDTO studentAcademicWorkDTO): " +
+                    "在解析学生学术作品JSON时出现了错误: {}", exception.getMessage());
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         }
     }
 

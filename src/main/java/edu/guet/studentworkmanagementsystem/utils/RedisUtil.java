@@ -25,7 +25,7 @@ public class RedisUtil {
     }
     public void delete(String key) {
         if (exists(key))
-            redisTemplate.delete(key);
+            redisTemplate.unlink(key);
     }
     public boolean exists(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
