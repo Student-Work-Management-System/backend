@@ -76,7 +76,7 @@ public class CompetitionController {
         return competitionService.getAllStudentCompetition(query);
     }
     @PreAuthorize( "hasAuthority('student_competition:select')")
-    @GetMapping("/student_competition/gets/pass")
+    @PostMapping("/student_competition/gets/pass")
     public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassStudentCompetition(@RequestBody CompetitionQuery query) {
         return competitionService.getAllPassedStudentCompetition(query);
     }
