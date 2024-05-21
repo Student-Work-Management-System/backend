@@ -3,7 +3,6 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
-import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.service.cet.CetService;
 import jakarta.validation.Valid;
@@ -51,7 +50,7 @@ public class CetController {
     }
     @PreAuthorize("hasAuthority('student_cet:select')")
     @PostMapping("/stat")
-    public BaseResponse<HashMap<String, CetStatistics>> stat(@RequestBody CetStatQuery query) {
+    public BaseResponse<HashMap<String, Object>> stat(@RequestBody CetStatQuery query) {
         return cetService.getCetStatistics(query);
     }
 }

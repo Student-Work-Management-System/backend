@@ -141,7 +141,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 }
             }
         }
-        Map<String, Object> map = enrollmentFeign.exportOnlyStat(query);
+        HashMap<String, Object> map = enrollmentFeign.exportOnlyStat(query);
         if (map.isEmpty())
             return ResponseUtil.success();
         HashMap<String, HashMap<String, Object>> originMap = (HashMap<String, HashMap<String, Object>>) map.get("生源地情况");

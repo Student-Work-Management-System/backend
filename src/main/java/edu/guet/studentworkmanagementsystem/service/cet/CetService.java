@@ -5,7 +5,6 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
-import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 
 import java.util.HashMap;
@@ -45,5 +44,5 @@ public interface CetService extends IService<StudentCet> {
     /**
      * cet成绩统计
      */
-    BaseResponse<HashMap<String, CetStatistics>> getCetStatistics(CetStatQuery query);
+    BaseResponse<HashMap<String, Object>> getCetStatistics(CetStatQuery query);
 }

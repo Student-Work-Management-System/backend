@@ -5,12 +5,12 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Map;
+import java.util.HashMap;
 
 @FeignClient(url = "http://10.33.9.182:8080/enrollment_stat", name = "enrollment")
 public interface EnrollmentFeign {
     @PostMapping("/export_with_stat")
     byte[] exportWithStat(@RequestBody EnrollmentStatQuery query);
     @PostMapping("/export_only_stat")
-    Map<String, Object> exportOnlyStat(@RequestBody EnrollmentStatQuery query);
+    HashMap<String, Object> exportOnlyStat(@RequestBody EnrollmentStatQuery query);
 }

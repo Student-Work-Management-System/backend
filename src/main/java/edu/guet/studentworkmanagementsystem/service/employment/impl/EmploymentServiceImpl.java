@@ -154,7 +154,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 }
             }
         }
-        Map<String, Object> map = employmentFeign.exportOnlyStat(query);
+        HashMap<String, Object> map = employmentFeign.exportOnlyStat(query);
         if (map.isEmpty())
             return ResponseUtil.success();
         HashMap<String, HashMap<String, Object>> graduationStatus = (HashMap<String, HashMap<String, Object>>) map.get("毕业后状态");

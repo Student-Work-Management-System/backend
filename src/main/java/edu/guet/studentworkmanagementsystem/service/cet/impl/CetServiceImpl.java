@@ -8,7 +8,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
-import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetStatistics;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.CetVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -25,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
-import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.cet.table.StudentCetTableDef.STUDENT_CET;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
@@ -116,7 +114,7 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
     }
 
     @Override
-    public BaseResponse<HashMap<String, CetStatistics>> getCetStatistics(CetStatQuery query) {
+    public BaseResponse<HashMap<String, Object>> getCetStatistics(CetStatQuery query) {
         List<String> majorIds = query.getMajorIds();
         if (majorIds.isEmpty()) {
             int key = 1;
@@ -125,19 +123,8 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
                 key++;
             }
         }
-        Map<String, Object> map = cetFeign.exportOnlyStat(query);
-        Set<String> keys = majorName2MajorId.keySet();
-        HashMap<String, CetStatistics> result = new HashMap<>();
-        keys.forEach(item -> {
-            if (map.containsKey(item)) {
-                CetStatistics cetStatistics = new CetStatistics();
-                HashMap<String, Object> dataMap = (HashMap<String, Object>) map.get(item);
-                cetStatistics.setCet4((HashMap<String, Object>) dataMap.get("cet4"));
-                cetStatistics.setCet6((HashMap<String, Object>) dataMap.get("cet6"));
-                result.put(item, cetStatistics);
-            }
-        });
-        return ResponseUtil.success(result);
+        HashMap<String, Object> map = cetFeign.exportOnlyStat(query);
+        return ResponseUtil.success(map);
     }
 
     private StudentCet convertToEntity(InsertStudentCetDTO insertStudentCetDTO) {
