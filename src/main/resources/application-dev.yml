@@ -6,6 +6,12 @@ spring:
     password: qx310320
     url: jdbc:mysql://121.41.115.29:5506/swms?useUnicode=true&characterEncoding=UTF-8
     type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 20
+      idle-timeout: 180000
+      pool-name: HikariPool
+      minimum-idle: 4
+      connection-timeout: 15000
   data:
     redis:
       host: 121.41.115.29
@@ -15,9 +21,9 @@ spring:
       lettuce:
         pool:
           max-active: 20
-          max-wait: -1
+          max-wait: 10000
           max-idle: 8
-          min-idle: 0
+          min-idle: 4
       password: Qx310320.n
   mail:
     host: smtp.163.com
