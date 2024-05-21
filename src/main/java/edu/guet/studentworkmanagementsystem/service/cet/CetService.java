@@ -6,6 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cet.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cet.StudentCet;
 import edu.guet.studentworkmanagementsystem.entity.vo.cet.StudentCetVO;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,4 +46,5 @@ public interface CetService extends IService<StudentCet> {
      * cet成绩统计
      */
     BaseResponse<HashMap<String, Object>> getCetStatistics(CetStatQuery query);
+    void download(CetStatQuery query, HttpServletResponse response);
 }

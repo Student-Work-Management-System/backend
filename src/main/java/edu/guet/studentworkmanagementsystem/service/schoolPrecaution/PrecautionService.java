@@ -4,11 +4,14 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.HashMap;
 
 
 public interface PrecautionService extends IService<StudentSchoolPrecaution> {
@@ -39,4 +42,6 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * @return 学业预警信息
      */
     BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(PrecautionQuery query);
+    BaseResponse<HashMap<String, Object>> stat(PrecautionStatQuery query);
+    void download(PrecautionStatQuery query, HttpServletResponse response);
 }

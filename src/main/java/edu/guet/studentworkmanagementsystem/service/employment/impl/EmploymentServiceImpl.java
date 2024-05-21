@@ -81,7 +81,6 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .and(Student::getGrade).eq(query.getGrade())
                 .and(STUDENT_EMPLOYMENT.GRADUATION_YEAR.eq(query.getGraduationYear()))
                 .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())));
-
         Page<StudentEmploymentVO> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
         return ResponseUtil.success(page);
     }
@@ -122,6 +121,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                     key++;
                 }
             }
+            query.setMajorIds(majorIds);
             byte[] excelBytes = employmentFeign.exportWithStat(query);
             String fileName = "学生就业信息统计.xlsx";
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
@@ -154,6 +154,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 }
             }
         }
+        query.setMajorIds(majorIds);
         HashMap<String, Object> map = employmentFeign.exportOnlyStat(query);
         if (map.isEmpty())
             return ResponseUtil.success();

@@ -109,6 +109,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                     key++;
                 }
             }
+            query.setMajorIds(majorIds);
             byte[] excelBytes = enrollmentFeign.exportWithStat(query);
             String fileName = "招生信息统计.xlsx";
             String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
@@ -141,6 +142,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 }
             }
         }
+        query.setMajorIds(majorIds);
         HashMap<String, Object> map = enrollmentFeign.exportOnlyStat(query);
         if (map.isEmpty())
             return ResponseUtil.success();

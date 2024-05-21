@@ -11,4 +11,6 @@ import java.util.HashMap;
 public interface CetFeign {
     @PostMapping("/export_only_stat")
     HashMap<String,Object> exportOnlyStat(@RequestBody CetStatQuery query);
+    @PostMapping("/export_with_stat")
+    byte[] exportWithStat(@RequestBody CetStatQuery query);
 }
