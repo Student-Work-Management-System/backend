@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -26,8 +27,10 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
@@ -55,11 +58,49 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     @Transactional
     public <T> BaseResponse<T> addStudent(Student student) {
+        String studentId = student.getStudentId();
+        Student one = QueryChain.of(Student.class)
+                .where(STUDENT.STUDENT_ID.eq(studentId))
+                .one();
+        if (!Objects.isNull(one))
+            return enableAndUpdateStudentWithAccount(student);
+        else
+            return createStudentAndUser(student);
+    }
+    @Transactional
+    public <T> BaseResponse<T> createStudentAndUser(Student student) {
         int i = mapper.insert(student);
         if (i > 0) {
             RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()));
             return userService.addUser(user);
         }
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    @Transactional
+    public <T> BaseResponse<T> enableAndUpdateStudentWithAccount(Student student) {
+        boolean i = UpdateChain.of(Student.class)
+                .set(Student::getName, student.getName(), StringUtils.hasLength(student.getName()))
+                .set(Student::getIdNumber, student.getIdNumber(), StringUtils.hasLength(student.getIdNumber()))
+                .set(Student::getGender, student.getGender(), StringUtils.hasLength(student.getGender()))
+                .set(Student::getPostalCode, student.getPostalCode(), StringUtils.hasLength(student.getPostalCode()))
+                .set(Student::getNativePlace, student.getNativePlace(), StringUtils.hasLength(student.getNativePlace()))
+                .set(Student::getPhone, student.getPhone(), StringUtils.hasLength(student.getPhone()))
+                .set(Student::getMajorId, student.getMajorId(), StringUtils.hasLength(student.getMajorId()))
+                .set(Student::getGrade, student.getGrade(), StringUtils.hasLength(student.getGrade()))
+                .set(Student::getClassNo, student.getClassNo(), StringUtils.hasLength(student.getClassNo()))
+                .set(Student::getPoliticsStatus, student.getPoliticsStatus(), StringUtils.hasLength(student.getPoliticsStatus()))
+                .set(STUDENT.ENABLED, true)
+                .where(STUDENT.STUDENT_ID.eq(student.getStudentId()))
+                .update();
+        boolean j = UpdateChain.of(User.class)
+                .set(User::getPassword, passwordEncoder.encode(createPassword(student.getIdNumber())), StringUtils::hasLength)
+                .set(User::getRealName, student.getName(), StringUtils::hasLength)
+                .set(User::getEmail, student.getStudentId(), StringUtils::hasLength)
+                .set(User::isEnabled, true)
+                .where(User::getUsername).eq(student.getStudentId())
+                .update();
+        if (i && j)
+            return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     private RegisterUserDTO createUser(String studentId, String name, String password) {
@@ -72,7 +113,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         Page<StudentVO> studentPage = QueryChain.of(Student.class)
                 .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                .where(Student::getEnabled).eq(true)
+                .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                 .and(Student::getNativePlace).like(query.getNativePlace())
                 .and(Student::getNation).like(query.getNation())
                 .and(Student::getGender).eq(query.getGender())
@@ -105,11 +147,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
-        int code = userService.deleteUser(studentId).getCode();
+        User one = QueryChain.of(User.class)
+                .where(USER.USERNAME.eq(studentId))
+                .one();
+        int code = userService.deleteUser(one.getUid()).getCode();
         if (code != 200)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        int i = mapper.deleteById(studentId);
-        if (i > 0)
+        boolean i = UpdateChain.of(Student.class)
+                .set(STUDENT.ENABLED, false)
+                .where(STUDENT.STUDENT_ID.eq(studentId))
+                .update();
+        if (i)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }

@@ -2,6 +2,7 @@ package edu.guet.studentworkmanagementsystem.service.cadre.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -60,6 +61,11 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteCadre(String cadreId) {
+        long size = count(query());
+        QueryWrapper queryWrapper = QueryWrapper.create().where(STUDENT_CADRE.CADRE_ID.eq(cadreId));
+        int rows = mapper.deleteByQuery(queryWrapper);
+        if (rows != size)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         int i = cadreMapper.deleteById(cadreId);
         if (i > 0)
             return ResponseUtil.success();
@@ -77,7 +83,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     @Transactional
     @Override
     public BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreList insertStudentCadreList) {
-        ArrayList<StudentCadre> studentCadres = new ArrayList<>();  
+        ArrayList<StudentCadre> studentCadres = new ArrayList<>();
         insertStudentCadreList.getInsertStudentCadreDTOList().forEach(item->{
             StudentCadre studentCadre = new StudentCadre(item);
             studentCadres.add(studentCadre);
@@ -119,7 +125,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
         Page<StudentCadreVO> studentCadreVOPage = QueryChain.of(StudentCadre.class)
                 .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS, CADRE.ALL_COLUMNS, STUDENT_CADRE.ALL_COLUMNS)
                 .from(STUDENT_CADRE)
-                .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID))
+                .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID).and(STUDENT.ENABLED.eq(true)))
                 .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
                 .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
                 .where(STUDENT.STUDENT_ID.like(query.getSearch())
