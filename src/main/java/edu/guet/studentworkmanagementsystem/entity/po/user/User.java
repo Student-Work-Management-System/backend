@@ -31,20 +31,20 @@ public class User {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
+    private boolean enabled;
     public User(RegisterUserDTO registerUserDTO) {
         this.username = registerUserDTO.getUsername();
         this.realName = registerUserDTO.getRealName();
         this.email = registerUserDTO.getEmail();
         this.password = registerUserDTO.getPassword();
         this.createdAt = LocalDate.now();
+        this.enabled = true;
     }
 
     public User(UpdateUserDTO updateUserDTO) {
         this.uid = updateUserDTO.getUid();
-        this.username = null;
         this.realName = updateUserDTO.getRealName();
         this.email = updateUserDTO.getEmail();
         this.password = updateUserDTO.getPassword();
-        this.createdAt = null;
     }
 }

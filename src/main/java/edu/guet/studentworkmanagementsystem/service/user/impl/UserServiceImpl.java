@@ -311,6 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                 .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
                 .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
+                .and(User::isEnabled).eq(true)
                 .listAs(UserDetailVO.class);
         return ResponseUtil.success(userDetailVOPage);
     }

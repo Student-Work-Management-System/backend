@@ -58,9 +58,9 @@ public class UserController {
         return userService.updateUserRole(userRoleDTO);
     }
     @PreAuthorize("hasAuthority('user:delete') and hasAuthority('user_role:delete')")
-    @DeleteMapping("/delete/{uid}")
-    public <T> BaseResponse<T> deleteUser(@PathVariable String uid) {
-        return userService.deleteUser(uid);
+    @DeleteMapping("/delete/{username}")
+    public <T> BaseResponse<T> deleteUser(@PathVariable String username) {
+        return userService.deleteUser(username);
     }
     @PreAuthorize("hasAuthority('user:update:all')")
     @PutMapping("/update")
