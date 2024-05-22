@@ -17,13 +17,14 @@ spring:
       host: 121.41.115.29
       database: 0
       port: 9379
-      timeout: 5000ms
+      timeout: 60
       lettuce:
         pool:
           max-active: 20
-          max-wait: 10000
+          max-wait: 5
           max-idle: 8
-          min-idle: 4
+          min-idle: 0
+        shutdown-timeout: 100
       password: Qx310320.n
   mail:
     host: smtp.163.com
