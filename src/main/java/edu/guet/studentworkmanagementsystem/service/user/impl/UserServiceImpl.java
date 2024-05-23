@@ -354,13 +354,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .from(USER)
                     .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                     .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
-                    .where(USER.REAL_NAME.like(query.getKeyword())).or(USER.USERNAME.like(query.getKeyword()))
-                    .and(USER.ENABLED.eq(query.getEnabled()))
+                    .where(USER.ENABLED.eq(query.getEnabled()))
+                    .and(USER.REAL_NAME.like(query.getKeyword()).or(USER.USERNAME.like(query.getKeyword())))
                     .listAs(UserDetailVO.class);
             return ResponseUtil.success(userDetailVOPage);
         }, readThreadPool);
         try {
-            return future.get(3, TimeUnit.HOURS);
+            return future.get(3, TimeUnit.SECONDS);
         } catch (Exception exception) {
             Throwable cause = exception.getCause();
             switch (cause) {

@@ -11,5 +11,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class UserQuery implements Serializable {
     private String keyword;
-    private Boolean enabled = true;
+    private Boolean enabled;
 }
