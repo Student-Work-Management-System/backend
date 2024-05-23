@@ -16,6 +16,7 @@ public class AsyncConfig {
     private static final int KEEP_ALIVE_TIME = 60;
     private static final String EMAIL_PREFIX = "emailThread-";
     private static final String READ_PREFIX = "readThread-";
+    private static final String WRITE_PREFIX = "writeThread-";
     private static final ThreadPoolExecutor.CallerRunsPolicy HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
     @Bean("emailThreadPool")
     public ThreadPoolTaskExecutor emailThreadPool() {
@@ -38,6 +39,18 @@ public class AsyncConfig {
         executor.setKeepAliveSeconds(KEEP_ALIVE_TIME);
         executor.setRejectedExecutionHandler(HANDLER);
         executor.setThreadNamePrefix(READ_PREFIX);
+        executor.initialize();
+        return executor;
+    }
+    @Bean("writeThreadPool")
+    public ThreadPoolTaskExecutor writeThreadPool() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(CORE_POOL_SIZE);
+        executor.setMaxPoolSize(MAXIMUM_POOL_SIZE);
+        executor.setQueueCapacity(QUEUE_CAPACITY);
+        executor.setKeepAliveSeconds(KEEP_ALIVE_TIME);
+        executor.setRejectedExecutionHandler(HANDLER);
+        executor.setThreadNamePrefix(WRITE_PREFIX);
         executor.initialize();
         return executor;
     }
