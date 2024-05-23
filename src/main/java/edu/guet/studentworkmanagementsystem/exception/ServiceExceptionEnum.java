@@ -12,12 +12,16 @@ public enum ServiceExceptionEnum {
     ACCOUNT_EXISTED(-1004, "用户已经存在"),
     TOKEN_ERROR(-1005, "Token异常"),
     UN_LOGIN(-1006, "还未登录或Token过期"),
+    ACCOUNT_DISABLED(-1007, "用户已被禁用, 联系管理员解除禁用"),
     // -2xxx: 用户操作不当造成异常
     METHOD_ARGUMENT_NOT_VALID(-2000, ""),
     KEY_ARGUMENT_NOT_INPUT(-2001, "关键信息未输入"),
     SELECT_NOT_IN(-2002, "该选项不存在"),
     METHOD_NOT_SUPPORT(-2003, "方法不支持"),
     TOO_MANY_REQUEST(-2004, "请求过于频繁"),
+    TYPE_ERROR(-2005, "参数存在错误"),
+    STUDENT_ID_OR_ID_NUMBER_REPEAT(-2006, "上传数据中存在学号/身份证重复"),
+    DB_STUDENT_ID_OR_ID_NUMBER_REPEAT(-2007, "该学号/身份证号已经被注册使用"),
     // -3xxx: 资源访问错误
     OPERATE_ERROR(-3000, "操作失败"),
     NOT_FOUND(-3001, "未找到相关记录"),

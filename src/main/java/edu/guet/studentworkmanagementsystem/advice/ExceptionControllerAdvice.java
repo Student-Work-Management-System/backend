@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -44,6 +45,10 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(UsernameNotFoundException.class)
     public <T> BaseResponse<T> usernameNotFoundExceptionHandler() {
         return ResponseUtil.failure(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
+    }
+    @ExceptionHandler(DisabledException.class)
+    public <T> BaseResponse<T> userDisabledExceptionHandler() {
+        return ResponseUtil.failure(ServiceExceptionEnum.ACCOUNT_DISABLED);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public <T> BaseResponse<T> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
