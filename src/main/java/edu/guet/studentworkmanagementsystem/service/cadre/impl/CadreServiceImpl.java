@@ -18,6 +18,8 @@ import edu.guet.studentworkmanagementsystem.mapper.cadre.StudentCadreMapper;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +27,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.CadreTableDef.CADRE;
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.StudentCadreTableDef.STUDENT_CADRE;
@@ -35,6 +40,10 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCadre>  implements CadreService{
     @Autowired
     private CadreMapper cadreMapper ;
+    @Qualifier("readThreadPool")
+    @Autowired
+    private ThreadPoolTaskExecutor readThreadPool;
+
     @Override
     public <T> BaseResponse<T> insertCadre(Cadre cadre) {
         int i = cadreMapper.insert(cadre);
@@ -42,6 +51,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public  <T> BaseResponse<T> updateCadre(CadreDTO cadreDTO) {
@@ -56,13 +66,29 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
     @Override
     public BaseResponse<List<Cadre>> getAllCadres() {
-        return ResponseUtil.success(cadreMapper.selectAll());
+        CompletableFuture<BaseResponse<List<Cadre>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(cadreMapper.selectAll()), readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteCadre(String cadreId) {
-        long size = count(query());
         QueryWrapper queryWrapper = QueryWrapper.create().where(STUDENT_CADRE.CADRE_ID.eq(cadreId));
+        long size = count(queryWrapper);
         int rows = mapper.deleteByQuery(queryWrapper);
         if (rows != size)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -80,6 +106,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
             return ResponseUtil.success(studentCadre);
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Transactional
     @Override
     public BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreList insertStudentCadreList) {
@@ -110,6 +137,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentCadre(String studentCadreId) {
@@ -118,25 +146,43 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query) {
-        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
-        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentCadreVO> studentCadreVOPage = QueryChain.of(StudentCadre.class)
-                .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS, CADRE.ALL_COLUMNS, STUDENT_CADRE.ALL_COLUMNS)
-                .from(STUDENT_CADRE)
-                .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID).and(STUDENT.ENABLED.eq(true)))
-                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
-                .where(STUDENT.STUDENT_ID.like(query.getSearch())
-                        .or(STUDENT.NAME.like(query.getSearch()))
-                        .or(CADRE.CADRE_POSITION.like(query.getSearch())))
-                .and(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getGrade).eq(query.getGrade())
-                .and(Cadre::getCadreLevel).eq(query.getCadreLevel())
-                .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())
-                .and(StudentCadre::getAppointmentEndTerm).eq(query.getAppointmentEndTerm())
-                .pageAs(Page.of(pageNo, pageSize), StudentCadreVO.class);
-        return ResponseUtil.success(studentCadreVOPage);
+        CompletableFuture<BaseResponse<Page<StudentCadreVO>>> future = CompletableFuture.supplyAsync(() -> {
+            Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+            Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
+            Page<StudentCadreVO> studentCadreVOPage = QueryChain.of(StudentCadre.class)
+                    .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS, CADRE.ALL_COLUMNS, STUDENT_CADRE.ALL_COLUMNS)
+                    .from(STUDENT_CADRE)
+                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID).and(STUDENT.ENABLED.eq(true)))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
+                    .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
+                    .where(STUDENT.STUDENT_ID.like(query.getSearch())
+                            .or(STUDENT.NAME.like(query.getSearch()))
+                            .or(CADRE.CADRE_POSITION.like(query.getSearch())))
+                    .and(Student::getMajorId).eq(query.getMajorId())
+                    .and(Student::getGrade).eq(query.getGrade())
+                    .and(Cadre::getCadreLevel).eq(query.getCadreLevel())
+                    .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())
+                    .and(StudentCadre::getAppointmentEndTerm).eq(query.getAppointmentEndTerm())
+                    .pageAs(Page.of(pageNo, pageSize), StudentCadreVO.class);
+            return ResponseUtil.success(studentCadreVOPage);
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
 }

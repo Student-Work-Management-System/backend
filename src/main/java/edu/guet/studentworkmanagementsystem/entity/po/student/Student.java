@@ -2,6 +2,7 @@ package edu.guet.studentworkmanagementsystem.entity.po.student;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.DigitsOnly;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -31,6 +32,7 @@ public class Student implements Serializable {
      * 学号, 系统中与学生有关的一律使用学号关联
      */
     @Id
+    @DigitsOnly(message = "学号只能由数字组成")
     @NotBlank(message = "学号不能为空")
     private String studentId;
     /**
@@ -53,7 +55,8 @@ public class Student implements Serializable {
      */
     private String postalCode;
     @NotBlank(message = "手机号不能为空")
-    @Size(min = 11, max = 11, message = "请输入正常的手机号")
+    @Size(min = 11, max = 11, message = "手机号只能由11位数字组成")
+    @DigitsOnly(message = "手机号只能由11位数字组成")
     private String phone;
     /**
      * 民族

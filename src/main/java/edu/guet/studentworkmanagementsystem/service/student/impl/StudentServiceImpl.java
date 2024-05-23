@@ -20,15 +20,18 @@ import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
@@ -40,33 +43,68 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Qualifier("readThreadPool")
+    @Autowired
+    private ThreadPoolTaskExecutor readThreadPool;
+
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudent(StudentList studentList) {
         List<Student> students = studentList.getStudents();
+        preImportStudent(students);
         int i = mapper.insertBatch(students);
-        if (i == students.size()) {
-            ArrayList<RegisterUserDTO> registerUserDTOS = new ArrayList<>();
-            students.forEach(item -> {
-                RegisterUserDTO user = createUser(item.getStudentId(), item.getName(), createPassword(item.getIdNumber()));
-                registerUserDTOS.add(user);
-            });
-            return userService.addUsers(new RegisterUserDTOList(registerUserDTOS));
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (i != students.size())
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        RegisterUserDTOList registerUserList = createRegisterUserList(students);
+        return userService.addUsers(registerUserList);
     }
+
+    @Transactional
+    public void preImportStudent(List<Student> students) {
+        Set<String> idNumberSet = students.stream().map(Student::getIdNumber).collect(Collectors.toSet());
+        Set<String> studentIdSet = students.stream().map(Student::getStudentId).collect(Collectors.toSet());
+        if ((idNumberSet.size() != students.size()) || (studentIdSet.size() != students.size()))
+            throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_REPEAT);
+        Set<String> dbIdNumberSet = QueryChain.of(Student.class)
+                .where(STUDENT.ID_NUMBER.in(idNumberSet))
+                .list()
+                .stream()
+                .map(Student::getIdNumber)
+                .collect(Collectors.toSet());
+        Set<String> dbStudentIdSet = QueryChain.of(Student.class)
+                .where(STUDENT.STUDENT_ID.in(studentIdSet))
+                .list()
+                .stream()
+                .map(Student::getStudentId)
+                .collect(Collectors.toSet());
+        if (!dbIdNumberSet.isEmpty() || !dbStudentIdSet.isEmpty())
+            throw new ServiceException(ServiceExceptionEnum.DB_STUDENT_ID_OR_ID_NUMBER_REPEAT);
+    }
+
+    public RegisterUserDTOList createRegisterUserList(List<Student> students) {
+        ArrayList<RegisterUserDTO> registerUserDTO = new ArrayList<>();
+        RegisterUserDTOList registerUserDTOList = new RegisterUserDTOList();
+        students.forEach(student -> {
+            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()));
+            registerUserDTO.add(user);
+        });
+        registerUserDTOList.setRegisterUserDTOList(registerUserDTO);
+        return registerUserDTOList;
+    }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> addStudent(Student student) {
         String studentId = student.getStudentId();
         Student one = QueryChain.of(Student.class)
                 .where(STUDENT.STUDENT_ID.eq(studentId))
+                .or(STUDENT.ID_NUMBER.eq(student.getIdNumber()))
                 .one();
         if (!Objects.isNull(one))
-            return enableAndUpdateStudentWithAccount(student);
-        else
-            return createStudentAndUser(student);
+            throw new ServiceException(ServiceExceptionEnum.DB_STUDENT_ID_OR_ID_NUMBER_REPEAT);
+        return createStudentAndUser(student);
     }
+
     @Transactional
     public <T> BaseResponse<T> createStudentAndUser(Student student) {
         int i = mapper.insert(student);
@@ -76,54 +114,47 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-    @Transactional
-    public <T> BaseResponse<T> enableAndUpdateStudentWithAccount(Student student) {
-        boolean i = UpdateChain.of(Student.class)
-                .set(Student::getName, student.getName(), StringUtils.hasLength(student.getName()))
-                .set(Student::getIdNumber, student.getIdNumber(), StringUtils.hasLength(student.getIdNumber()))
-                .set(Student::getGender, student.getGender(), StringUtils.hasLength(student.getGender()))
-                .set(Student::getPostalCode, student.getPostalCode(), StringUtils.hasLength(student.getPostalCode()))
-                .set(Student::getNativePlace, student.getNativePlace(), StringUtils.hasLength(student.getNativePlace()))
-                .set(Student::getPhone, student.getPhone(), StringUtils.hasLength(student.getPhone()))
-                .set(Student::getMajorId, student.getMajorId(), StringUtils.hasLength(student.getMajorId()))
-                .set(Student::getGrade, student.getGrade(), StringUtils.hasLength(student.getGrade()))
-                .set(Student::getClassNo, student.getClassNo(), StringUtils.hasLength(student.getClassNo()))
-                .set(Student::getPoliticsStatus, student.getPoliticsStatus(), StringUtils.hasLength(student.getPoliticsStatus()))
-                .set(STUDENT.ENABLED, true)
-                .where(STUDENT.STUDENT_ID.eq(student.getStudentId()))
-                .update();
-        boolean j = UpdateChain.of(User.class)
-                .set(User::getPassword, passwordEncoder.encode(createPassword(student.getIdNumber())), StringUtils::hasLength)
-                .set(User::getRealName, student.getName(), StringUtils::hasLength)
-                .set(User::getEmail, student.getStudentId(), StringUtils::hasLength)
-                .set(User::isEnabled, true)
-                .where(User::getUsername).eq(student.getStudentId())
-                .update();
-        if (i && j)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
+
     private RegisterUserDTO createUser(String studentId, String name, String password) {
         return new RegisterUserDTO(studentId, name, studentId, password, List.of("5"));
     }
+
     @Override
     public BaseResponse<Page<StudentVO>> getStudents(StudentQuery query) {
-        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
-        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentVO> studentPage = QueryChain.of(Student.class)
-                .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
-                .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(Student::getEnabled).eq(true)
-                .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
-                .and(Student::getNativePlace).like(query.getNativePlace())
-                .and(Student::getNation).like(query.getNation())
-                .and(Student::getGender).eq(query.getGender())
-                .and(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getPoliticsStatus).eq(query.getPoliticsStatus())
-                .and(Student::getGrade).eq(query.getGrade())
-                .pageAs(Page.of(pageNo, pageSize), StudentVO.class);
-        return ResponseUtil.success(studentPage);
+        CompletableFuture<BaseResponse<Page<StudentVO>>> future = CompletableFuture.supplyAsync(() -> {
+            Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+            Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
+            Page<StudentVO> studentPage = QueryChain.of(Student.class)
+                    .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
+                    .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
+                    .where(Student::getEnabled).eq(true)
+                    .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                    .and(Student::getNativePlace).like(query.getNativePlace())
+                    .and(Student::getNation).like(query.getNation())
+                    .and(Student::getGender).eq(query.getGender())
+                    .and(Student::getMajorId).eq(query.getMajorId())
+                    .and(Student::getPoliticsStatus).eq(query.getPoliticsStatus())
+                    .and(Student::getGrade).eq(query.getGrade())
+                    .pageAs(Page.of(pageNo, pageSize), StudentVO.class);
+            return ResponseUtil.success(studentPage);
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudent(StudentDTO studentDTO) {
@@ -144,6 +175,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
@@ -161,6 +193,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     private String createPassword(String idNumber) {
         return idNumber.substring(idNumber.length() - 6);
     }
