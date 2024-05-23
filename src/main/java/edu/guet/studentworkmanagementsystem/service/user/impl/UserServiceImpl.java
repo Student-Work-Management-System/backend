@@ -38,7 +38,9 @@ import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,7 +51,10 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
@@ -79,6 +84,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private EmailService emailService;
     @Value("${jwt.key}")
     private String key;
+    @Qualifier("readThreadPool")
+    @Autowired
+    private ThreadPoolTaskExecutor readThreadPool;
 
     @Override
     public BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) {
@@ -142,15 +150,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
-        User userByUsername = mapper.getUserByUsername(username);
-        if (Objects.isNull(userByUsername))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
-        UserDetailVO userDetailVO = new UserDetailVO(userByUsername);
-        String uid = userDetailVO.getUid();
-        List<Role> userRole = userRoleMapper.getUserRole(uid);
-        if (!Objects.isNull(userRole))
-            userDetailVO.setRoles(userRole);
-        return ResponseUtil.success(userDetailVO);
+        CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
+            User userByUsername = mapper.getUserByUsername(username);
+            if (Objects.isNull(userByUsername))
+                throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
+            UserDetailVO userDetailVO = new UserDetailVO(userByUsername);
+            String uid = userDetailVO.getUid();
+            List<Role> userRole = userRoleMapper.getUserRole(uid);
+            if (!Objects.isNull(userRole))
+                userDetailVO.setRoles(userRole);
+            return ResponseUtil.success(userDetailVO);
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
     private <T> boolean listHandler(List<T> list) {
         return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
@@ -285,13 +310,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<List<RolePermissionVO>> getAllRole() {
-        List<Role> roles = roleMapper.selectAll();
-        ArrayList<RolePermissionVO> rolePermissionList = new ArrayList<>();
-        roles.forEach(item -> {
-            List<Permission> permissions = rolePermissionMapper.getRolePermission(item.getRid());
-            rolePermissionList.add(new RolePermissionVO(item, permissions));
-        });
-        return ResponseUtil.success(rolePermissionList);
+        CompletableFuture<BaseResponse<List<RolePermissionVO>>> future = CompletableFuture.supplyAsync(() -> {
+            List<Role> roles = roleMapper.selectAll();
+            ArrayList<RolePermissionVO> rolePermissionList = new ArrayList<>();
+            roles.forEach(item -> {
+                List<Permission> permissions = rolePermissionMapper.getRolePermission(item.getRid());
+                rolePermissionList.add(new RolePermissionVO(item, permissions));
+            });
+            return ResponseUtil.success(rolePermissionList);
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
 
     @Override
@@ -305,27 +347,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<List<UserDetailVO>> gets(String keyWord) {
-        List<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
-                .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
-                .from(USER)
-                .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
-                .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
-                .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
-                .and(User::isEnabled).eq(true)
-                .listAs(UserDetailVO.class);
-        return ResponseUtil.success(userDetailVOPage);
+        CompletableFuture<BaseResponse<List<UserDetailVO>>> future = CompletableFuture.supplyAsync(() -> {
+            List<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
+                    .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
+                    .from(USER)
+                    .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                    .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
+                    .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
+                    .and(User::isEnabled).eq(true)
+                    .listAs(UserDetailVO.class);
+            return ResponseUtil.success(userDetailVOPage);
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.HOURS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
     }
 
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteUser(String uid) {
-        QueryWrapper wrapper = QueryWrapper.create().where(USER_ROLE.UID.eq(uid));
-        int i = userRoleMapper.deleteByQuery(wrapper);
-        if (i >= 0) {
-            int j = mapper.deleteById(uid);
-            if (j > 0)
-                return ResponseUtil.success();
-        }
+        boolean update = UpdateChain.of(User.class)
+                .set(User::isEnabled, false)
+                .where(User::getUid).eq(uid)
+                .update();
+        if (update)
+            return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
@@ -343,41 +401,58 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
-        List<Permission> permissions = permissionMapper.selectAll();
-        PermissionTreeVO root =
-                new PermissionTreeVO("root", "root", "root", new ArrayList<>());
-        for (Permission permission : permissions) {
-            PermissionTreeVO nowAt = root;
-            int beginIndex = 0;
-            String parentPrefix = "";
-            while (beginIndex != -1) {
-                String name, pid, desc;
-                int index = permission.getPermissionName().indexOf(':', beginIndex);
-                if (index == -1) {
-                    name = permission.getPermissionName();
-                    pid = permission.getPid();
-                    desc = permission.getPermissionDesc();
-                    beginIndex = -1;
-                } else {
-                    name = permission.getPermissionName().substring(beginIndex, index);
-                    desc = name;
-                    pid = parentPrefix + name + ':';
-                    parentPrefix = pid;
-                    beginIndex = index + 1;
+        CompletableFuture<BaseResponse<List<PermissionTreeVO>>> future = CompletableFuture.supplyAsync(() -> {
+            List<Permission> permissions = permissionMapper.selectAll();
+            PermissionTreeVO root =
+                    new PermissionTreeVO("root", "root", "root", new ArrayList<>());
+            for (Permission permission : permissions) {
+                PermissionTreeVO nowAt = root;
+                int beginIndex = 0;
+                String parentPrefix = "";
+                while (beginIndex != -1) {
+                    String name, pid, desc;
+                    int index = permission.getPermissionName().indexOf(':', beginIndex);
+                    if (index == -1) {
+                        name = permission.getPermissionName();
+                        pid = permission.getPid();
+                        desc = permission.getPermissionDesc();
+                        beginIndex = -1;
+                    } else {
+                        name = permission.getPermissionName().substring(beginIndex, index);
+                        desc = name;
+                        pid = parentPrefix + name + ':';
+                        parentPrefix = pid;
+                        beginIndex = index + 1;
+                    }
+                    PermissionTreeVO finalNowAt = nowAt;
+                    nowAt = nowAt.getChildren().stream()
+                            .filter(tree -> tree.getPermissionName().equals(name))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                        PermissionTreeVO permissionTreeVO = new PermissionTreeVO(pid, name, desc, new ArrayList<>());
+                                        finalNowAt.getChildren().add(permissionTreeVO);
+                                        return permissionTreeVO;
+                                    }
+                            );
                 }
-                PermissionTreeVO finalNowAt = nowAt;
-                nowAt = nowAt.getChildren().stream()
-                        .filter(tree -> tree.getPermissionName().equals(name))
-                        .findFirst()
-                        .orElseGet(()->{
-                            PermissionTreeVO permissionTreeVO = new PermissionTreeVO(pid, name, desc, new ArrayList<>());
-                            finalNowAt.getChildren().add(permissionTreeVO);
-                            return permissionTreeVO;
-                        }
-                );
+            }
+            return ResponseUtil.success(root.getChildren());
+        }, readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
             }
         }
-        return ResponseUtil.success(root.getChildren());
     }
 
     @Override

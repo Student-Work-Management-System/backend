@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public interface UserMapper extends BaseMapper<User> {
-    @Select("select * from user where username = #{username} and enabled = true")
+    @Select("select * from user where username = #{username}")
     User getUserByUsername(String username);
     @Select("select * from swms.user " +
             "left join swms.user_role on user.uid = user_role.uid " +
