@@ -78,7 +78,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .map(Student::getStudentId)
                 .collect(Collectors.toSet());
         if (!dbIdNumberSet.isEmpty() || !dbStudentIdSet.isEmpty())
-            throw new ServiceException(ServiceExceptionEnum.DB_STUDENT_ID_OR_ID_NUMBER_REPEAT);
+            throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
     }
 
     public RegisterUserDTOList createRegisterUserList(List<Student> students) {
@@ -101,7 +101,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .or(STUDENT.ID_NUMBER.eq(student.getIdNumber()))
                 .one();
         if (!Objects.isNull(one))
-            throw new ServiceException(ServiceExceptionEnum.DB_STUDENT_ID_OR_ID_NUMBER_REPEAT);
+            throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
         return createStudentAndUser(student);
     }
 
