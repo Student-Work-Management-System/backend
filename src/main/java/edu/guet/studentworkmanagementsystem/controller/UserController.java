@@ -43,9 +43,9 @@ public class UserController {
         return userService.getUserDetails(username);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
-    @GetMapping("/gets")
-    public BaseResponse<List<UserDetailVO>> gets(@RequestParam(defaultValue = "") String keyword) {
-        return userService.gets(keyword);
+    @PostMapping("/gets")
+    public BaseResponse<List<UserDetailVO>> gets(@RequestBody UserQuery query) {
+        return userService.gets(query);
     }
     @PreAuthorize(
             "hasAuthority('user:update:all') " +
@@ -58,9 +58,14 @@ public class UserController {
         return userService.updateUserRole(userRoleDTO);
     }
     @PreAuthorize("hasAuthority('user:delete') and hasAuthority('user_role:delete')")
-    @DeleteMapping("/delete/{username}")
-    public <T> BaseResponse<T> deleteUser(@PathVariable String username) {
-        return userService.deleteUser(username);
+    @DeleteMapping("/delete/{uid}")
+    public <T> BaseResponse<T> deleteUser(@PathVariable String uid) {
+        return userService.deleteUser(uid);
+    }
+    @PreAuthorize("hasAuthority('user:update')")
+    @PutMapping("/recovery/{uid}")
+    public <T> BaseResponse<T> recoveryUser(@PathVariable String uid) {
+        return userService.recoveryUser(uid);
     }
     @PreAuthorize("hasAuthority('user:update:all')")
     @PutMapping("/update")

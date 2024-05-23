@@ -11,10 +11,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.LoginUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
@@ -154,7 +151,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
         CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
             User userByUsername = QueryChain.of(User.class)
-                    .where(USER.ENABLED.eq(true))
                     .and(USER.USERNAME.eq(username))
                     .one();
             if (Objects.isNull(userByUsername))
@@ -351,15 +347,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<List<UserDetailVO>> gets(String keyWord) {
+    public BaseResponse<List<UserDetailVO>> gets(UserQuery query) {
         CompletableFuture<BaseResponse<List<UserDetailVO>>> future = CompletableFuture.supplyAsync(() -> {
             List<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
                     .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                     .from(USER)
                     .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                     .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
-                    .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
-                    .and(USER.ENABLED.eq(true))
+                    .where(USER.REAL_NAME.like(query.getKeyword())).or(USER.USERNAME.like(query.getKeyword()))
+                    .and(USER.ENABLED.eq(query.getEnabled()))
                     .listAs(UserDetailVO.class);
             return ResponseUtil.success(userDetailVOPage);
         }, readThreadPool);
@@ -385,6 +381,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public <T> BaseResponse<T> deleteUser(String uid) {
         boolean update = UpdateChain.of(User.class)
                 .set(User::isEnabled, false)
+                .where(User::getUid).eq(uid)
+                .update();
+        if (update)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> recoveryUser(String uid) {
+        boolean update = UpdateChain.of(User.class)
+                .set(User::isEnabled, true)
                 .where(User::getUid).eq(uid)
                 .update();
         if (update)
