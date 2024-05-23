@@ -37,4 +37,5 @@ public interface StudentService extends IService<Student> {
      * @param studentId 学号
      */
     <T> BaseResponse<T> deleteStudent(String studentId);
+    <T> BaseResponse<T> recoveryStudent(String studentId);
 }

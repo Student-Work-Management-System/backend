@@ -39,6 +39,11 @@ public class StudentController {
     public <T> BaseResponse<T> deleteStudent(@PathVariable String studentId) {
         return studentService.deleteStudent(studentId);
     }
+    @PreAuthorize("hasAuthority('student:update') and hasAuthority('user:update')")
+    @PutMapping("/recovery/{studentId}")
+    public <T> BaseResponse<T> recoveryStudent(@PathVariable String studentId) {
+        return studentService.recoveryStudent(studentId);
+    }
     @PreAuthorize("hasAuthority('student:update')")
     @PutMapping("/update")
     public <T> BaseResponse<T> updateStudent(@RequestBody @Valid StudentDTO studentDTO) {
