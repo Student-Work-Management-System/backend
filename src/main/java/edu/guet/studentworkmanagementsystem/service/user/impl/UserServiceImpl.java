@@ -56,6 +56,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
@@ -123,11 +124,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     @Override
     public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
-        registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
         String username = registerUserDTO.getUsername();
-        User userByUsername = mapper.getUserByUsername(username);
-        if (!Objects.isNull(userByUsername))
+        String email = registerUserDTO.getEmail();
+        User userFromDB = QueryChain.of(User.class)
+                .where(USER.USERNAME.eq(username).or(USER.EMAIL.eq(email)))
+                .one();
+        if (!Objects.isNull(userFromDB))
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_EXISTED);
+        registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
         User user = new User(registerUserDTO);
         int i = mapper.insert(user);
         if (i > 0) {
@@ -147,7 +151,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         registerUserDTOList.forEach(this::addUser);
         return ResponseUtil.success();
     }
-
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
         CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
