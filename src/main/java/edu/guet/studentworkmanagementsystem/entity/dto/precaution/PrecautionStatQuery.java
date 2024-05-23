@@ -13,4 +13,5 @@ import java.util.List;
 public class PrecautionStatQuery implements Serializable {
     private List<String> precautionTimes;
     private List<String> majorIds;
+    private Boolean enabled = true;
 }

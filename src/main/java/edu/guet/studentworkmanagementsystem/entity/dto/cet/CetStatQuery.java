@@ -13,4 +13,5 @@ import java.util.List;
 public class CetStatQuery implements Serializable {
     private List<String> examTimes;
     private List<String> majorIds;
+    private Boolean enabled = true;
 }

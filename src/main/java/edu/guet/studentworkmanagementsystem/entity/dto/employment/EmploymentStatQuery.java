@@ -13,4 +13,5 @@ import java.util.List;
 public class EmploymentStatQuery implements Serializable {
     private List<String> graduationYears;
     private List<String> majorIds;
+    private Boolean enabled = true;
 }
