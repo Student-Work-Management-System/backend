@@ -181,6 +181,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
         User one = findUser(studentId);
+        if (Objects.isNull(one))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         int code = userService.deleteUser(one.getUid()).getCode();
         if (code != 200)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -196,6 +198,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     public <T> BaseResponse<T> recoveryStudent(String studentId) {
         User one = findUser(studentId);
+        if (Objects.isNull(one))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         int code = userService.recoveryUser(one.getUid()).getCode();
         if (code != 200)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
