@@ -135,6 +135,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                     .and(Student::getMajorId).eq(query.getMajorId())
                     .and(Student::getPoliticsStatus).eq(query.getPoliticsStatus())
                     .and(Student::getGrade).eq(query.getGrade())
+                    .and(STUDENT.ENABLED.eq(query.getEnabled()))
                     .pageAs(Page.of(pageNo, pageSize), StudentVO.class);
             return ResponseUtil.success(studentPage);
         }, readThreadPool);
@@ -179,9 +180,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
-        User one = QueryChain.of(User.class)
-                .where(USER.USERNAME.eq(studentId))
-                .one();
+        User one = findUser(studentId);
         int code = userService.deleteUser(one.getUid()).getCode();
         if (code != 200)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -192,6 +191,27 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (i)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    @Override
+    public <T> BaseResponse<T> recoveryStudent(String studentId) {
+        User one = findUser(studentId);
+        int code = userService.recoveryUser(one.getUid()).getCode();
+        if (code != 200)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        boolean update = UpdateChain.of(Student.class)
+                .set(STUDENT.ENABLED, true)
+                .where(STUDENT.STUDENT_ID.eq(studentId))
+                .update();
+        if (update)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    private User findUser(String studentId) {
+        return QueryChain.of(User.class)
+                .where(USER.USERNAME.eq(studentId))
+                .one();
     }
 
     private String createPassword(String idNumber) {
