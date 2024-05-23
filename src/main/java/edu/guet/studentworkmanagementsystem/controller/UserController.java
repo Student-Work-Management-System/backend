@@ -62,7 +62,7 @@ public class UserController {
     public <T> BaseResponse<T> deleteUser(@PathVariable String uid) {
         return userService.deleteUser(uid);
     }
-    @PreAuthorize("hasAuthority('user:update')")
+    @PreAuthorize("hasAuthority('user:update:all')")
     @PutMapping("/recovery/{uid}")
     public <T> BaseResponse<T> recoveryUser(@PathVariable String uid) {
         return userService.recoveryUser(uid);

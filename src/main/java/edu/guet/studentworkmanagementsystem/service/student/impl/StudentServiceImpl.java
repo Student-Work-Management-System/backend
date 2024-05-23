@@ -181,37 +181,35 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
+        boolean i = UpdateChain.of(Student.class)
+                .set(STUDENT.ENABLED, false)
+                .where(STUDENT.STUDENT_ID.eq(studentId))
+                .update();
         User one = findUser(studentId);
-        if (Objects.isNull(one)) {
-            boolean i = UpdateChain.of(Student.class)
-                    .set(STUDENT.ENABLED, false)
-                    .where(STUDENT.STUDENT_ID.eq(studentId))
-                    .update();
-            if (i)
-                return ResponseUtil.success();
-        } else {
+        if (!Objects.isNull(one)) {
             int code = userService.deleteUser(one.getUid()).getCode();
             if (code == 200)
                 return ResponseUtil.success();
         }
+        if (i)
+            return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
     @Override
     public <T> BaseResponse<T> recoveryStudent(String studentId) {
+        boolean update = UpdateChain.of(Student.class)
+                .set(STUDENT.ENABLED, true)
+                .where(STUDENT.STUDENT_ID.eq(studentId))
+                .update();
         User one = findUser(studentId);
-        if (Objects.isNull(one)) {
-            boolean update = UpdateChain.of(Student.class)
-                    .set(STUDENT.ENABLED, true)
-                    .where(STUDENT.STUDENT_ID.eq(studentId))
-                    .update();
-            if (update)
-                return ResponseUtil.success();
-        } else {
+        if (!Objects.isNull(one)) {
             int code = userService.recoveryUser(one.getUid()).getCode();
             if (code == 200)
                 return ResponseUtil.success();
         }
+        if (update)
+            return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
