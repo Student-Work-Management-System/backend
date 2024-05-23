@@ -39,13 +39,16 @@ final public class AuthenticationFilter extends OncePerRequestFilter {
 
         String redisKey = getRedisKeyFromToken(token, response);
         if (redisKey == null) return;
-
         String json = getJsonFromRedis(redisKey, response);
-        if (json == null) return;
-
+        if (json == null) {
+            respondWithFailure(response, ServiceExceptionEnum.UN_LOGIN);
+            return;
+        }
         SecurityUser securityUser = parseJsonToSecurityUser(json, response);
-        if (securityUser == null) return;
-
+        if (securityUser == null) {
+            respondWithFailure(response, ServiceExceptionEnum.UN_LOGIN);
+            return;
+        }
         setAuthentication(securityUser);
         filterChain.doFilter(request, response);
     }
