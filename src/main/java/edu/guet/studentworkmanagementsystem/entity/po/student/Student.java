@@ -82,5 +82,5 @@ public class Student implements Serializable {
      */
     @NotBlank(message = "政治面貌不能为空")
     private String politicsStatus;
-    private Boolean enabled = true;
+    private Boolean enabled;
 }

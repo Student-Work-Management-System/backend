@@ -51,6 +51,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional
     public <T> BaseResponse<T> importStudent(StudentList studentList) {
         List<Student> students = studentList.getStudents();
+        students.forEach(it -> it.setEnabled(true));
         preImportStudent(students);
         int i = mapper.insertBatch(students);
         if (i != students.size())
@@ -96,6 +97,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional
     public <T> BaseResponse<T> addStudent(Student student) {
         String studentId = student.getStudentId();
+        student.setEnabled(true);
         Student one = QueryChain.of(Student.class)
                 .where(STUDENT.STUDENT_ID.eq(studentId))
                 .or(STUDENT.ID_NUMBER.eq(student.getIdNumber()))
@@ -127,7 +129,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             Page<StudentVO> studentPage = QueryChain.of(Student.class)
                     .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                     .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                    .where(Student::getEnabled).eq(true)
                     .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                     .and(Student::getNativePlace).like(query.getNativePlace())
                     .and(Student::getNation).like(query.getNation())
@@ -181,34 +182,36 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
         User one = findUser(studentId);
-        if (Objects.isNull(one))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
-        int code = userService.deleteUser(one.getUid()).getCode();
-        if (code != 200)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        boolean i = UpdateChain.of(Student.class)
-                .set(STUDENT.ENABLED, false)
-                .where(STUDENT.STUDENT_ID.eq(studentId))
-                .update();
-        if (i)
-            return ResponseUtil.success();
+        if (Objects.isNull(one)) {
+            boolean i = UpdateChain.of(Student.class)
+                    .set(STUDENT.ENABLED, false)
+                    .where(STUDENT.STUDENT_ID.eq(studentId))
+                    .update();
+            if (i)
+                return ResponseUtil.success();
+        } else {
+            int code = userService.deleteUser(one.getUid()).getCode();
+            if (code == 200)
+                return ResponseUtil.success();
+        }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
     @Override
     public <T> BaseResponse<T> recoveryStudent(String studentId) {
         User one = findUser(studentId);
-        if (Objects.isNull(one))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
-        int code = userService.recoveryUser(one.getUid()).getCode();
-        if (code != 200)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        boolean update = UpdateChain.of(Student.class)
-                .set(STUDENT.ENABLED, true)
-                .where(STUDENT.STUDENT_ID.eq(studentId))
-                .update();
-        if (update)
-            return ResponseUtil.success();
+        if (Objects.isNull(one)) {
+            boolean update = UpdateChain.of(Student.class)
+                    .set(STUDENT.ENABLED, true)
+                    .where(STUDENT.STUDENT_ID.eq(studentId))
+                    .update();
+            if (update)
+                return ResponseUtil.success();
+        } else {
+            int code = userService.recoveryUser(one.getUid()).getCode();
+            if (code == 200)
+                return ResponseUtil.success();
+        }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
