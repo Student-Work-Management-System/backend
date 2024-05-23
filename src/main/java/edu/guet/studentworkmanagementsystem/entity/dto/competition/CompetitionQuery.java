@@ -16,6 +16,7 @@ public class CompetitionQuery implements Serializable {
     private String majorId;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Boolean enabled;
     private Integer pageNo;
     private Integer pageSize;
 }

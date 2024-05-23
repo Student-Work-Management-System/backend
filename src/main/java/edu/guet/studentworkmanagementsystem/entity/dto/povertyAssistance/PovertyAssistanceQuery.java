@@ -15,6 +15,7 @@ public class PovertyAssistanceQuery implements Serializable {
     private String majorId;
     private String povertyLevel;
     private String assistanceYear;
+    private Boolean enabled;
     private Integer pageNo;
     private Integer pageSize;
 }

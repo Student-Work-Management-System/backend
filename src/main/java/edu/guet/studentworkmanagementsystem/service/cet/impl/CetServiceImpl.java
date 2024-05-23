@@ -65,7 +65,7 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<StudentCetVO>> getAllRecord(CETQuery query) {
+    public BaseResponse<Page<StudentCetVO>> getAllRecord(CetQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         Page<StudentCetVO> studentCetVOPage = QueryChain.of(StudentCet.class)
@@ -74,6 +74,7 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
                 .innerJoin(STUDENT_CET).on(STUDENT_CET.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .and(STUDENT_CET.EXAM_TYPE.eq(query.getExamType()))

@@ -25,7 +25,7 @@ public interface CetService extends IService<StudentCet> {
      * 分页获取未通过CET4的所有学生以及考试记录
      * @param query 查询参数
      */
-    BaseResponse<Page<StudentCetVO>> getAllRecord(CETQuery query);
+    BaseResponse<Page<StudentCetVO>> getAllRecord(CetQuery query);
     <T> BaseResponse<T> updateStudentCET(UpdateStudentCetDTO updateStudentCetDTO);
     /**
      * 删除成绩记录

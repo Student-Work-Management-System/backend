@@ -189,6 +189,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
                 .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
@@ -216,6 +217,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                     .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                     .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
                     .where(STUDENT_COMPETITION.HEADER_ID.eq(studentId).or(STUDENT_COMPETITION.MEMBERS.like(studentId)))
+                    .and(STUDENT.ENABLED.eq(query.getEnabled()))
                     .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
                     .listAs(StudentCompetitionVO.class);
             item.setAwards(studentCompetitionVOList);

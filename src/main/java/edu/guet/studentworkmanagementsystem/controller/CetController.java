@@ -30,7 +30,7 @@ public class CetController {
     }
     @PreAuthorize("hasAuthority('student_cet:select') and hasAuthority('student:select') and hasAuthority('major:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentCetVO>> getAllRecord(@RequestBody CETQuery query) {
+    public BaseResponse<Page<StudentCetVO>> getAllRecord(@RequestBody CetQuery query) {
         return cetService.getAllRecord(query);
     }
     @PreAuthorize("hasAuthority('student_cet:update')")

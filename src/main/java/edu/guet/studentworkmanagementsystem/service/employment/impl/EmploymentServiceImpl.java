@@ -38,6 +38,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper, StudentEmployment> implements EmploymentService {
     @Autowired
     private EmploymentFeign employmentFeign;
+
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList) {
@@ -51,11 +52,13 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     private StudentEmployment convertToEntity(InsertStudentEmploymentDTO dto) {
         StudentEmployment entity = new StudentEmployment();
         BeanUtils.copyProperties(dto, entity);
         return entity;
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> insertStudentEmployment(InsertStudentEmploymentDTO insertStudentEmploymentDTO) {
@@ -66,12 +69,12 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-
         QueryChain<StudentEmployment> queryChain = QueryChain.of(StudentEmployment.class)
                 .select(STUDENT_EMPLOYMENT.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_EMPLOYMENT)
@@ -79,11 +82,13 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(Student::getMajorId).eq(query.getMajorId())
                 .and(Student::getGrade).eq(query.getGrade())
+                .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_EMPLOYMENT.GRADUATION_YEAR.eq(query.getGraduationYear()))
                 .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())));
         Page<StudentEmploymentVO> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
         return ResponseUtil.success(page);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudentEmployment(UpdateStudentEmploymentDTO updateStudentEmploymentDTO) {
@@ -102,6 +107,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId) {
@@ -110,6 +116,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public void download(EmploymentStatQuery query, HttpServletResponse response) {
         try {
