@@ -27,6 +27,7 @@ public class UserDetailVO implements Serializable {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
+    private Boolean enabled;
     private List<Role> roles;
     public UserDetailVO(User user) {
         this.uid = user.getUid();
@@ -34,5 +35,6 @@ public class UserDetailVO implements Serializable {
         this.realName = user.getRealName();
         this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
+        this.enabled = user.isEnabled();
     }
 }

@@ -153,7 +153,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
         CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
-            User userByUsername = mapper.getUserByUsername(username);
+            User userByUsername = QueryChain.of(User.class)
+                    .where(USER.ENABLED.eq(true))
+                    .and(USER.USERNAME.eq(username))
+                    .one();
             if (Objects.isNull(userByUsername))
                 throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
             UserDetailVO userDetailVO = new UserDetailVO(userByUsername);
@@ -356,7 +359,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                     .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
                     .where(USER.REAL_NAME.like(keyWord)).or(USER.USERNAME.like(keyWord))
-                    .and(User::isEnabled).eq(true)
+                    .and(USER.ENABLED.eq(true))
                     .listAs(UserDetailVO.class);
             return ResponseUtil.success(userDetailVOPage);
         }, readThreadPool);
@@ -392,11 +395,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO) {
-        if (!Objects.isNull(updateUserDTO.getPassword()) && !updateUserDTO.getPassword().isEmpty())
-            updateUserDTO.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
-        User user = new User(updateUserDTO);
-        int update = mapper.update(user);
-        if (update > 0)
+        boolean update = UpdateChain.of(User.class)
+                .set(USER.REAL_NAME, updateUserDTO.getRealName(), StringUtils::hasLength)
+                .set(USER.EMAIL, updateUserDTO.getEmail(), StringUtils::hasLength)
+                .set(USER.PASSWORD, passwordEncoder.encode(updateUserDTO.getPassword()), StringUtils::hasLength)
+                .where(USER.UID.eq(updateUserDTO.getUid()))
+                .update();
+        if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
