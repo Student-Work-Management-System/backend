@@ -41,8 +41,6 @@ public class MajorServiceImpl extends ServiceImpl<MajorMapper, Major> implements
     @Override
     @Transactional
     public <T> BaseResponse<T> updateMajor(Major major) {
-        if (Objects.isNull(major.getMajorId()))
-            throw new ServiceException(ServiceExceptionEnum.KEY_ARGUMENT_NOT_INPUT);
         int update = mapper.update(major);
         if (update > 0)
             return ResponseUtil.success();
