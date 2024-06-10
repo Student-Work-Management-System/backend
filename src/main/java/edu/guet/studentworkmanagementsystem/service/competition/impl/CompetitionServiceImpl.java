@@ -8,10 +8,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAuditDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
@@ -25,6 +22,7 @@ import edu.guet.studentworkmanagementsystem.service.competition.CompetitionServi
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +37,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTa
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
+@Slf4j
 public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper, StudentCompetition> implements CompetitionService {
     @Autowired
     private CompetitionMapper competitionMapper;
@@ -47,7 +46,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     private static final String REJECT = "已拒绝";
     private static final String PASS = "已通过";
     private static final String WAITING = "审核中";
-    private static final String SOLO = "担任";
+    private static final String SOLO = "单人";
     private static final String TEAM = "团队";
     @Override
     @Transactional
@@ -188,7 +187,10 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(COMPETITION).on(STUDENT_COMPETITION.COMPETITION_ID.eq(COMPETITION.COMPETITION_ID))
-                .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
+                .where(STUDENT.STUDENT_ID.like(query.getSearch())
+                        .or(STUDENT.NAME.like(query.getSearch()))
+                        .or(COMPETITION.COMPETITION_NAME.like(query.getSearch())))
+                .and(STUDENT_COMPETITION.REVIEW_STATE.eq(query.getState()))
                 .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT.GRADE.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
@@ -224,6 +226,38 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         });
         Page<StudentCompetitionPassedRecord> page = new Page<>(list, pageNo, pageSize, list.size());
         return ResponseUtil.success(page);
+    }
+
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> clearStudentCompetitionState(ClearStudentCompetition clearStudentCompetition) {
+        String id = SecurityUtil.getUserPrincipal();
+        StudentCompetition one = QueryChain.of(StudentCompetition.class)
+                .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(clearStudentCompetition.getStudentCompetitionId()))
+                .and(STUDENT_COMPETITION.HEADER_ID.eq(id).or(STUDENT_COMPETITION.MEMBERS.like(id)))
+                .one();
+        if (Objects.isNull(one) || !Objects.equals(one.getReviewState(), REJECT))
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        String memberJson;
+        try {
+            memberJson = JsonUtil.mapper.writeValueAsString(one.getMembers());
+        } catch (JsonProcessingException e) {
+            log.error("CompetitionServiceImpl#clearStudentCompetitionState出现JSON解析异常: {}", e.getMessage());
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+        boolean update = UpdateChain.of(StudentCompetition.class)
+                .set(STUDENT_COMPETITION.EVIDENCE, clearStudentCompetition.getEvidence(), StringUtils::hasLength)
+                .set(STUDENT_COMPETITION.AWARD_DATE, clearStudentCompetition.getAwardDate(), Objects::nonNull)
+                .set(STUDENT_COMPETITION.AWARD_LEVEL, clearStudentCompetition.getAwardLevel(), StringUtils::hasLength)
+                .set(STUDENT_COMPETITION.MEMBERS, memberJson, StringUtils::hasLength)
+                .set(STUDENT_COMPETITION.AUDITOR_ID, null)
+                .set(STUDENT_COMPETITION.REJECT_REASON, null)
+                .set(STUDENT_COMPETITION.REVIEW_STATE, WAITING)
+                .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.eq(clearStudentCompetition.getStudentCompetitionId()))
+                .update();
+        if (update)
+            return ResponseUtil.success();
+        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
     private Member[] convertToEntity(String membersJson) throws JsonProcessingException {

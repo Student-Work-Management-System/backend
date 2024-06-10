@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAuditDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
@@ -73,7 +70,7 @@ public interface CompetitionService extends IService<StudentCompetition> {
      */
     <T> BaseResponse<T> deleteStudentCompetition(String studentCompetitionId);
     /**
-     * (审核人用)分页查询学生上报记录, 默认只查询状态为 待审核 的上报记录
+     * (审核人用)分页查询学生上报记录
      * <br/>
      * 审核人在前端不展示, 拒绝理由只有状态未 未通过 时才展示
      * @param query 查询参数
@@ -84,5 +81,9 @@ public interface CompetitionService extends IService<StudentCompetition> {
      * 获取所有学生参加且通过审核竞赛记录
      */
     BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassedStudentCompetition(CompetitionQuery query);
+    /**
+     * 清空当前申报的状态
+     */
+    <T> BaseResponse<T> clearStudentCompetitionState(ClearStudentCompetition clearStudentCompetition) throws JsonProcessingException;
 }
 

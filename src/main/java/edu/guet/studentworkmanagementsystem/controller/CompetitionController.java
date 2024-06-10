@@ -5,10 +5,7 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionAuditDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionPassedRecord;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionVO;
@@ -79,5 +76,10 @@ public class CompetitionController {
     @PostMapping("/student_competition/gets/pass")
     public BaseResponse<Page<StudentCompetitionPassedRecord>> getAllPassStudentCompetition(@RequestBody CompetitionQuery query) {
         return competitionService.getAllPassedStudentCompetition(query);
+    }
+    @PreAuthorize("hasAuthority('student_competition:update')")
+    @PostMapping("/student_competition/clear")
+    public BaseResponse<String> clearStudentCompetitionState(@RequestBody @Valid ClearStudentCompetition clearStudentCompetition) throws JsonProcessingException {
+        return competitionService.clearStudentCompetitionState(clearStudentCompetition);
     }
 }
