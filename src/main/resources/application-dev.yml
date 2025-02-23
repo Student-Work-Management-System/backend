@@ -3,8 +3,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: qx310320
-    url: jdbc:mysql://121.41.115.29:5506/swms?useUnicode=true&characterEncoding=UTF-8
+    password: fish0310
+    url: jdbc:mysql://localhost:3306/swms?useUnicode=true&characterEncoding=UTF-8
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       maximum-pool-size: 20
@@ -15,9 +15,9 @@ spring:
       max-lifetime: 120000
   data:
     redis:
-      host: 121.41.115.29
+      host: localhost
       database: 0
-      port: 9379
+      port: 6379
       timeout: 60
       lettuce:
         pool:
@@ -26,7 +26,7 @@ spring:
           max-idle: 8
           min-idle: 0
         shutdown-timeout: 100
-      password: qx310320
+      password: fish0310
   mail:
     host: smtp.163.com
     port: 25
