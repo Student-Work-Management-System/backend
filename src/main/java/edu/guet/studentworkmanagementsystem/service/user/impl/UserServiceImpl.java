@@ -8,7 +8,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.common.CommonString;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
@@ -92,7 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
-        String redisKey = "uid:" + securityUser.getUser().getUid();
+        String redisKey = Common.LOGIN_UID.getValue() + securityUser.getUser().getUid();
         String token = createToken(redisKey, key);
         try {
             redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
@@ -342,7 +342,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public <T> BaseResponse<T> logout() {
         String uid = SecurityUtil.getUserPrincipal();
-        if (Objects.equals(uid, "anonymousUser"))
+        if (Objects.equals(uid, Common.ANONYMOUS_USER.getValue()))
             throw new ServiceException(ServiceExceptionEnum.UN_LOGIN);
         redisUtil.delete("uid:" + uid);
         return ResponseUtil.success();
@@ -482,7 +482,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1000000));
         emailService.sendEmail(user.getEmail(), code);
-        redisUtil.setValue("code_by: " + username, code, 5);
+        redisUtil.setValue(Common.UPDATE_PASSWORD.getValue() + username, code, 5);
 
         String email = user.getEmail();
         int idx = email.indexOf('@');
@@ -496,7 +496,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public <T> BaseResponse<T> updatePassword(String username, String password, String code) {
-        String codeFromRedis = String.valueOf(redisUtil.getValue("code_by:" + username));
+        String passwordRedisKey = Common.UPDATE_PASSWORD.getValue() + username;
+        String codeFromRedis = String.valueOf(redisUtil.getValue(passwordRedisKey));
         if (!code.equals(codeFromRedis))
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         boolean update = UpdateChain.of(User.class)
@@ -517,7 +518,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         uidList.forEach(this::userRoleUpdateHandler);
     }
     private void userRoleUpdateHandler(String uid) {
-        String redisUidKey = CommonString.LOGIN_UID.getValue() + uid;
+        String redisUidKey = Common.LOGIN_UID.getValue() + uid;
         if (redisUtil.exists(redisUidKey))
             redisUtil.delete(redisUidKey);
     }
