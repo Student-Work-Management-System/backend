@@ -49,6 +49,6 @@ public class SecurityUser implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return user.isEnabled();
+        return true;
     }
 }

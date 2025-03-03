@@ -8,6 +8,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.CommonString;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
@@ -139,7 +140,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
     @Transactional
     @Override
     public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
@@ -147,6 +147,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         registerUserDTOList.forEach(this::addUser);
         return ResponseUtil.success();
     }
+
     @Override
     public BaseResponse<UserDetailVO> getUserDetails(String username) {
         CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
@@ -178,6 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
     }
+
     private <T> boolean listHandler(List<T> list) {
         return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
     }
@@ -515,11 +517,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         uidList.forEach(this::userRoleUpdateHandler);
     }
     private void userRoleUpdateHandler(String uid) {
-        redisUtil.delete("uid:" + uid);
+        String redisUidKey = CommonString.LOGIN_UID.getValue() + uid;
+        if (redisUtil.exists(redisUidKey))
+            redisUtil.delete(redisUidKey);
     }
     private void rolePermissionUpdateHandler(String rid) {
         QueryWrapper wrapper = QueryWrapper.create().from(USER_ROLE).where(USER_ROLE.RID.eq(rid));
         List<UserRole> userRoles = userRoleMapper.selectListByQuery(wrapper);
+        // 更新完毕角色权限时, 需要拥有该角色的用户重新登录保证安全
         userRoles.forEach(item -> userRoleUpdateHandler(item.getUid()));
     }
     private Set<String> getInsert(Set<String> roleSetFromWeb, Set<String> roleSetFromDB) {
