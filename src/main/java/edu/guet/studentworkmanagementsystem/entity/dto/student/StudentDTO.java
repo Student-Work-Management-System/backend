@@ -26,4 +26,5 @@ public class StudentDTO implements Serializable {
     private String grade;
     private String classNo;
     private String politicsStatus;
+    private String headTeacherId;
 }

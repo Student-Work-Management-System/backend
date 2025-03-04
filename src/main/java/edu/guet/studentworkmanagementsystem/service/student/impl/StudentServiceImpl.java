@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
@@ -16,6 +17,8 @@ import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
+import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
+import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
@@ -46,11 +49,14 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Qualifier("readThreadPool")
     @Autowired
     private ThreadPoolTaskExecutor readThreadPool;
+    @Autowired
+    private StudentBasicService studentBasicService;
+    @Autowired
+    private StudentDetailService studentDetailService;
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudent(StudentList studentList) {
-        List<Student> students = studentList.getStudents();
+    public <T> BaseResponse<T> importStudent(ValidateList<Student> students) {
         students.forEach(it -> it.setEnabled(true));
         preImportStudent(students);
         int i = mapper.insertBatch(students);
@@ -60,6 +66,10 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         return userService.addUsers(registerUserList);
     }
 
+    /**
+     * 检查学号或身份证号是否重复
+     * @param students 学生列表
+     */
     @Transactional
     public void preImportStudent(List<Student> students) {
         Set<String> idNumberSet = students.stream().map(Student::getIdNumber).collect(Collectors.toSet());
@@ -86,7 +96,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         ArrayList<RegisterUserDTO> registerUserDTO = new ArrayList<>();
         RegisterUserDTOList registerUserDTOList = new RegisterUserDTOList();
         students.forEach(student -> {
-            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()));
+            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()), student.getEmail(), student.getPhone());
             registerUserDTO.add(user);
         });
         registerUserDTOList.setRegisterUserDTOList(registerUserDTO);
@@ -111,14 +121,20 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public <T> BaseResponse<T> createStudentAndUser(Student student) {
         int i = mapper.insert(student);
         if (i > 0) {
-            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()));
+            RegisterUserDTO user = createUser(
+                    student.getStudentId(),
+                    student.getName(),
+                    createPassword(student.getIdNumber()),
+                    student.getEmail(),
+                    student.getPhone()
+            );
             return userService.addUser(user);
         }
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
-    private RegisterUserDTO createUser(String studentId, String name, String password) {
-        return new RegisterUserDTO(studentId, name, studentId, password, List.of("5"));
+    private RegisterUserDTO createUser(String studentId, String name, String password, String email, String phone) {
+        return new RegisterUserDTO(studentId, name, email, password, phone, List.of("5"));
     }
 
     @Override
@@ -211,6 +227,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    @Override
+    public <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherName, String headTeacherPhone) {
+        User target = QueryChain.of(User.class)
+                .where(USER.REAL_NAME.eq(headTeacherName))
+                .and(USER.PHONE.eq(headTeacherPhone))
+                .one();
+        if (Objects.isNull(target))
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
+        return ResponseUtil.success();
     }
 
     private User findUser(String studentId) {

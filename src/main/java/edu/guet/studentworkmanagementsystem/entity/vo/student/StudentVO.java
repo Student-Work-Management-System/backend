@@ -22,6 +22,9 @@ public class StudentVO implements Serializable {
     private String majorName;
     private String grade;
     private String classNo;
+    private String headTeacherName;
+    private String headTeacherPhone;
+    private String email;
     private String politicsStatus;
     private Boolean enabled;
 }

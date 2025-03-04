@@ -17,6 +17,9 @@ public class StudentQuery implements Serializable {
     private String grade;
     private String nation;
     private String politicsStatus;
+    private String phone;
+    private String email;
+    private String classNo;
     private Boolean enabled;
     private Integer pageNo;
     private Integer pageSize;

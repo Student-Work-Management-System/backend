@@ -1,5 +1,7 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.user;
 
+import edu.guet.studentworkmanagementsystem.common.Phone;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,9 +18,11 @@ public class RegisterUserDTO implements Serializable {
     private String username;
     @NotBlank(message = "真实姓名不能为空")
     private String realName;
-    @NotBlank(message = "邮箱不能为空")
+    @Email(message = "请输入正确的邮箱")
     private String email;
     @NotBlank(message = "密码不能为空")
     private String password;
+    @Phone
+    private String phone;
     private List<String> roles;
 }

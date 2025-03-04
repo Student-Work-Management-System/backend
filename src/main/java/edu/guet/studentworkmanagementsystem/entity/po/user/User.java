@@ -26,6 +26,7 @@ public class User {
     private String username;
     private String realName;
     private String email;
+    private String phone;
     private String password;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -39,12 +40,5 @@ public class User {
         this.password = registerUserDTO.getPassword();
         this.createdAt = LocalDate.now();
         this.enabled = true;
-    }
-
-    public User(UpdateUserDTO updateUserDTO) {
-        this.uid = updateUserDTO.getUid();
-        this.realName = updateUserDTO.getRealName();
-        this.email = updateUserDTO.getEmail();
-        this.password = updateUserDTO.getPassword();
     }
 }

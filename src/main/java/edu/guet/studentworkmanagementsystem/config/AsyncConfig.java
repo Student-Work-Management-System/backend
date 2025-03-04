@@ -18,7 +18,8 @@ public class AsyncConfig {
     private static final String READ_PREFIX = "readThread-";
     private static final String WRITE_PREFIX = "writeThread-";
     private static final ThreadPoolExecutor.CallerRunsPolicy HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
-    @Bean("emailThreadPool")
+
+    @Bean
     public ThreadPoolTaskExecutor emailThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
@@ -30,7 +31,8 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
-    @Bean("readThreadPool")
+
+    @Bean
     public ThreadPoolTaskExecutor readThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(CORE_POOL_SIZE);
@@ -42,7 +44,8 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
-    @Bean("writeThreadPool")
+
+    @Bean
     public ThreadPoolTaskExecutor writeThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(CORE_POOL_SIZE);
