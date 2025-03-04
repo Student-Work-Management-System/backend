@@ -9,6 +9,8 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
+import edu.guet.studentworkmanagementsystem.common.UsernameTrie;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
@@ -48,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -104,12 +107,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return ResponseUtil.success(loginUserVO);
     }
 
-    private boolean RoleNotNullOrEmpty(List<String> roles) {
+    private boolean RoleNotNullOrEmpty(Set<String> roles) {
         return !Objects.isNull(roles) && !roles.isEmpty();
     }
 
     @Transactional
-    public void addUserRole(List<String> roles, String uid) {
+    public void addUserRole(Set<String> roles, String uid) {
         ArrayList<UserRole> userRoles = new ArrayList<>();
         roles.forEach(item -> userRoles.add(new UserRole(uid, item)));
         int i = userRoleMapper.insertBatch(userRoles);
@@ -120,32 +123,98 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO) {
-        String username = registerUserDTO.getUsername();
-        String email = registerUserDTO.getEmail();
-        User userFromDB = QueryChain.of(User.class)
-                .where(USER.USERNAME.eq(username).or(USER.EMAIL.eq(email)))
-                .one();
-        if (!Objects.isNull(userFromDB))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_EXISTED);
-        registerUserDTO.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
-        User user = new User(registerUserDTO);
-        int i = mapper.insert(user);
-        if (i > 0) {
-            List<String> roles = registerUserDTO.getRoles();
-            String uid = user.getUid();
-            if (RoleNotNullOrEmpty(roles))
-                addUserRole(roles, uid);
-            return ResponseUtil.success();
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public <T> BaseResponse<T> addUser(RegisterUser registerUser) {
+        ValidateList<RegisterUser> registerUsers = new ValidateList<>();
+        registerUsers.add(registerUser);
+        return addUsers(registerUsers);
     }
+
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS) {
-        List<RegisterUserDTO> registerUserDTOList = registerUserDTOS.getRegisterUserDTOList();
-        registerUserDTOList.forEach(this::addUser);
+    public <T> BaseResponse<T> addUsers(ValidateList<RegisterUser> registerUsers) {
+        checkAccountExisted(registerUsers);
+        List<User> users = insertUserBatch(registerUsers);
+        List<UserRoleDTO> userRoleDTOS = matchUserRole(registerUsers.size(), registerUsers, users);
+        addUserRoleBatch(userRoleDTOS);
         return ResponseUtil.success();
+    }
+
+    @Transactional
+    public void checkAccountExisted(List<RegisterUser> registerUsers) {
+        // 从数据库中检查是否有重复的用户
+        // 学生 -> username是学号, 系统唯一
+        // 其他身份 -> 默认使用工号(待商榷)
+        List<String> usernames = registerUsers.stream()
+                .map(RegisterUser::getUsername)
+                .toList();
+        List<User> userFromDB = QueryChain.of(User.class)
+                .where(USER.USERNAME.in(usernames))
+                .list();
+        if (!userFromDB.isEmpty()) {
+            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_EXISTED);
+        }
+    }
+
+    @Transactional
+    public List<User> insertUserBatch(List<RegisterUser> registerUsers) {
+        // 构造数据库结构的User并插入
+        ArrayList<User> users = new ArrayList<>();
+        registerUsers.forEach(it -> {
+            User user = createUser(it);
+            users.add(user);
+        });
+        int i = mapper.insertBatch(users);
+        int size = users.size();
+        if (i != size) {
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        }
+        return users;
+    }
+
+    @Transactional
+    public List<UserRoleDTO> matchUserRole(int size, List<RegisterUser> registerUsers, List<User> users) {
+        // username和对应身份配对
+        UsernameTrie root = new UsernameTrie();
+        root.buildTrie(registerUsers);
+        ArrayList<UserRoleDTO> userRoleDTOs = new ArrayList<>();
+        for (int idx = 0; idx < size; idx++) {
+            User user = users.get(idx);
+            String username = user.getUsername();
+            String uid = user.getUid();
+            if (!root.search(username))
+                continue;
+            UsernameTrie.TrieNode node = root.getNode(username);
+            UserRoleDTO userRoleDTO = createUserRoleDTO(uid, node.getRoles());
+            userRoleDTOs.add(userRoleDTO);
+        }
+        return userRoleDTOs;
+    }
+
+    public User createUser(RegisterUser registerUser) {
+        return User.builder()
+                .username(registerUser.getUsername())
+                .realName(registerUser.getRealName())
+                .email(registerUser.getEmail())
+                .phone(registerUser.getPhone())
+                .password(passwordEncoder.encode(registerUser.getPassword()))
+                .createdAt(LocalDate.now())
+                .enabled(true)
+                .build();
+    }
+
+    public UserRoleDTO createUserRoleDTO(String uid, Set<String> roles) {
+        return UserRoleDTO.builder()
+                .uid(uid)
+                .roles(roles)
+                .build();
+    }
+
+    @Transactional
+    public void addUserRoleBatch(List<UserRoleDTO> userRoleDTOs) {
+        userRoleDTOs.forEach(it -> {
+            if (RoleNotNullOrEmpty(it.getRoles()))
+                addUserRole(it.getRoles(), it.getUid());
+        });
     }
 
     @Override
@@ -180,8 +249,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
     }
 
+    /**
+     * 检查传入的列表是否为空 或 传入的列表内全为空(当该用户没有角色 或 该角色没有权限 时会出现该情况)
+     */
     private <T> boolean listHandler(List<T> list) {
-        return Objects.isNull(list) || list.isEmpty() || (list.size() == 1 && Objects.isNull(list.getFirst()));
+        if (Objects.isNull(list) || list.isEmpty())
+            return true;
+        return list.size() == 1 && Objects.isNull(list.getFirst());
     }
 
     @Transactional
@@ -190,7 +264,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String uid = userRoleDTO.getUid();
         List<Role> roles = userRoleMapper.getUserRole(uid);
         if (listHandler(roles)) {
-            addUserRole(userRoleDTO.getRoles().stream().toList(), uid);
+            addUserRole(userRoleDTO.getRoles(), uid);
         } else {
             Set<String> roleSetFromDB = roles.stream()
                     .map(Role::getRid)

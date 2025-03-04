@@ -4,16 +4,18 @@ import edu.guet.studentworkmanagementsystem.common.Phone;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterUserDTO implements Serializable {
+public class RegisterUser implements Serializable {
     @NotBlank(message = "工号/学号不能为空")
     private String username;
     @NotBlank(message = "真实姓名不能为空")
@@ -24,5 +26,5 @@ public class RegisterUserDTO implements Serializable {
     private String password;
     @Phone
     private String phone;
-    private List<String> roles;
+    private Set<String> roles;
 }

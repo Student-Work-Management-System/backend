@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
@@ -19,8 +20,8 @@ import java.util.List;
 
 public interface UserService extends IService<User> {
     BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) throws JsonProcessingException;
-    <T> BaseResponse<T> addUser(RegisterUserDTO registerUserDTO);
-    <T> BaseResponse<T> addUsers(RegisterUserDTOList registerUserDTOS);
+    <T> BaseResponse<T> addUser(RegisterUser registerUser);
+    <T> BaseResponse<T> addUsers(ValidateList<RegisterUser> registerUsers);
     BaseResponse<UserDetailVO> getUserDetails(String username);
     <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO);
     <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO);

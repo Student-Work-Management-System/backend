@@ -7,6 +7,7 @@ import edu.guet.studentworkmanagementsystem.mapper.student.StudentDetailMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -18,6 +19,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, StudentDetail> implements StudentDetailService {
     @Autowired
     private StudentDetailMapper studentDetailMapper;
+
+    @Transactional
     @Override
     public boolean importStudentDetail(List<StudentDetail> studentDetails) {
         int size = studentDetails.size();
@@ -25,12 +28,14 @@ public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, S
         return size == i;
     }
 
+    @Transactional
     @Override
     public boolean addStudentDetail(StudentDetail studentDetail) {
         int i = studentDetailMapper.insert(studentDetail);
         return i == 1;
     }
 
+    @Transactional
     @Override
     public boolean updateStudentDetail(StudentDetail studentDetail) {
         return UpdateChain.of(StudentDetail.class)

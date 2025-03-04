@@ -7,6 +7,7 @@ import edu.guet.studentworkmanagementsystem.mapper.student.StudentBasicMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -17,6 +18,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, StudentBasic> implements StudentBasicService {
     @Autowired
     private StudentBasicMapper studentBasicMapper;
+
+    @Transactional
     @Override
     public boolean importStudentBasic(List<StudentBasic> studentBasics) {
         int size = studentBasics.size();
@@ -24,12 +27,14 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
         return size == i;
     }
 
+    @Transactional
     @Override
     public boolean addStudentBasic(StudentBasic studentBasic) {
         int i = studentBasicMapper.insert(studentBasic);
         return i == 1;
     }
 
+    @Transactional
     @Override
     public boolean updateStudentBasic(StudentBasic studentBasic) {
         return UpdateChain.of(StudentBasic.class)
@@ -41,6 +46,7 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
                 .update();
     }
 
+    @Transactional
     @Override
     public boolean deleteStudentBasic(String studentId) {
         return UpdateChain.of(StudentBasic.class)
@@ -49,6 +55,7 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
                 .update();
     }
 
+    @Transactional
     @Override
     public boolean recoverStudentBasic(String studentId) {
         return UpdateChain.of(StudentBasic.class)

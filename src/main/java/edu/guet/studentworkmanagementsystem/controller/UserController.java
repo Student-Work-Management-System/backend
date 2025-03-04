@@ -2,6 +2,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
@@ -29,13 +30,13 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> addUser(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
-        return userService.addUser(registerUserDTO);
+    public <T> BaseResponse<T> addUser(@RequestBody @Valid RegisterUser registerUser) {
+        return userService.addUser(registerUser);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> addUsers(@RequestBody RegisterUserDTOList registerUserDTOList) {
-        return userService.addUsers(registerUserDTOList);
+    public <T> BaseResponse<T> addUsers(@RequestBody @Valid ValidateList<RegisterUser> registerUsers) {
+        return userService.addUsers(registerUsers);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @GetMapping("/detail/{username}")

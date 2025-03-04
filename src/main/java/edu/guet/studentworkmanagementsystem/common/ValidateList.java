@@ -8,9 +8,14 @@ import java.util.*;
 
 public class ValidateList<E> implements List<E> {
     @Valid
-    private final ArrayList<E> list;
+    private ArrayList<E> list;
     public ValidateList(ArrayList<E> list) {
         this.list = list;
+    }
+    public ValidateList() {}
+    public void setList(List<E> list) {
+        this.list.clear();
+        this.list.addAll(list);
     }
     @Override
     public int size() {

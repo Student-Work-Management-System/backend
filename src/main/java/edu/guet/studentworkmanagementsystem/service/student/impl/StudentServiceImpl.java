@@ -7,11 +7,11 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTOList;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
+import edu.guet.studentworkmanagementsystem.entity.po.student.StudentDetail;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -59,22 +59,34 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public <T> BaseResponse<T> importStudent(ValidateList<Student> students) {
         students.forEach(it -> it.setEnabled(true));
         preImportStudent(students);
-        int i = mapper.insertBatch(students);
-        if (i != students.size())
+        List<StudentBasic> studentBasics = createStudentBasics(students);
+        boolean studentBasicInsertSuccess = studentBasicService.importStudentBasic(studentBasics);
+        if (!studentBasicInsertSuccess)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        RegisterUserDTOList registerUserList = createRegisterUserList(students);
-        return userService.addUsers(registerUserList);
+        List<StudentDetail> studentDetails = createStudentDetails(students);
+        boolean studentDetailInsertSuccess = studentDetailService.importStudentDetail(studentDetails);
+        if (!studentDetailInsertSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        List<RegisterUser> registerUsers = createRegisterUsers(students);
+        ValidateList<RegisterUser> validateRegisterUsers = new ValidateList<>();
+        validateRegisterUsers.setList(registerUsers);
+        userService.addUsers(validateRegisterUsers);
+        return ResponseUtil.success();
     }
-
     /**
      * 检查学号或身份证号是否重复
      * @param students 学生列表
      */
     @Transactional
     public void preImportStudent(List<Student> students) {
-        Set<String> idNumberSet = students.stream().map(Student::getIdNumber).collect(Collectors.toSet());
-        Set<String> studentIdSet = students.stream().map(Student::getStudentId).collect(Collectors.toSet());
-        if ((idNumberSet.size() != students.size()) || (studentIdSet.size() != students.size()))
+        int size = students.size();
+        Set<String> idNumberSet = students.stream()
+                .map(Student::getIdNumber)
+                .collect(Collectors.toSet());
+        Set<String> studentIdSet = students.stream()
+                .map(Student::getStudentId)
+                .collect(Collectors.toSet());
+        if ((idNumberSet.size() != size) || (studentIdSet.size() != size))
             throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_REPEAT);
         Set<String> dbIdNumberSet = QueryChain.of(Student.class)
                 .where(STUDENT.ID_NUMBER.in(idNumberSet))
@@ -91,50 +103,98 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (!dbIdNumberSet.isEmpty() || !dbStudentIdSet.isEmpty())
             throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
     }
+    /**
+     * 将原始Student转化成StudentBasic
+     */
+    public StudentBasic createStudentBasic(Student student) {
+        return StudentBasic.builder()
+                .studentId(student.getStudentId())
+                .idNumber(student.getIdNumber())
+                .name(student.getName())
+                .gender(student.getGender())
+                .phone(student.getPhone())
+                .email(student.getEmail())
+                .enabled(student.getEnabled())
+                .build();
+    }
+    public List<StudentBasic> createStudentBasics(List<Student> students) {
+        ArrayList<StudentBasic> studentBasics = new ArrayList<>();
+        for (Student student : students) {
+            studentBasics.add(createStudentBasic(student));
+        }
+        return studentBasics;
+    }
+    /**
+     * 将原始Student转化成StudentDetail
+     */
+    public StudentDetail createStudentDetail(Student student) {
+        return StudentDetail.builder()
+                .studentId(student.getStudentId())
+                .headTeacherId(student.getHeadTeacherId())
+                .majorId(student.getMajorId())
+                .nativePlace(student.getNativePlace())
+                .postalCode(student.getPostalCode())
+                .nation(student.getNation())
+                .politicsStatus(student.getPoliticsStatus())
+                .grade(student.getGrade())
+                .classNo(student.getClassNo())
+                .dormitory(student.getDormitory())
+                .birthdate(student.getBirthdate())
+                .householdRegistration(student.getHouseholdRegistration())
+                .householdType(student.getHouseholdType())
+                .address(student.getAddress())
+                .fatherName(student.getFatherName())
+                .fatherPhone(student.getFatherPhone())
+                .fatherOccupation(student.getFatherOccupation())
+                .motherName(student.getMotherName())
+                .motherPhone(student.getMotherPhone())
+                .motherOccupation(student.getMotherOccupation())
+                .guardian(student.getGuardian())
+                .guardianPhone(student.getGuardianPhone())
+                .highSchool(student.getHighSchool())
+                .examId(student.getExamId())
+                .admissionBatch(student.getAdmissionBatch())
+                .totalExamScore(student.getTotalExamScore())
+                .foreignLanguage(student.getForeignLanguage())
+                .foreignScore(student.getForeignScore())
+                .hobbies(student.getHobbies())
+                .otherNotes(student.getOtherNotes())
+                .build();
+    }
+    public List<StudentDetail> createStudentDetails(List<Student> students) {
+        ArrayList<StudentDetail> studentDetails = new ArrayList<>();
+        for (Student student : students) {
+            studentDetails.add(createStudentDetail(student));
+        }
+        return studentDetails;
+    }
 
-    public RegisterUserDTOList createRegisterUserList(List<Student> students) {
-        ArrayList<RegisterUserDTO> registerUserDTO = new ArrayList<>();
-        RegisterUserDTOList registerUserDTOList = new RegisterUserDTOList();
+    public List<RegisterUser> createRegisterUsers(List<Student> students) {
+        ArrayList<RegisterUser> registerUsers = new ArrayList<>();
         students.forEach(student -> {
-            RegisterUserDTO user = createUser(student.getStudentId(), student.getName(), createPassword(student.getIdNumber()), student.getEmail(), student.getPhone());
-            registerUserDTO.add(user);
+            RegisterUser user = createRegisterUser(student);
+            registerUsers.add(user);
         });
-        registerUserDTOList.setRegisterUserDTOList(registerUserDTO);
-        return registerUserDTOList;
+        return registerUsers;
     }
 
     @Override
     @Transactional
     public <T> BaseResponse<T> addStudent(Student student) {
-        String studentId = student.getStudentId();
-        student.setEnabled(true);
-        Student one = QueryChain.of(Student.class)
-                .where(STUDENT.STUDENT_ID.eq(studentId))
-                .or(STUDENT.ID_NUMBER.eq(student.getIdNumber()))
-                .one();
-        if (!Objects.isNull(one))
-            throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
-        return createStudentAndUser(student);
+        ValidateList<Student> students = new ValidateList<>();
+        students.add(student);
+        return importStudent(students);
     }
 
-    @Transactional
-    public <T> BaseResponse<T> createStudentAndUser(Student student) {
-        int i = mapper.insert(student);
-        if (i > 0) {
-            RegisterUserDTO user = createUser(
-                    student.getStudentId(),
-                    student.getName(),
-                    createPassword(student.getIdNumber()),
-                    student.getEmail(),
-                    student.getPhone()
-            );
-            return userService.addUser(user);
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
-    private RegisterUserDTO createUser(String studentId, String name, String password, String email, String phone) {
-        return new RegisterUserDTO(studentId, name, email, password, phone, List.of("5"));
+    private RegisterUser createRegisterUser(Student student) {
+        return RegisterUser.builder()
+                .username(student.getStudentId())
+                .password(createPassword(student.getIdNumber()))
+                .realName(student.getName())
+                .email(student.getEmail())
+                .phone(student.getPhone())
+                .roles(Set.of("5"))
+                .build();
     }
 
     @Override

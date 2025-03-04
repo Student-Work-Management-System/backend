@@ -8,15 +8,15 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.UpdateUserDTO;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Table("user")
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,12 +33,4 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
     private boolean enabled;
-    public User(RegisterUserDTO registerUserDTO) {
-        this.username = registerUserDTO.getUsername();
-        this.realName = registerUserDTO.getRealName();
-        this.email = registerUserDTO.getEmail();
-        this.password = registerUserDTO.getPassword();
-        this.createdAt = LocalDate.now();
-        this.enabled = true;
-    }
 }
