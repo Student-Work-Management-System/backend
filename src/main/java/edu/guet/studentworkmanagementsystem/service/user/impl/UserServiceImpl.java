@@ -468,8 +468,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public <T> BaseResponse<T> deleteUser(String uid) {
         boolean update = UpdateChain.of(User.class)
-                .set(User::isEnabled, false)
-                .where(User::getUid).eq(uid)
+                .set(USER.ENABLED, false)
+                .where(USER.UID.eq(uid))
                 .update();
         if (update)
             return ResponseUtil.success();
@@ -480,8 +480,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public <T> BaseResponse<T> recoveryUser(String uid) {
         boolean update = UpdateChain.of(User.class)
-                .set(User::isEnabled, true)
-                .where(User::getUid).eq(uid)
+                .set(USER.ENABLED, true)
+                .where(USER.UID.eq(uid))
                 .update();
         if (update)
             return ResponseUtil.success();

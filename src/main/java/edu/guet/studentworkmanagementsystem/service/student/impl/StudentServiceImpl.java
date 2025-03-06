@@ -4,7 +4,6 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
@@ -28,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +60,15 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         insertStudentDetailBatch(students);
         insertUserBatch(students);
         return ResponseUtil.success();
+    }
+    /**
+     * 添加学生
+     */
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> addStudent(Student student) {
+        ValidateList<Student> students = new ValidateList<>(student);
+        return importStudent(students);
     }
     /**
      * 检查学号或身份证号是否重复
@@ -195,15 +202,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         ValidateList<RegisterUser> validateRegisterUsers = new ValidateList<>(registerUsers);
         userService.addUsers(validateRegisterUsers);
     }
-    /**
-     * 添加学生
-     */
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> addStudent(Student student) {
-        ValidateList<Student> students = new ValidateList<>(student);
-        return importStudent(students);
-    }
 
     @Override
     public BaseResponse<Page<StudentVO>> getStudents(StudentQuery query) {
@@ -288,11 +286,11 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .one();
     }
     @Transactional
-    public <T> BaseResponse<T> afterUpdateStudentEnabled(String  studentId, boolean enabled) {
+    public <T> BaseResponse<T> afterUpdateStudentEnabled(String studentId, boolean enabled) {
         User user = findUser(studentId);
-        if (!Objects.isNull(user))
+        if (Objects.isNull(user))
             return ResponseUtil.success();
-        return enabled ? userService.recoveryUser(studentId) : userService.deleteUser(studentId);
+        return enabled ? userService.recoveryUser(user.getUid()) : userService.deleteUser(user.getUid());
     }
     /**
      * 创建用户密码，默认为身份证后六位
@@ -305,9 +303,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
      */
     @Transactional
     public void updateStudentBasic(Student student) {
-        boolean needUpdate = checkAttributeNotEmpty(student, StudentBasic.class);
-        if (!needUpdate)
-            return;
         StudentBasic studentBasic = createStudentBasic(student);
         boolean flag = studentBasicService.updateStudentBasic(studentBasic);
         if (!flag)
@@ -318,36 +313,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
      */
     @Transactional
     public void updateStudentDetail(Student student) {
-        boolean needUpdate = checkAttributeNotEmpty(student, StudentDetail.class);
-        if (!needUpdate)
-            return;
         StudentDetail studentDetail = createStudentDetail(student);
         boolean flag = studentDetailService.updateStudentDetail(studentDetail);
         if (!flag)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-    /**
-     * 检查是否存在对应属性且不为空
-     */
-    public boolean checkAttributeNotEmpty(Student student, Class<?> clazz) {
-        HashSet<String> fields = new HashSet<>();
-        for (Field declaredField : clazz.getDeclaredFields()) {
-            fields.add(declaredField.getName());
-        }
-        Field[] studentFields = Student.class.getDeclaredFields();
-        for (Field studentField : studentFields) {
-            studentField.setAccessible(true);
-            String fieldName = studentField.getName();
-            if (Common.STUDENT_ID.getValue().equals(fieldName)) continue;
-            try {
-                Object value = studentField.get(student);
-                if (value != null && (!(value instanceof String) || !((String) value).trim().isEmpty())) {
-                    return fields.contains(fieldName);
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("字段访问失败", e);
-            }
-        }
-        return false;
     }
 }
