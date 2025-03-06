@@ -3,8 +3,10 @@ package edu.guet.studentworkmanagementsystem.service.user.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.row.Db;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -163,12 +165,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user = createUser(it);
             users.add(user);
         });
-        int i = mapper.insertBatch(users);
-        int size = users.size();
-        if (i != size) {
+        // mapper.insertBatch(List<Entity> list)无法像mapper.insert(Entity)一样插入后写回id, 因此无法使用
+        // 需要使用Db.execute写法, 此写法是通过Statement.executeBatch()进行批量执行, 数量大时效率高
+        boolean flag = DbInsertUserBatch(users);
+        if (!flag)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        }
         return users;
+    }
+
+    public boolean DbInsertUserBatch(List<User> users) {
+        int size = users.size();
+        int[] executedResult = Db.executeBatch(users, 1000, UserMapper.class, BaseMapper::insert);
+        int sum = 0;
+        for (int item : executedResult) {
+            sum += item;
+        }
+        return sum == size;
     }
 
     @Transactional
