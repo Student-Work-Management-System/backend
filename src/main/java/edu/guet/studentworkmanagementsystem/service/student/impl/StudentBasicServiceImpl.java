@@ -5,7 +5,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentBasicMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -16,21 +15,18 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 
 @Service
 public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, StudentBasic> implements StudentBasicService {
-    @Autowired
-    private StudentBasicMapper studentBasicMapper;
-
     @Transactional
     @Override
     public boolean importStudentBasic(List<StudentBasic> studentBasics) {
         int size = studentBasics.size();
-        int i = studentBasicMapper.insertBatch(studentBasics);
+        int i = mapper.insertBatch(studentBasics);
         return size == i;
     }
 
     @Transactional
     @Override
     public boolean addStudentBasic(StudentBasic studentBasic) {
-        int i = studentBasicMapper.insert(studentBasic);
+        int i = mapper.insert(studentBasic);
         return i == 1;
     }
 
@@ -57,7 +53,7 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
 
     @Transactional
     @Override
-    public boolean recoverStudentBasic(String studentId) {
+    public boolean recoveryStudentBasic(String studentId) {
         return UpdateChain.of(StudentBasic.class)
                 .set(STUDENT_BASIC.ENABLED, true)
                 .where(STUDENT_BASIC.STUDENT_ID.eq(studentId))

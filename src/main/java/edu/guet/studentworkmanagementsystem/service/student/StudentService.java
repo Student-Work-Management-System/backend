@@ -4,12 +4,13 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
 
-
+/**
+ * 因学生相关信息太大, 学生表信息拆分为StudentBasic和StudentDetail两个子模块
+ */
 public interface StudentService extends IService<Student> {
     /**
      * 批量导入学生
@@ -29,14 +30,14 @@ public interface StudentService extends IService<Student> {
     BaseResponse<Page<StudentVO>> getStudents(StudentQuery query);
     /**
      * 修改学生信息
-     * @param studentDTO 学生信息对象
+     * @param student 学生信息对象
      */
-    <T> BaseResponse<T> updateStudent(StudentDTO studentDTO);
+    <T> BaseResponse<T> updateStudent(Student student);
     /**
      * 使用学号删除学生
      * @param studentId 学号
      */
     <T> BaseResponse<T> deleteStudent(String studentId);
     <T> BaseResponse<T> recoveryStudent(String studentId);
-    <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherName, String headTeacherPhone);
+    <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername);
 }

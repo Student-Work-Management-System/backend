@@ -26,5 +26,5 @@ public interface StudentBasicService extends IService<StudentBasic> {
      * 恢复学生 - enabled控制
      * @param studentId 学号
      */
-    boolean recoverStudentBasic(String studentId);
+    boolean recoveryStudentBasic(String studentId);
 }

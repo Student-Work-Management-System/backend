@@ -3,7 +3,6 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
@@ -45,7 +44,7 @@ public class StudentController {
     }
     @PreAuthorize("hasAuthority('student:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudent(@RequestBody @Valid StudentDTO studentDTO) {
-        return studentService.updateStudent(studentDTO);
+    public <T> BaseResponse<T> updateStudent(@RequestBody @Valid Student student) {
+        return studentService.updateStudent(student);
     }
 }

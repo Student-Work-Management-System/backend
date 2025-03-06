@@ -2,11 +2,10 @@ package edu.guet.studentworkmanagementsystem.service.student.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
@@ -28,8 +27,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -58,27 +57,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Transactional
     public <T> BaseResponse<T> importStudent(ValidateList<Student> students) {
         students.forEach(it -> it.setEnabled(true));
-        preImportStudent(students);
-        List<StudentBasic> studentBasics = createStudentBasics(students);
-        boolean studentBasicInsertSuccess = studentBasicService.importStudentBasic(studentBasics);
-        if (!studentBasicInsertSuccess)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        List<StudentDetail> studentDetails = createStudentDetails(students);
-        boolean studentDetailInsertSuccess = studentDetailService.importStudentDetail(studentDetails);
-        if (!studentDetailInsertSuccess)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        List<RegisterUser> registerUsers = createRegisterUsers(students);
-        ValidateList<RegisterUser> validateRegisterUsers = new ValidateList<>();
-        validateRegisterUsers.setList(registerUsers);
-        userService.addUsers(validateRegisterUsers);
+        checkStudentIdOrIdNumberExisted(students);
+        insertStudentBasicBatch(students);
+        insertStudentDetailBatch(students);
+        insertUserBatch(students);
         return ResponseUtil.success();
     }
     /**
      * 检查学号或身份证号是否重复
-     * @param students 学生列表
      */
     @Transactional
-    public void preImportStudent(List<Student> students) {
+    public void checkStudentIdOrIdNumberExisted(List<Student> students) {
         int size = students.size();
         Set<String> idNumberSet = students.stream()
                 .map(Student::getIdNumber)
@@ -104,7 +93,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
     }
     /**
-     * 将原始Student转化成StudentBasic
+     *  插入学生基础信息
      */
     public StudentBasic createStudentBasic(Student student) {
         return StudentBasic.builder()
@@ -124,8 +113,14 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
         return studentBasics;
     }
+    public void insertStudentBasicBatch(ValidateList<Student> students) {
+        List<StudentBasic> studentBasics = createStudentBasics(students);
+        boolean studentBasicInsertSuccess = studentBasicService.importStudentBasic(studentBasics);
+        if (!studentBasicInsertSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
     /**
-     * 将原始Student转化成StudentDetail
+     * 插入学生详细信息
      */
     public StudentDetail createStudentDetail(Student student) {
         return StudentDetail.builder()
@@ -168,25 +163,16 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
         return studentDetails;
     }
-
-    public List<RegisterUser> createRegisterUsers(List<Student> students) {
-        ArrayList<RegisterUser> registerUsers = new ArrayList<>();
-        students.forEach(student -> {
-            RegisterUser user = createRegisterUser(student);
-            registerUsers.add(user);
-        });
-        return registerUsers;
+    public void insertStudentDetailBatch(ValidateList<Student> students) {
+        List<StudentDetail> studentDetails = createStudentDetails(students);
+        boolean studentDetailInsertSuccess = studentDetailService.importStudentDetail(studentDetails);
+        if (!studentDetailInsertSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> addStudent(Student student) {
-        ValidateList<Student> students = new ValidateList<>();
-        students.add(student);
-        return importStudent(students);
-    }
-
-    private RegisterUser createRegisterUser(Student student) {
+    /**
+     * 注册学生身份用户
+     */
+    public RegisterUser createRegisterUser(Student student) {
         return RegisterUser.builder()
                 .username(student.getStudentId())
                 .password(createPassword(student.getIdNumber()))
@@ -195,6 +181,28 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .phone(student.getPhone())
                 .roles(Set.of("5"))
                 .build();
+    }
+    public List<RegisterUser> createRegisterUsers(List<Student> students) {
+        ArrayList<RegisterUser> registerUsers = new ArrayList<>();
+        students.forEach(student -> {
+            RegisterUser user = createRegisterUser(student);
+            registerUsers.add(user);
+        });
+        return registerUsers;
+    }
+    public void insertUserBatch(ValidateList<Student> students) {
+        List<RegisterUser> registerUsers = createRegisterUsers(students);
+        ValidateList<RegisterUser> validateRegisterUsers = new ValidateList<>(registerUsers);
+        userService.addUsers(validateRegisterUsers);
+    }
+    /**
+     * 添加学生
+     */
+    @Override
+    @Transactional
+    public <T> BaseResponse<T> addStudent(Student student) {
+        ValidateList<Student> students = new ValidateList<>(student);
+        return importStudent(students);
     }
 
     @Override
@@ -235,78 +243,111 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudent(StudentDTO studentDTO) {
-        boolean update = UpdateChain.of(Student.class)
-                .set(Student::getName, studentDTO.getName(), StringUtils.hasLength(studentDTO.getName()))
-                .set(Student::getIdNumber, studentDTO.getIdNumber(), StringUtils.hasLength(studentDTO.getIdNumber()))
-                .set(Student::getGender, studentDTO.getGender(), StringUtils.hasLength(studentDTO.getGender()))
-                .set(Student::getPostalCode, studentDTO.getPostalCode(), StringUtils.hasLength(studentDTO.getPostalCode()))
-                .set(Student::getNativePlace, studentDTO.getNativePlace(), StringUtils.hasLength(studentDTO.getNativePlace()))
-                .set(Student::getPhone, studentDTO.getPhone(), StringUtils.hasLength(studentDTO.getPhone()))
-                .set(Student::getMajorId, studentDTO.getMajorId(), StringUtils.hasLength(studentDTO.getMajorId()))
-                .set(Student::getGrade, studentDTO.getGrade(), StringUtils.hasLength(studentDTO.getGrade()))
-                .set(Student::getClassNo, studentDTO.getClassNo(), StringUtils.hasLength(studentDTO.getClassNo()))
-                .set(Student::getPoliticsStatus, studentDTO.getPoliticsStatus(), StringUtils.hasLength(studentDTO.getPoliticsStatus()))
-                .where(Student::getStudentId).eq(studentDTO.getStudentId())
-                .update();
-        if (update)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public <T> BaseResponse<T> updateStudent(Student student) {
+        updateStudentBasic(student);
+        updateStudentDetail(student);
+        return ResponseUtil.success();
     }
-
+    /**
+     * 删除 恢复学生
+     */
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudent(String studentId) {
-        boolean i = UpdateChain.of(Student.class)
-                .set(STUDENT.ENABLED, false)
-                .where(STUDENT.STUDENT_ID.eq(studentId))
-                .update();
-        User one = findUser(studentId);
-        if (!Objects.isNull(one)) {
-            int code = userService.deleteUser(one.getUid()).getCode();
-            if (code == 200)
-                return ResponseUtil.success();
-        }
-        if (i)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        boolean isSuccess = studentBasicService.deleteStudentBasic(studentId);
+        if (!isSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        return afterUpdateStudentEnabled(studentId, false);
     }
-
     @Override
+    @Transactional
     public <T> BaseResponse<T> recoveryStudent(String studentId) {
-        boolean update = UpdateChain.of(Student.class)
-                .set(STUDENT.ENABLED, true)
-                .where(STUDENT.STUDENT_ID.eq(studentId))
-                .update();
-        User one = findUser(studentId);
-        if (!Objects.isNull(one)) {
-            int code = userService.recoveryUser(one.getUid()).getCode();
-            if (code == 200)
-                return ResponseUtil.success();
-        }
-        if (update)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        boolean isSuccess = studentBasicService.recoveryStudentBasic(studentId);
+        if (!isSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        return afterUpdateStudentEnabled(studentId, true);
     }
-
+    /**
+     * 用于添加学生前校验班主任是否存在
+     */
     @Override
-    public <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherName, String headTeacherPhone) {
+    public <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername) {
         User target = QueryChain.of(User.class)
-                .where(USER.REAL_NAME.eq(headTeacherName))
-                .and(USER.PHONE.eq(headTeacherPhone))
+                .where(USER.USERNAME.eq(headTeacherUsername))
                 .one();
         if (Objects.isNull(target))
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         return ResponseUtil.success();
     }
-
-    private User findUser(String studentId) {
+    /**
+     * 删除 恢复学生后的的必要操作
+     */
+    public User findUser(String username) {
         return QueryChain.of(User.class)
-                .where(USER.USERNAME.eq(studentId))
+                .where(USER.USERNAME.eq(username))
                 .one();
     }
-
-    private String createPassword(String idNumber) {
+    @Transactional
+    public <T> BaseResponse<T> afterUpdateStudentEnabled(String  studentId, boolean enabled) {
+        User user = findUser(studentId);
+        if (!Objects.isNull(user))
+            return ResponseUtil.success();
+        return enabled ? userService.recoveryUser(studentId) : userService.deleteUser(studentId);
+    }
+    /**
+     * 创建用户密码，默认为身份证后六位
+     */
+    public String createPassword(String idNumber) {
         return idNumber.substring(idNumber.length() - 6);
+    }
+    /**
+     * 检查是否有StudentBasic的属性
+     */
+    @Transactional
+    public void updateStudentBasic(Student student) {
+        boolean needUpdate = checkAttributeNotEmpty(student, StudentBasic.class);
+        if (!needUpdate)
+            return;
+        StudentBasic studentBasic = createStudentBasic(student);
+        boolean flag = studentBasicService.updateStudentBasic(studentBasic);
+        if (!flag)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    /**
+     * 检查是否有StudentDetail的属性
+     */
+    @Transactional
+    public void updateStudentDetail(Student student) {
+        boolean needUpdate = checkAttributeNotEmpty(student, StudentDetail.class);
+        if (!needUpdate)
+            return;
+        StudentDetail studentDetail = createStudentDetail(student);
+        boolean flag = studentDetailService.updateStudentDetail(studentDetail);
+        if (!flag)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+    /**
+     * 检查是否存在对应属性且不为空
+     */
+    public boolean checkAttributeNotEmpty(Student student, Class<?> clazz) {
+        HashSet<String> fields = new HashSet<>();
+        for (Field declaredField : clazz.getDeclaredFields()) {
+            fields.add(declaredField.getName());
+        }
+        Field[] studentFields = Student.class.getDeclaredFields();
+        for (Field studentField : studentFields) {
+            studentField.setAccessible(true);
+            String fieldName = studentField.getName();
+            if (Common.STUDENT_ID.getValue().equals(fieldName)) continue;
+            try {
+                Object value = studentField.get(student);
+                if (value != null && (!(value instanceof String) || !((String) value).trim().isEmpty())) {
+                    return fields.contains(fieldName);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("字段访问失败", e);
+            }
+        }
+        return false;
     }
 }
