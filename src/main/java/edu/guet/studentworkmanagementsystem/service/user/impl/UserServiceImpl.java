@@ -494,6 +494,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         boolean update = UpdateChain.of(User.class)
                 .set(USER.REAL_NAME, updateUserDTO.getRealName(), StringUtils::hasLength)
                 .set(USER.EMAIL, updateUserDTO.getEmail(), StringUtils::hasLength)
+                .set(USER.PHONE, updateUserDTO.getPhone(), StringUtils::hasLength)
                 .set(USER.PASSWORD, passwordEncoder.encode(updateUserDTO.getPassword()), StringUtils::hasLength)
                 .where(USER.UID.eq(updateUserDTO.getUid()))
                 .update();
