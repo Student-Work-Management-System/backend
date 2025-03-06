@@ -28,6 +28,7 @@ public interface StudentService extends IService<Student> {
      * @return 学生列表
      */
     BaseResponse<Page<StudentVO>> getStudents(StudentQuery query);
+    BaseResponse<StudentVO> getStudent(String studentId);
     /**
      * 修改学生信息
      * @param student 学生信息对象

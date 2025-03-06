@@ -23,14 +23,6 @@ public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, S
         int i = mapper.insertBatch(studentDetails);
         return size == i;
     }
-
-    @Transactional
-    @Override
-    public boolean addStudentDetail(StudentDetail studentDetail) {
-        int i = mapper.insert(studentDetail);
-        return i == 1;
-    }
-
     @Transactional
     @Override
     public boolean updateStudentDetail(StudentDetail studentDetail) {

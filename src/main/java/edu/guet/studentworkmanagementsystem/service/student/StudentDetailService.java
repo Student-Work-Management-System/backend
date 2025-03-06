@@ -11,7 +11,6 @@ public interface StudentDetailService extends IService<StudentDetail> {
      * @param studentDetails 学生详细信息列表
      */
     boolean importStudentDetail(List<StudentDetail> studentDetails);
-    boolean addStudentDetail(StudentDetail studentDetail);
     /**
      * 更新学生详细信息
      * @param studentDetail - 学生详细信息

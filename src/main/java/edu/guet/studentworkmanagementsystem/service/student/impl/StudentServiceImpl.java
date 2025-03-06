@@ -240,6 +240,12 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
+    public BaseResponse<StudentVO> getStudent(String studentId) {
+        // todo: 总学生档案, 包含系统中所有关于学生的信息
+        return ResponseUtil.success();
+    }
+
+    @Override
     @Transactional
     public <T> BaseResponse<T> updateStudent(Student student) {
         updateStudentBasic(student);

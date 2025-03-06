@@ -47,4 +47,9 @@ public class StudentController {
     public <T> BaseResponse<T> updateStudent(@RequestBody @Valid Student student) {
         return studentService.updateStudent(student);
     }
+    @PreAuthorize("hasAuthority('user:select')")
+    @GetMapping("/validate_teacher_existed/{headTeacherUsername}")
+    public <T> BaseResponse<T> validateHeadTeacherExists(@PathVariable String headTeacherUsername) {
+        return studentService.validateHeadTeacherExists(headTeacherUsername);
+    }
 }

@@ -11,7 +11,6 @@ public interface StudentBasicService extends IService<StudentBasic> {
      * @param studentBasics 学生基础信息列表
      */
     boolean importStudentBasic(List<StudentBasic> studentBasics);
-    boolean addStudentBasic(StudentBasic studentBasic);
     /**
      * 更新学生基础信息
      * @param studentBasic - 学生基础信息

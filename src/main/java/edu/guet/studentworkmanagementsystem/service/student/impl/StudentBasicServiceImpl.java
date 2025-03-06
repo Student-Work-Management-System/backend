@@ -25,13 +25,6 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
 
     @Transactional
     @Override
-    public boolean addStudentBasic(StudentBasic studentBasic) {
-        int i = mapper.insert(studentBasic);
-        return i == 1;
-    }
-
-    @Transactional
-    @Override
     public boolean updateStudentBasic(StudentBasic studentBasic) {
         return UpdateChain.of(StudentBasic.class)
                 .set(STUDENT_BASIC.NAME, studentBasic.getName(), StringUtils::hasLength)
