@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Builder
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentQuery implements Serializable {
@@ -69,3 +69,4 @@ public class StudentQuery implements Serializable {
     private Integer pageNo;
     private Integer pageSize;
 }
+

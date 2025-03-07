@@ -6,7 +6,8 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 
 /**
  * 因学生相关信息太大, 学生表信息拆分为StudentBasic和StudentDetail两个子模块
@@ -27,8 +28,8 @@ public interface StudentService extends IService<Student> {
      * @param query 学生查询参数
      * @return 学生列表
      */
-    BaseResponse<Page<StudentVO>> getStudents(StudentQuery query);
-    BaseResponse<StudentVO> getStudent(String studentId);
+    BaseResponse<Page<StudentTableItem>> getStudents(StudentQuery query);
+    BaseResponse<StudentArchive> getStudent(String studentId);
     /**
      * 修改学生信息
      * @param student 学生信息对象

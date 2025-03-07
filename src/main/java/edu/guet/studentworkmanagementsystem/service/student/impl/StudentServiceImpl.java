@@ -11,7 +11,8 @@ import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
 import edu.guet.studentworkmanagementsystem.entity.po.student.StudentDetail;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
@@ -33,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
@@ -204,24 +207,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
-    public BaseResponse<Page<StudentVO>> getStudents(StudentQuery query) {
-        CompletableFuture<BaseResponse<Page<StudentVO>>> future = CompletableFuture.supplyAsync(() -> {
-            Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
-            Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-            Page<StudentVO> studentPage = QueryChain.of(Student.class)
-                    .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
-                    .from(STUDENT).innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                    .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
-                    .and(Student::getNativePlace).like(query.getNativePlace())
-                    .and(Student::getNation).like(query.getNation())
-                    .and(Student::getGender).eq(query.getGender())
-                    .and(Student::getMajorId).eq(query.getMajorId())
-                    .and(Student::getPoliticsStatus).eq(query.getPoliticsStatus())
-                    .and(Student::getGrade).eq(query.getGrade())
-                    .and(STUDENT.ENABLED.eq(query.getEnabled()))
-                    .pageAs(Page.of(pageNo, pageSize), StudentVO.class);
-            return ResponseUtil.success(studentPage);
-        }, readThreadPool);
+    public BaseResponse<Page<StudentTableItem>> getStudents(StudentQuery query) {
+        CompletableFuture<BaseResponse<Page<StudentTableItem>>> future =
+                CompletableFuture.supplyAsync(() -> ResponseUtil.success(getStudentTableItems(query)), readThreadPool);
         try {
             return future.get(3, TimeUnit.SECONDS);
         } catch (Exception exception) {
@@ -238,9 +226,50 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
         }
     }
+    private Page<StudentTableItem> getStudentTableItems(StudentQuery query) {
+        return QueryChain.of(StudentBasic.class)
+                .select(STUDENT_BASIC.ALL_COLUMNS, STUDENT_DETAIL.ALL_COLUMNS, MAJOR.ALL_COLUMNS, USER.ALL_COLUMNS)
+                .from(STUDENT_BASIC)
+                .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
+                .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
+                .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_ID.eq(USER.USERNAME))
+                .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
+                .and(STUDENT_BASIC.STUDENT_ID.eq(query.getSearch())
+                        .or(STUDENT_BASIC.NAME.eq(query.getSearch()))
+                        .or(STUDENT_BASIC.ID_NUMBER.eq(query.getSearch()))
+                        .or(STUDENT_BASIC.EMAIL.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_NAME.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_PHONE.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_NAME.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_PHONE.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN.eq(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN_PHONE.eq(query.getSearch()))
+                )
+                .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
+                .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
+                .and(STUDENT_DETAIL.GRADE.eq(query.getGrade()))
+                .and(STUDENT_DETAIL.NATION.like(query.getNation()))
+                .and(STUDENT_DETAIL.POLITICS_STATUS.like(query.getPoliticsStatus()))
+                .and(STUDENT_DETAIL.POSTAL_CODE.like(query.getPostalCode()))
+                .and(STUDENT_DETAIL.CLASS_NO.like(query.getClassNo()))
+                .and(STUDENT_DETAIL.DORMITORY.like(query.getDormitory()))
+                .and(STUDENT_DETAIL.BIRTHDATE.eq(query.getBirthdate()))
+                .and(STUDENT_DETAIL.HOUSEHOLD_REGISTRATION.like(query.getHouseholdRegistration()))
+                .and(STUDENT_DETAIL.HOUSEHOLD_TYPE.like(query.getHouseholdType()))
+                .and(STUDENT_DETAIL.ADDRESS.like(query.getAddress()))
+                .and(STUDENT_DETAIL.EXAM_ID.eq(query.getExamId()))
+                .and(STUDENT_DETAIL.HIGH_SCHOOL.like(query.getHighSchool()))
+                .and(STUDENT_DETAIL.ADMISSION_BATCH.like(query.getAdmissionBatch()))
+                .and(STUDENT_DETAIL.TOTAL_EXAM_SCORE.eq(query.getTotalExamScore()))
+                .and(STUDENT_DETAIL.FOREIGN_LANGUAGE.like(query.getForeignLanguage()))
+                .and(STUDENT_DETAIL.FOREIGN_SCORE.eq(query.getForeignScore()))
+                .and(STUDENT_DETAIL.HOBBIES.like(query.getHobbies()))
+                .and(STUDENT_DETAIL.OTHER_NOTES.like(query.getOtherNotes()))
+                .pageAs(Page.of(query.getPageNo(), query.getPageSize()), StudentTableItem.class);
+    }
 
     @Override
-    public BaseResponse<StudentVO> getStudent(String studentId) {
+    public BaseResponse<StudentArchive> getStudent(String studentId) {
         // todo: 总学生档案, 包含系统中所有关于学生的信息
         return ResponseUtil.success();
     }

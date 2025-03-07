@@ -1,8 +1,11 @@
 package edu.guet.studentworkmanagementsystem;
 
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,17 @@ public class StudentServiceTest {
         String studentId = "22";
         BaseResponse<Object> response = studentService.recoveryStudent(studentId);
         System.out.println(response.getCode() + ": " + response.getMessage());
+    }
+
+    @Test
+    void getStudent() {
+        StudentQuery query = StudentQuery.builder()
+                .enabled(true)
+                .pageNo(1)
+                .pageSize(50)
+                .build();
+        BaseResponse<Page<StudentTableItem>> students = studentService.getStudents(query);
+        System.out.println(students.getCode() + ": " + students.getMessage());
     }
 
     private List<Student> mockStudents() {
