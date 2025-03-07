@@ -135,7 +135,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public StudentDetail createStudentDetail(Student student) {
         return StudentDetail.builder()
                 .studentId(student.getStudentId())
-                .headTeacherId(student.getHeadTeacherId())
+                .headTeacherUsername(student.getHeadTeacherUsername())
                 .majorId(student.getMajorId())
                 .nativePlace(student.getNativePlace())
                 .postalCode(student.getPostalCode())
@@ -227,23 +227,25 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
     }
     private Page<StudentTableItem> getStudentTableItems(StudentQuery query) {
+        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         return QueryChain.of(StudentBasic.class)
                 .select(STUDENT_BASIC.ALL_COLUMNS, STUDENT_DETAIL.ALL_COLUMNS, MAJOR.ALL_COLUMNS, USER.ALL_COLUMNS)
                 .from(STUDENT_BASIC)
                 .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_ID.eq(USER.USERNAME))
+                .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_USERNAME.eq(USER.USERNAME))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
-                .and(STUDENT_BASIC.STUDENT_ID.eq(query.getSearch())
-                        .or(STUDENT_BASIC.NAME.eq(query.getSearch()))
-                        .or(STUDENT_BASIC.ID_NUMBER.eq(query.getSearch()))
-                        .or(STUDENT_BASIC.EMAIL.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.FATHER_NAME.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.FATHER_PHONE.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.MOTHER_NAME.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.MOTHER_PHONE.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.GUARDIAN.eq(query.getSearch()))
-                        .or(STUDENT_DETAIL.GUARDIAN_PHONE.eq(query.getSearch()))
+                .and(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch())
+                        .or(STUDENT_BASIC.NAME.likeLeft(query.getSearch()))
+                        .or(STUDENT_BASIC.ID_NUMBER.likeLeft(query.getSearch()))
+                        .or(STUDENT_BASIC.EMAIL.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_NAME.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_PHONE.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_NAME.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_PHONE.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN.likeLeft(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN_PHONE.likeLeft(query.getSearch()))
                 )
                 .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
                 .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
@@ -265,7 +267,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .and(STUDENT_DETAIL.FOREIGN_SCORE.eq(query.getForeignScore()))
                 .and(STUDENT_DETAIL.HOBBIES.like(query.getHobbies()))
                 .and(STUDENT_DETAIL.OTHER_NOTES.like(query.getOtherNotes()))
-                .pageAs(Page.of(query.getPageNo(), query.getPageSize()), StudentTableItem.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentTableItem.class);
     }
 
     @Override

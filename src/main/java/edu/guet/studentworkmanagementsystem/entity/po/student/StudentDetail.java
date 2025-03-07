@@ -29,7 +29,7 @@ public class StudentDetail implements Serializable {
     /**
      * 班主任id
      */
-    private String headTeacherId;
+    private String headTeacherUsername;
     /**
      * 专业id, 由专业表进行约束
      */

@@ -81,7 +81,7 @@ public class Student implements Serializable {
     /**
      * 班主任
      */
-    private String headTeacherId;
+    private String headTeacherUsername;
     /**
      * 政治面貌
      */

@@ -102,7 +102,7 @@ public class StudentServiceTest {
 
     private Student createStudent(
             String studentId, String name, String idNumber, String gender,
-            String phone, String email, String headTeacherId, String majorId,
+            String phone, String email, String headTeacherUsername, String majorId,
             String grade, String politicsStatus
     ) {
         return Student.builder()
@@ -112,7 +112,7 @@ public class StudentServiceTest {
                 .gender(gender)
                 .phone(phone)
                 .email(email)
-                .headTeacherId(headTeacherId)
+                .headTeacherUsername(headTeacherUsername)
                 .majorId(majorId)
                 .grade(grade)
                 .politicsStatus(politicsStatus)
