@@ -230,7 +230,14 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         return QueryChain.of(StudentBasic.class)
-                .select(STUDENT_BASIC.ALL_COLUMNS, STUDENT_DETAIL.ALL_COLUMNS, MAJOR.ALL_COLUMNS, USER.ALL_COLUMNS)
+                .select(
+                        STUDENT_BASIC.ALL_COLUMNS,
+                        STUDENT_DETAIL.ALL_COLUMNS,
+                        MAJOR.ALL_COLUMNS,
+                        USER.USERNAME.as("headTeacherUsername"),
+                        USER.REAL_NAME.as("headTeacherName"),
+                        USER.PHONE.as("headTeacherPhone")
+                )
                 .from(STUDENT_BASIC)
                 .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
@@ -247,26 +254,27 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                         .or(STUDENT_DETAIL.GUARDIAN.likeLeft(query.getSearch()))
                         .or(STUDENT_DETAIL.GUARDIAN_PHONE.likeLeft(query.getSearch()))
                 )
+                .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
-                .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
+                .and(STUDENT_DETAIL.NATIVE_PLACE.likeLeft(query.getNativePlace()))
                 .and(STUDENT_DETAIL.GRADE.eq(query.getGrade()))
-                .and(STUDENT_DETAIL.NATION.like(query.getNation()))
-                .and(STUDENT_DETAIL.POLITICS_STATUS.like(query.getPoliticsStatus()))
-                .and(STUDENT_DETAIL.POSTAL_CODE.like(query.getPostalCode()))
-                .and(STUDENT_DETAIL.CLASS_NO.like(query.getClassNo()))
-                .and(STUDENT_DETAIL.DORMITORY.like(query.getDormitory()))
+                .and(STUDENT_DETAIL.NATION.likeLeft(query.getNation()))
+                .and(STUDENT_DETAIL.POLITICS_STATUS.likeLeft(query.getPoliticsStatus()))
+                .and(STUDENT_DETAIL.POSTAL_CODE.likeLeft(query.getPostalCode()))
+                .and(STUDENT_DETAIL.CLASS_NO.likeLeft(query.getClassNo()))
+                .and(STUDENT_DETAIL.DORMITORY.likeLeft(query.getDormitory()))
                 .and(STUDENT_DETAIL.BIRTHDATE.eq(query.getBirthdate()))
-                .and(STUDENT_DETAIL.HOUSEHOLD_REGISTRATION.like(query.getHouseholdRegistration()))
-                .and(STUDENT_DETAIL.HOUSEHOLD_TYPE.like(query.getHouseholdType()))
-                .and(STUDENT_DETAIL.ADDRESS.like(query.getAddress()))
+                .and(STUDENT_DETAIL.HOUSEHOLD_REGISTRATION.likeLeft(query.getHouseholdRegistration()))
+                .and(STUDENT_DETAIL.HOUSEHOLD_TYPE.likeLeft(query.getHouseholdType()))
+                .and(STUDENT_DETAIL.ADDRESS.likeLeft(query.getAddress()))
                 .and(STUDENT_DETAIL.EXAM_ID.eq(query.getExamId()))
-                .and(STUDENT_DETAIL.HIGH_SCHOOL.like(query.getHighSchool()))
-                .and(STUDENT_DETAIL.ADMISSION_BATCH.like(query.getAdmissionBatch()))
+                .and(STUDENT_DETAIL.HIGH_SCHOOL.likeLeft(query.getHighSchool()))
+                .and(STUDENT_DETAIL.ADMISSION_BATCH.likeLeft(query.getAdmissionBatch()))
                 .and(STUDENT_DETAIL.TOTAL_EXAM_SCORE.eq(query.getTotalExamScore()))
-                .and(STUDENT_DETAIL.FOREIGN_LANGUAGE.like(query.getForeignLanguage()))
+                .and(STUDENT_DETAIL.FOREIGN_LANGUAGE.likeLeft(query.getForeignLanguage()))
                 .and(STUDENT_DETAIL.FOREIGN_SCORE.eq(query.getForeignScore()))
-                .and(STUDENT_DETAIL.HOBBIES.like(query.getHobbies()))
-                .and(STUDENT_DETAIL.OTHER_NOTES.like(query.getOtherNotes()))
+                .and(STUDENT_DETAIL.HOBBIES.likeLeft(query.getHobbies()))
+                .and(STUDENT_DETAIL.OTHER_NOTES.likeLeft(query.getOtherNotes()))
                 .pageAs(Page.of(pageNo, pageSize), StudentTableItem.class);
     }
 
