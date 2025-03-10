@@ -38,7 +38,6 @@ import static edu.guet.studentworkmanagementsystem.entity.po.student.table.Stude
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
 public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
@@ -87,17 +86,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .collect(Collectors.toSet());
         if ((idNumberSet.size() != size) || (studentIdSet.size() != size))
             throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_REPEAT);
-        Set<String> dbIdNumberSet = QueryChain.of(Student.class)
-                .where(STUDENT.ID_NUMBER.in(idNumberSet))
+        Set<String> dbIdNumberSet = QueryChain.of(StudentBasic.class)
+                .where(STUDENT_BASIC.ID_NUMBER.in(idNumberSet))
                 .list()
                 .stream()
-                .map(Student::getIdNumber)
+                .map(StudentBasic::getIdNumber)
                 .collect(Collectors.toSet());
-        Set<String> dbStudentIdSet = QueryChain.of(Student.class)
-                .where(STUDENT.STUDENT_ID.in(studentIdSet))
+        Set<String> dbStudentIdSet = QueryChain.of(StudentBasic.class)
+                .where(STUDENT_BASIC.STUDENT_ID.in(studentIdSet))
                 .list()
                 .stream()
-                .map(Student::getStudentId)
+                .map(StudentBasic::getStudentId)
                 .collect(Collectors.toSet());
         if (!dbIdNumberSet.isEmpty() || !dbStudentIdSet.isEmpty())
             throw new ServiceException(ServiceExceptionEnum.STUDENT_ID_OR_ID_NUMBER_EXISTED);
@@ -279,7 +278,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
-    public BaseResponse<StudentArchive> getStudent(String studentId) {
+    public BaseResponse<StudentArchive> getStudentArchive(String studentId) {
         // todo: 总学生档案, 包含系统中所有关于学生的信息
         return ResponseUtil.success();
     }

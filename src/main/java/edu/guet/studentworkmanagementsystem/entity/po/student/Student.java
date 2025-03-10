@@ -171,6 +171,50 @@ public class Student implements Serializable {
      */
     private String dormitory;
     /**
+     * 是否共青团员
+     */
+    private Boolean isCommunistYouthLeagueMember;
+
+    /**
+     * 入团时间
+     */
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate joiningTime;
+    /**
+     * 是否学生贷款
+     */
+    private Boolean isStudentLoans;
+    /**
+     * 身高
+     */
+    private String height;
+    /**
+     * 体重
+     */
+    private String weight;
+    /**
+     * 宗教信仰
+     */
+    private String religiousBeliefs;
+    /**
+     * 家庭所在地
+     */
+    private String location;
+    /**
+     * 家庭人口
+     */
+    private String familyPopulation;
+    /**
+     * 家庭成员
+     */
+    private String familyMembers;
+    /**
+     * 独生子女
+     */
+    private Boolean isOnlyChild;
+    /**
      * 其他标签备注
      */
     private String otherNotes;

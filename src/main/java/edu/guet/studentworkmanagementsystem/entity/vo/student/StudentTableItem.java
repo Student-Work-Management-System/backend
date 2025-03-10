@@ -37,6 +37,16 @@ public class StudentTableItem {
     private String headTeacherName;
     private String headTeacherPhone;
     private String politicsStatus;
+    private Boolean isCommunistYouthLeagueMember;
+    private LocalDate joiningTime;
+    private Boolean isStudentLoans;
+    private String height;
+    private String weight;
+    private String religiousBeliefs;
+    private String location;
+    private String familyPopulation;
+    private String familyMembers;
+    private Boolean isOnlyChild;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
