@@ -28,6 +28,7 @@ public class StudentTableItem {
     private String postalCode;
     private String phone;
     private String email;
+    private String degree;
     private String nation;
     private String majorId;
     private String majorName;
@@ -37,7 +38,6 @@ public class StudentTableItem {
     private String headTeacherName;
     private String headTeacherPhone;
     private String politicsStatus;
-    private Boolean isCommunistYouthLeagueMember;
     private LocalDate joiningTime;
     private Boolean isStudentLoans;
     private String height;
@@ -67,9 +67,10 @@ public class StudentTableItem {
     private String admissionBatch;
     private String totalExamScore;
     private String foreignLanguage;
-    private String  foreignScore;
+    private String foreignScore;
     private String hobbies;
     private String dormitory;
+    private Boolean disability;
     private String otherNotes;
     private Boolean enabled;
 }

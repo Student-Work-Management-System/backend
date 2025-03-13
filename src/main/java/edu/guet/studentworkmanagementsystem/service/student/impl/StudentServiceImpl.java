@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
@@ -45,8 +46,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Qualifier("readThreadPool")
     @Autowired
+    @Qualifier("readThreadPool")
     private ThreadPoolTaskExecutor readThreadPool;
     @Autowired
     private StudentBasicService studentBasicService;
@@ -112,6 +113,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .gender(student.getGender())
                 .phone(student.getPhone())
                 .email(student.getEmail())
+                .degree(student.getDegree())
                 .enabled(student.getEnabled())
                 .build();
     }
@@ -162,6 +164,15 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .foreignLanguage(student.getForeignLanguage())
                 .foreignScore(student.getForeignScore())
                 .hobbies(student.getHobbies())
+                .joiningTime(student.getJoiningTime())
+                .isStudentLoans(student.getIsStudentLoans())
+                .height(student.getHeight())
+                .weight(student.getWeight())
+                .religiousBeliefs(student.getReligiousBeliefs())
+                .familyPopulation(student.getFamilyPopulation())
+                .isOnlyChild(student.getIsOnlyChild())
+                .location(student.getLocation())
+                .disability(student.getDisability())
                 .otherNotes(student.getOtherNotes())
                 .build();
     }
@@ -241,39 +252,47 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_USERNAME.eq(USER.USERNAME))
+                .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
+                .and(STUDENT_BASIC.DEGREE.eq(query.getDegree()))
                 .and(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch())
-                        .or(STUDENT_BASIC.NAME.likeLeft(query.getSearch()))
-                        .or(STUDENT_BASIC.ID_NUMBER.likeLeft(query.getSearch()))
-                        .or(STUDENT_BASIC.EMAIL.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.FATHER_NAME.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.FATHER_PHONE.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.MOTHER_NAME.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.MOTHER_PHONE.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.GUARDIAN.likeLeft(query.getSearch()))
-                        .or(STUDENT_DETAIL.GUARDIAN_PHONE.likeLeft(query.getSearch()))
+                        .or(STUDENT_BASIC.NAME.like(query.getSearch()))
+                        .or(STUDENT_BASIC.ID_NUMBER.like(query.getSearch()))
+                        .or(STUDENT_BASIC.EMAIL.like(query.getSearch()))
+                        .or(STUDENT_BASIC.PHONE.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_NAME.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.FATHER_PHONE.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_NAME.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.MOTHER_PHONE.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN.like(query.getSearch()))
+                        .or(STUDENT_DETAIL.GUARDIAN_PHONE.like(query.getSearch()))
                 )
-                .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
-                .and(STUDENT_DETAIL.NATIVE_PLACE.likeLeft(query.getNativePlace()))
+                .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
+                .and(STUDENT_DETAIL.STATUS_ID.eq(query.getStatusId()))
+                .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
                 .and(STUDENT_DETAIL.GRADE.eq(query.getGrade()))
-                .and(STUDENT_DETAIL.NATION.likeLeft(query.getNation()))
-                .and(STUDENT_DETAIL.POLITICS_STATUS.likeLeft(query.getPoliticsStatus()))
-                .and(STUDENT_DETAIL.POSTAL_CODE.likeLeft(query.getPostalCode()))
-                .and(STUDENT_DETAIL.CLASS_NO.likeLeft(query.getClassNo()))
-                .and(STUDENT_DETAIL.DORMITORY.likeLeft(query.getDormitory()))
-                .and(STUDENT_DETAIL.BIRTHDATE.eq(query.getBirthdate()))
+                .and(STUDENT_DETAIL.NATION.like(query.getNation()))
+                .and(STUDENT_DETAIL.POLITICS_STATUS.eq(query.getPoliticsStatus()))
+                .and(STUDENT_DETAIL.CLASS_NO.eq(query.getClassNo()))
+                .and(STUDENT_DETAIL.DORMITORY.eq(query.getDormitory()))
                 .and(STUDENT_DETAIL.HOUSEHOLD_REGISTRATION.likeLeft(query.getHouseholdRegistration()))
-                .and(STUDENT_DETAIL.HOUSEHOLD_TYPE.likeLeft(query.getHouseholdType()))
+                .and(STUDENT_DETAIL.HOUSEHOLD_TYPE.eq(query.getHouseholdType()))
                 .and(STUDENT_DETAIL.ADDRESS.likeLeft(query.getAddress()))
                 .and(STUDENT_DETAIL.EXAM_ID.eq(query.getExamId()))
-                .and(STUDENT_DETAIL.HIGH_SCHOOL.likeLeft(query.getHighSchool()))
-                .and(STUDENT_DETAIL.ADMISSION_BATCH.likeLeft(query.getAdmissionBatch()))
+                .and(STUDENT_DETAIL.HIGH_SCHOOL.like(query.getHighSchool()))
+                .and(STUDENT_DETAIL.ADMISSION_BATCH.like(query.getAdmissionBatch()))
                 .and(STUDENT_DETAIL.TOTAL_EXAM_SCORE.eq(query.getTotalExamScore()))
-                .and(STUDENT_DETAIL.FOREIGN_LANGUAGE.likeLeft(query.getForeignLanguage()))
+                .and(STUDENT_DETAIL.FOREIGN_LANGUAGE.like(query.getForeignLanguage()))
                 .and(STUDENT_DETAIL.FOREIGN_SCORE.eq(query.getForeignScore()))
-                .and(STUDENT_DETAIL.HOBBIES.likeLeft(query.getHobbies()))
-                .and(STUDENT_DETAIL.OTHER_NOTES.likeLeft(query.getOtherNotes()))
+                .and(STUDENT_DETAIL.HOBBIES.like(query.getHobbies()))
+                .and(STUDENT_DETAIL.OTHER_NOTES.like(query.getOtherNotes()))
+                .and(STUDENT_DETAIL.IS_STUDENT_LOANS.eq(query.getIsStudentLoans()))
+                .and(STUDENT_DETAIL.RELIGIOUS_BELIEFS.like(query.getReligiousBeliefs()))
+                .and(STUDENT_DETAIL.FAMILY_POPULATION.eq(query.getFamilyPopulation()))
+                .and(STUDENT_DETAIL.IS_ONLY_CHILD.eq(query.getIsOnlyChild()))
+                .and(STUDENT_DETAIL.LOCATION.like(query.getLocation()))
+                .and(STUDENT_DETAIL.DISABILITY.eq(query.getDisability()))
                 .pageAs(Page.of(pageNo, pageSize), StudentTableItem.class);
     }
 

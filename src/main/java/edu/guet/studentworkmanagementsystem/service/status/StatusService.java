@@ -6,12 +6,15 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusList;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
+import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusVO;
 
+import java.util.List;
 
 
 public interface StatusService extends IService<StudentStatus> {
+    BaseResponse<List<Status>> getAllStatus();
     /**
      * 批量导入学生学籍变动信息记录
      * @param statusList 学生学籍信息列表

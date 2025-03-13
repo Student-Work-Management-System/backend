@@ -50,6 +50,10 @@ public class Student implements Serializable {
      */
     private String nativePlace;
     /**
+     * 学历层次
+     */
+    private String degree;
+    /**
      * 邮政编码
      */
     private String postalCode;
@@ -171,11 +175,6 @@ public class Student implements Serializable {
      */
     private String dormitory;
     /**
-     * 是否共青团员
-     */
-    private Boolean isCommunistYouthLeagueMember;
-
-    /**
      * 入团时间
      */
     @JsonSerialize(using = LocalDateSerializer.class)
@@ -214,6 +213,10 @@ public class Student implements Serializable {
      * 独生子女
      */
     private Boolean isOnlyChild;
+    /**
+     * 是否残疾
+     */
+    private Boolean disability;
     /**
      * 其他标签备注
      */

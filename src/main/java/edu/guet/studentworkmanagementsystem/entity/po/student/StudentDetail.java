@@ -31,6 +31,10 @@ public class StudentDetail implements Serializable {
      */
     private String headTeacherUsername;
     /**
+     * 学籍Id
+     */
+    private String statusId;
+    /**
      * 专业id, 由专业表进行约束
      */
     private String majorId;
@@ -141,6 +145,49 @@ public class StudentDetail implements Serializable {
      * 个人兴趣爱好特长
      */
     private String hobbies;
+    /**
+     * 入团时间
+     */
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate joiningTime;
+    /**
+     * 是否学生贷款
+     */
+    private Boolean isStudentLoans;
+    /**
+     * 身高
+     */
+    private String height;
+    /**
+     * 体重
+     */
+    private String weight;
+    /**
+     * 宗教信仰
+     */
+    private String religiousBeliefs;
+    /**
+     * 家庭人口
+     */
+    private String familyPopulation;
+    /**
+     * 家庭成员
+     */
+    private String familyMembers;
+    /**
+     * 独生子女
+     */
+    private Boolean isOnlyChild;
+    /**
+     * 家庭所在地
+     */
+    private String location;
+    /**
+     * 是否残疾
+     */
+    private Boolean disability;
     /**
      * 其他标签备注
      */

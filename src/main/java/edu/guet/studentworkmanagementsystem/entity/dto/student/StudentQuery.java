@@ -1,17 +1,11 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.student;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Data
 @Builder
@@ -24,6 +18,10 @@ public class StudentQuery implements Serializable {
     private String gender;
     // 籍贯
     private String nativePlace;
+    // 学籍id
+    private String statusId;
+    // 学历层次
+    private String degree;
     // 专业id
     private String majorId;
     // 年级
@@ -32,17 +30,10 @@ public class StudentQuery implements Serializable {
     private String nation;
     // 政治面貌
     private String politicsStatus;
-    // 邮政编码
-    private String postalCode;
     // 班号
     private String classNo;
     // 宿舍
     private String dormitory;
-    // 出生日期
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthdate;
     // 户籍所在地
     private String householdRegistration;
     // 户口类型
@@ -63,6 +54,18 @@ public class StudentQuery implements Serializable {
     private String foreignScore;
     // 个人兴趣爱好特长
     private String hobbies;
+    // 是否学生贷款
+    private Boolean isStudentLoans;
+    // 宗教信仰
+    private String religiousBeliefs;
+    // 家庭人口
+    private String familyPopulation;
+    // 是否独生子女
+    private Boolean isOnlyChild;
+    // 家庭所在地省/市/县
+    private String location;
+    //
+    private Boolean disability;
     // 其他标签备注
     private String otherNotes;
     private Boolean enabled;
