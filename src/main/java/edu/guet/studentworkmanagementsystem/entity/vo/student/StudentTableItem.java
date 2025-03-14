@@ -28,11 +28,13 @@ public class StudentTableItem {
     private String postalCode;
     private String phone;
     private String email;
-    private String degree;
+    private String degreeId;
+    private String degreeName;
     private String nation;
     private String majorId;
     private String majorName;
-    private String grade;
+    private String gradeId;
+    private String gradeName;
     private String classNo;
     private String headTeacherUsername;
     private String headTeacherName;

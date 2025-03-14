@@ -192,7 +192,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                         .or(COMPETITION.COMPETITION_NAME.like(query.getSearch())))
                 .and(STUDENT_COMPETITION.REVIEW_STATE.eq(query.getState()))
                 .and(STUDENT.ENABLED.eq(query.getEnabled()))
-                .and(STUDENT.GRADE.eq(query.getGrade()))
+                .and(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_COMPETITION.AWARD_DATE.ge(query.getStartDate()).and(STUDENT_COMPETITION.AWARD_DATE.le(query.getEndDate())))
                 .pageAs(Page.of(pageNo, pageSize), StudentCompetitionVO.class);
@@ -209,7 +209,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID)).and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                 .innerJoin(STUDENT_COMPETITION_CLAIM).on(STUDENT.STUDENT_ID.eq(STUDENT_COMPETITION_CLAIM.STUDENT_ID))
                 .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
-                .and(STUDENT.GRADE.eq(query.getGrade()))
+                .and(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .listAs(StudentCompetitionPassedRecord.class);
         list.forEach(item -> {
             String studentId = item.getStudentId();

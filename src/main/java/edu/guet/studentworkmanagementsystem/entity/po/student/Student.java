@@ -52,7 +52,7 @@ public class Student implements Serializable {
     /**
      * 学历层次
      */
-    private String degree;
+    private String degreeId;
     /**
      * 邮政编码
      */
@@ -76,8 +76,7 @@ public class Student implements Serializable {
      * 年级
      */
     @NotBlank(message = "年级不能为空")
-    @Pattern(regexp = "\\d{4}$", message = "请输入正确的年级")
-    private String grade;
+    private String gradeId;
     /**
      * 班号
      */

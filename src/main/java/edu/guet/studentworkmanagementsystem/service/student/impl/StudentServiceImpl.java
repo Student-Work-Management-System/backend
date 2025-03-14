@@ -7,14 +7,14 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
-import edu.guet.studentworkmanagementsystem.entity.po.student.StudentDetail;
+import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
+import edu.guet.studentworkmanagementsystem.mapper.student.DegreeMapper;
+import edu.guet.studentworkmanagementsystem.mapper.student.GradeMapper;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
@@ -35,6 +35,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.DegreeTableDef.DEGREE;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
@@ -53,6 +55,10 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private StudentBasicService studentBasicService;
     @Autowired
     private StudentDetailService studentDetailService;
+    @Autowired
+    private GradeMapper gradeMapper;
+    @Autowired
+    private DegreeMapper degreeMapper;
 
     @Override
     @Transactional
@@ -113,7 +119,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .gender(student.getGender())
                 .phone(student.getPhone())
                 .email(student.getEmail())
-                .degree(student.getDegree())
+                .degreeId(student.getDegreeId())
                 .enabled(student.getEnabled())
                 .build();
     }
@@ -142,7 +148,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .postalCode(student.getPostalCode())
                 .nation(student.getNation())
                 .politicsStatus(student.getPoliticsStatus())
-                .grade(student.getGrade())
+                .gradeId(student.getGradeId())
                 .classNo(student.getClassNo())
                 .dormitory(student.getDormitory())
                 .birthdate(student.getBirthdate())
@@ -244,6 +250,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                         STUDENT_BASIC.ALL_COLUMNS,
                         STUDENT_DETAIL.ALL_COLUMNS,
                         MAJOR.ALL_COLUMNS,
+                        GRADE.ALL_COLUMNS,
+                        DEGREE.ALL_COLUMNS,
                         USER.USERNAME.as("headTeacherUsername"),
                         USER.REAL_NAME.as("headTeacherName"),
                         USER.PHONE.as("headTeacherPhone")
@@ -253,8 +261,10 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_USERNAME.eq(USER.USERNAME))
                 .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
+                .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
+                .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
-                .and(STUDENT_BASIC.DEGREE.eq(query.getDegree()))
+                .and(STUDENT_BASIC.DEGREE_ID.eq(query.getDegreeId()))
                 .and(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch())
                         .or(STUDENT_BASIC.NAME.like(query.getSearch()))
                         .or(STUDENT_BASIC.ID_NUMBER.like(query.getSearch()))
@@ -267,11 +277,11 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                         .or(STUDENT_DETAIL.GUARDIAN.like(query.getSearch()))
                         .or(STUDENT_DETAIL.GUARDIAN_PHONE.like(query.getSearch()))
                 )
+                .and(STUDENT_DETAIL.GRADE_ID.eq(query.getGradeId()))
                 .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
                 .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_DETAIL.STATUS_ID.eq(query.getStatusId()))
                 .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
-                .and(STUDENT_DETAIL.GRADE.eq(query.getGrade()))
                 .and(STUDENT_DETAIL.NATION.like(query.getNation()))
                 .and(STUDENT_DETAIL.POLITICS_STATUS.eq(query.getPoliticsStatus()))
                 .and(STUDENT_DETAIL.CLASS_NO.eq(query.getClassNo()))
@@ -340,6 +350,47 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
         return ResponseUtil.success();
     }
+
+    @Override
+    public BaseResponse<List<Grade>> getAllGrades() {
+        CompletableFuture<BaseResponse<List<Grade>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(gradeMapper.selectAll()), readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
+    }
+
+    @Override
+    public BaseResponse<List<Degree>> getAllDegrees() {
+        CompletableFuture<BaseResponse<List<Degree>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(degreeMapper.selectAll()), readThreadPool);
+        try {
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (Exception exception) {
+            Throwable cause = exception.getCause();
+            switch (cause) {
+                case ServiceException serviceException ->
+                        throw serviceException;
+                case TimeoutException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
+                case InterruptedException ignored ->
+                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
+                default ->
+                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+            }
+        }
+    }
+
     /**
      * 删除 恢复学生后的的必要操作
      */

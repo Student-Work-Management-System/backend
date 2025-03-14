@@ -106,7 +106,7 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .leftJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.STUDENT_LEAVE_ID.eq(STUDENT_LEAVE.STUDENT_LEAVE_ID))
                 .leftJoin(USER).on(USER.UID.eq(STUDENT_LEAVE_AUDIT.AUDITOR_ID))
-                .where(Student::getGrade).eq(query.getGrade())
+                .where(Student::getGradeId).eq(query.getGrade())
                 .and(Student::getMajorId).eq(query.getMajorId())
                 .and(StudentLeave::getLeaveDate).eq(query.getLeaveDate())
                 .and(STUDENT_LEAVE_AUDIT.AUDIT_STATE.eq(query.getAuditState()))

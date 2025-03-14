@@ -125,7 +125,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                 .select(STUDENT.STUDENT_ID)
                 .from(STUDENT)
                 .where(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getGrade).eq(query.getGrade())
+                .and(Student::getGradeId).eq(query.getGrade())
                 .list();
         return students.stream().map(Student::getStudentId).collect(Collectors.toList());
     }

@@ -31,7 +31,7 @@ public class StudentBasicServiceImpl extends ServiceImpl<StudentBasicMapper, Stu
                 .set(STUDENT_BASIC.EMAIL, studentBasic.getEmail(), StringUtils::hasLength)
                 .set(STUDENT_BASIC.PHONE, studentBasic.getPhone(), StringUtils::hasLength)
                 .set(STUDENT_BASIC.ID_NUMBER, studentBasic.getIdNumber(), StringUtils::hasLength)
-                .set(STUDENT_BASIC.DEGREE, studentBasic.getDegree(), StringUtils::hasLength)
+                .set(STUDENT_BASIC.DEGREE_ID, studentBasic.getDegreeId(), StringUtils::hasLength)
                 .where(STUDENT_BASIC.STUDENT_ID.eq(studentBasic.getStudentId()))
                 .update();
     }

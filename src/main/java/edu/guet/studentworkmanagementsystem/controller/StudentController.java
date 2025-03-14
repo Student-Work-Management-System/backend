@@ -4,6 +4,8 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.student.Degree;
+import edu.guet.studentworkmanagementsystem.entity.po.student.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
@@ -11,6 +13,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/student")
@@ -51,5 +55,15 @@ public class StudentController {
     @GetMapping("/validate_teacher_existed/{headTeacherUsername}")
     public <T> BaseResponse<T> validateHeadTeacherExists(@PathVariable String headTeacherUsername) {
         return studentService.validateHeadTeacherExists(headTeacherUsername);
+    }
+    @PreAuthorize("hasAuthority('student:select')")
+    @GetMapping("/allGrade")
+    public BaseResponse<List<Grade>> getAllGrades() {
+        return studentService.getAllGrades();
+    }
+    @PreAuthorize("hasAuthority('student:select')")
+    @GetMapping("/allDegree")
+    public BaseResponse<List<Degree>> getAllDegree() {
+        return studentService.getAllDegrees();
     }
 }

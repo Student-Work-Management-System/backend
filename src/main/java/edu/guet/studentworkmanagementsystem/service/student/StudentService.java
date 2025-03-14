@@ -5,9 +5,13 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.student.Degree;
+import edu.guet.studentworkmanagementsystem.entity.po.student.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
+
+import java.util.List;
 
 /**
  * 因学生相关信息太大, 学生表信息拆分为StudentBasic和StudentDetail两个子模块
@@ -42,4 +46,6 @@ public interface StudentService extends IService<Student> {
     <T> BaseResponse<T> deleteStudent(String studentId);
     <T> BaseResponse<T> recoveryStudent(String studentId);
     <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername);
+    BaseResponse<List<Grade>> getAllGrades();
+    BaseResponse<List<Degree>> getAllDegrees();
 }

@@ -162,7 +162,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                             .or(STUDENT.NAME.like(query.getSearch()))
                             .or(CADRE.CADRE_POSITION.like(query.getSearch())))
                     .and(Student::getMajorId).eq(query.getMajorId())
-                    .and(Student::getGrade).eq(query.getGrade())
+                    .and(Student::getGradeId).eq(query.getGrade())
                     .and(Student::getEnabled).eq(query.getEnabled())
                     .and(Cadre::getCadreLevel).eq(query.getCadreLevel())
                     .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())

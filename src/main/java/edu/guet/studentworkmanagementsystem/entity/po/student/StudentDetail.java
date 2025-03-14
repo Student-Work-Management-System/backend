@@ -57,7 +57,7 @@ public class StudentDetail implements Serializable {
     /**
      * 年级
      */
-    private String grade;
+    private String gradeId;
     /**
      * 班号
      */

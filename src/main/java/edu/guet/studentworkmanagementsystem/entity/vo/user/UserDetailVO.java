@@ -23,6 +23,7 @@ public class UserDetailVO implements Serializable {
     private String username;
     private String realName;
     private String email;
+    private String phone;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")

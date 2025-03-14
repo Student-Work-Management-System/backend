@@ -21,11 +21,11 @@ public class StudentQuery implements Serializable {
     // 学籍id
     private String statusId;
     // 学历层次
-    private String degree;
+    private String degreeId;
     // 专业id
     private String majorId;
     // 年级
-    private String grade;
+    private String gradeId;
     // 民族
     private String nation;
     // 政治面貌

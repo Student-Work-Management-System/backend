@@ -110,7 +110,7 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
                 .innerJoin(POVERTY_ASSISTANCE).on(STUDENT_POVERTY_ASSISTANCE.POVERTY_ASSISTANCE_ID.eq(POVERTY_ASSISTANCE.POVERTY_ASSISTANCE_ID))
                 .innerJoin(STUDENT).on(STUDENT_POVERTY_ASSISTANCE.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .where(Student::getGrade).eq(query.getGrade())
+                .where(Student::getGradeId).eq(query.getGrade())
                 .and(Student::getMajorId).eq(query.getMajorId())
                 .and(Student::getEnabled).eq(query.getEnabled())
                 .or(PovertyAssistance::getPovertyType).like(query.getSearch())

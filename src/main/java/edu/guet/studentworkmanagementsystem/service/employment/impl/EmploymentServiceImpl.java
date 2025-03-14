@@ -81,7 +81,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(Student::getMajorId).eq(query.getMajorId())
-                .and(Student::getGrade).eq(query.getGrade())
+                .and(Student::getGradeId).eq(query.getGrade())
                 .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_EMPLOYMENT.GRADUATION_YEAR.eq(query.getGraduationYear()))
                 .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())));
