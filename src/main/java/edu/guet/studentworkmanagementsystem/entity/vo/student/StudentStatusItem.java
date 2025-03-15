@@ -16,33 +16,47 @@ import java.util.List;
 public class StudentStatusItem implements Serializable {
     private String majorName;
     // 总人数
-    private Integer totalCount;
-    // 在籍人数
-    private Integer normalCount;
+    private Long totalCount;
+    // 在籍
+    private Long normalCount;
     // 休学
-    private Integer suspendCount;
+    private Long suspendCount;
     // 入伍
-    private Integer militaryCount;
+    private Long militaryCount;
     // 复学
-    private Integer returnCount;
+    private Long returnCount;
     // 转入
-    private Integer transferInCount;
+    private Long transferInCount;
     // 转出
-    private Integer transferOutCount;
+    private Long transferOutCount;
+    // 放弃入学资格
+    private Long dropOfEnrollmentCount;
+    // 保留入学资格
+    private Long retainEnrollmentCount;
+    // 结业
+    private Long graduationCount;
+    // 毕业
+    private Long gradCount;
+    // 退学
+    private Long droppedCount;
+    // 改名
+    private Long rechristenCount;
+    // 死亡
+    private Long deathCount;
     // 性别
-    private Integer maleCount;
-    private Integer femaleCount;
+    private Long maleCount;
+    private Long femaleCount;
     // 群众数量
-    private Integer massCount;
+    private Long massCount;
     // 共青团员
-    private Integer leagueCount;
+    private Long leagueCount;
     // 中共党员
-    private Integer partyCount;
+    private Long partyCount;
     // 预备党员
-    private Integer prepareCount;
+    private Long prepareCount;
     // 残疾学生
-    private Integer disabilityCount;
+    private Long disabilityCount;
     // 少数民族
-    private Integer minorityCount;
+    private Long minorityCount;
     private List<Student> originData;
 }

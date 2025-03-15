@@ -1,15 +1,13 @@
 package edu.guet.studentworkmanagementsystem.service.student;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Politic;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 
 import java.util.List;
@@ -47,5 +45,5 @@ public interface StudentService {
     <T> BaseResponse<T> deleteStudent(String studentId);
     <T> BaseResponse<T> recoveryStudent(String studentId);
     <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername);
-    BaseResponse<List<Student>> getStudentStatus();
+    BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query);
 }

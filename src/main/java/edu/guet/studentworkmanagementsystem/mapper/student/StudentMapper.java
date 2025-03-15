@@ -1,8 +1,12 @@
 package edu.guet.studentworkmanagementsystem.mapper.student;
 
-import com.mybatisflex.core.BaseMapper;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-@Deprecated
-public interface StudentMapper extends BaseMapper<Student> {
+import java.util.List;
+
+public interface StudentMapper {
+    List<StudentStatusItem> getStudentStatusList(StudentStatusQuery query);
 }

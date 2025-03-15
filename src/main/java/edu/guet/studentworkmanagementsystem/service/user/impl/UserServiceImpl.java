@@ -17,7 +17,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Counselor;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
@@ -62,6 +63,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.CounselorTableDef.COUNSELOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
@@ -115,12 +119,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     public LoginUserVO createLoginUser(SecurityUser securityUser, String token) {
         List<SystemAuthority> authorities = (List<SystemAuthority>) securityUser.getAuthorities();
-        LoginUserVO.LoginUserVOBuilder builder = LoginUserVO.builder()
+        LoginUserVO loginUser = LoginUserVO.builder()
                 .uid(securityUser.getUser().getUid())
                 .username(securityUser.getUsername())
                 .email(securityUser.getUser().getEmail())
                 .authorities(authorities)
-                .token(token);
+                .token(token)
+                .build();
         // 检查权限:
         // 1. 若有student:status权限, 说明至少有辅导员身份, 可以查看该辅导员负责的年级和学历层次学生
         // 2. 若有student:status:all权限, 说明至少是辅导员以上身份, 可以查看所有的学生信息
@@ -129,18 +134,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         boolean hasStudentStatusAllPermission = hasStudentStatusAllPermission(set);
         //  两权限均无, 则无需查询相关信息
         if (!hasStudentStatusPermission && !hasStudentStatusAllPermission)
-            return builder.build();
+            return loginUser;
         // 有student:status, 则查询负责信息, 在登录后返回给前端保存
-        List<Counselor> userCounselor = otherService.getCounselorByUid(securityUser.getUser().getUid());
-        if (hasStudentStatusAllPermission)
-            return builder
-                    .counselors(userCounselor)
-                    .build();
+        if (hasStudentStatusPermission && !hasStudentStatusAllPermission) {
+            String uid = securityUser.getUser().getUid();
+            loginUser.setChargeGrades(getChargeGrade(uid));
+            loginUser.setChargeDegrees(getChargeDegree(uid));
+            return loginUser;
+        }
         // 有student:status:all, 则在前端保存所有的年级和学历层次信息
-        List<Counselor> counselors = otherService.getAllCounselors();
-        return builder
-                .counselors(counselors)
-                .build();
+        loginUser.setChargeGrades(otherService.getGradeList());
+        loginUser.setChargeDegrees(otherService.getDegreeList());
+        return loginUser;
+    }
+
+    public List<Grade> getChargeGrade(String uid) {
+        return QueryChain.of(Grade.class)
+                .select(GRADE.ALL_COLUMNS)
+                .innerJoin(COUNSELOR).on(COUNSELOR.GRADE_ID.eq(GRADE.GRADE_ID))
+                .innerJoin(USER).on(USER.UID.eq(USER.UID))
+                .where(USER.UID.eq(uid))
+                .list();
+    }
+
+    public List<Degree> getChargeDegree(String uid) {
+        return QueryChain.of(Degree.class)
+                .select(DEGREE.ALL_COLUMNS)
+                .innerJoin(COUNSELOR).on(COUNSELOR.DEGREE_ID.eq(DEGREE.DEGREE_ID))
+                .innerJoin(USER).on(USER.UID.eq(USER.UID))
+                .where(USER.UID.eq(uid))
+                .list();
     }
 
     public boolean hasStudentStatusAllPermission(Set<String> permissions) {

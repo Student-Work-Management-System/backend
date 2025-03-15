@@ -3,25 +3,29 @@ package edu.guet.studentworkmanagementsystem.service.student.impl;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Politic;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Major;
 import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.other.DegreeMapper;
 import edu.guet.studentworkmanagementsystem.mapper.other.GradeMapper;
 import edu.guet.studentworkmanagementsystem.mapper.other.PoliticMapper;
+import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
+import edu.guet.studentworkmanagementsystem.service.other.OtherService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
+import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,13 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static com.mybatisflex.core.query.QueryMethods.*;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.PoliticTableDef.POLITIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
+import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StudentStatusTableDef.STUDENT_STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
@@ -58,11 +63,15 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentDetailService studentDetailService;
     @Autowired
+    private OtherService otherService;
+    @Autowired
     private GradeMapper gradeMapper;
     @Autowired
     private DegreeMapper degreeMapper;
     @Autowired
     private PoliticMapper politicMapper;
+    @Autowired
+    private StudentMapper studentMapper;
 
     @Override
     @Transactional
@@ -230,32 +239,21 @@ public class StudentServiceImpl implements StudentService {
     public BaseResponse<Page<StudentTableItem>> getStudents(StudentQuery query) {
         CompletableFuture<BaseResponse<Page<StudentTableItem>>> future =
                 CompletableFuture.supplyAsync(() -> ResponseUtil.success(getStudentTableItems(query)), readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+        return FutureExceptionExecute.fromFuture(future).execute();
     }
-    private Page<StudentTableItem> getStudentTableItems(StudentQuery query) {
+    public Page<StudentTableItem> getStudentTableItems(StudentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         return QueryChain.of(StudentBasic.class)
                 .select(
+                        // 学生基础信息、学生详细信息、专业、年级、学历层次、学籍状态、政治面貌
                         STUDENT_BASIC.ALL_COLUMNS,
                         STUDENT_DETAIL.ALL_COLUMNS,
                         MAJOR.ALL_COLUMNS,
                         GRADE.ALL_COLUMNS,
                         DEGREE.ALL_COLUMNS,
+                        STATUS.ALL_COLUMNS,
+                        POLITIC.ALL_COLUMNS,
                         USER.USERNAME.as("headTeacherUsername"),
                         USER.REAL_NAME.as("headTeacherName"),
                         USER.PHONE.as("headTeacherPhone")
@@ -264,9 +262,10 @@ public class StudentServiceImpl implements StudentService {
                 .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_USERNAME.eq(USER.USERNAME))
-                .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
                 .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
                 .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
+                .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
+                .innerJoin(POLITIC).on(STUDENT_DETAIL.POLITIC_ID.eq(STATUS.STATUS_ID))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_BASIC.DEGREE_ID.eq(query.getDegreeId()))
                 .and(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch())
@@ -356,42 +355,15 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public BaseResponse<List<Student>> getStudentStatus() {
-        CompletableFuture<List<Student>> future = CompletableFuture.supplyAsync(this::getAllStudent, readThreadPool);
-        try {
-            List<Student> students = future.get(3, TimeUnit.SECONDS);
-            return ResponseUtil.success(students);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+    public BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query) {
+        CompletableFuture<List<StudentStatusItem>> future = CompletableFuture.supplyAsync(()-> getAllStudent(query), readThreadPool);
+        List<StudentStatusItem> list = FutureExceptionExecute.fromFuture(future).execute();
+        // List<StudentStatusItem> list = getAllStudent(query);
+        return ResponseUtil.success(list);
     }
 
-    public List<Student> getAllStudent() {
-        return QueryChain.of(StudentBasic.class)
-                .select(
-                        STUDENT_BASIC.ALL_COLUMNS,
-                        STUDENT_DETAIL.ALL_COLUMNS,
-                        DEGREE.ALL_COLUMNS,
-                        GRADE.ALL_COLUMNS,
-                        MAJOR.ALL_COLUMNS,
-                        STATUS.ALL_COLUMNS
-                )
-                .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
-                .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
-                .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
-                .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
-                .listAs(Student.class);
+    public List<StudentStatusItem> getAllStudent(StudentStatusQuery query) {
+        return studentMapper.getStudentStatusList(query);
     }
 
     /**
