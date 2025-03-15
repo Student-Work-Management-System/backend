@@ -53,7 +53,7 @@ public class StudentDetail implements Serializable {
     /**
      * 政治面貌
      */
-    private String politicsStatus;
+    private String politicId;
     /**
      * 年级
      */

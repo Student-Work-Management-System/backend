@@ -2,20 +2,22 @@ package edu.guet.studentworkmanagementsystem.service.student.impl;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
-import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Politic;
 import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
-import edu.guet.studentworkmanagementsystem.mapper.student.DegreeMapper;
-import edu.guet.studentworkmanagementsystem.mapper.student.GradeMapper;
-import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
+import edu.guet.studentworkmanagementsystem.mapper.other.DegreeMapper;
+import edu.guet.studentworkmanagementsystem.mapper.other.GradeMapper;
+import edu.guet.studentworkmanagementsystem.mapper.other.PoliticMapper;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
@@ -35,15 +37,15 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.DegreeTableDef.DEGREE;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.GradeTableDef.GRADE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
-import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 
 @Service
-public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
+public class StudentServiceImpl implements StudentService {
     @Autowired
     private UserService userService;
     @Autowired
@@ -59,6 +61,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private GradeMapper gradeMapper;
     @Autowired
     private DegreeMapper degreeMapper;
+    @Autowired
+    private PoliticMapper politicMapper;
 
     @Override
     @Transactional
@@ -147,7 +151,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .nativePlace(student.getNativePlace())
                 .postalCode(student.getPostalCode())
                 .nation(student.getNation())
-                .politicsStatus(student.getPoliticsStatus())
+                .politicId(student.getPoliticId())
                 .gradeId(student.getGradeId())
                 .classNo(student.getClassNo())
                 .dormitory(student.getDormitory())
@@ -283,7 +287,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 .and(STUDENT_DETAIL.STATUS_ID.eq(query.getStatusId()))
                 .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
                 .and(STUDENT_DETAIL.NATION.like(query.getNation()))
-                .and(STUDENT_DETAIL.POLITICS_STATUS.eq(query.getPoliticsStatus()))
+                .and(STUDENT_DETAIL.POLITIC_ID.eq(query.getPoliticId()))
                 .and(STUDENT_DETAIL.CLASS_NO.eq(query.getClassNo()))
                 .and(STUDENT_DETAIL.DORMITORY.eq(query.getDormitory()))
                 .and(STUDENT_DETAIL.HOUSEHOLD_REGISTRATION.likeLeft(query.getHouseholdRegistration()))
@@ -352,10 +356,11 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
-    public BaseResponse<List<Grade>> getAllGrades() {
-        CompletableFuture<BaseResponse<List<Grade>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(gradeMapper.selectAll()), readThreadPool);
+    public BaseResponse<List<Student>> getStudentStatus() {
+        CompletableFuture<List<Student>> future = CompletableFuture.supplyAsync(this::getAllStudent, readThreadPool);
         try {
-            return future.get(3, TimeUnit.SECONDS);
+            List<Student> students = future.get(3, TimeUnit.SECONDS);
+            return ResponseUtil.success(students);
         } catch (Exception exception) {
             Throwable cause = exception.getCause();
             switch (cause) {
@@ -371,24 +376,22 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
     }
 
-    @Override
-    public BaseResponse<List<Degree>> getAllDegrees() {
-        CompletableFuture<BaseResponse<List<Degree>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(degreeMapper.selectAll()), readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+    public List<Student> getAllStudent() {
+        return QueryChain.of(StudentBasic.class)
+                .select(
+                        STUDENT_BASIC.ALL_COLUMNS,
+                        STUDENT_DETAIL.ALL_COLUMNS,
+                        DEGREE.ALL_COLUMNS,
+                        GRADE.ALL_COLUMNS,
+                        MAJOR.ALL_COLUMNS,
+                        STATUS.ALL_COLUMNS
+                )
+                .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
+                .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
+                .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
+                .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
+                .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
+                .listAs(Student.class);
     }
 
     /**

@@ -17,6 +17,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Counselor;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
@@ -33,6 +34,7 @@ import edu.guet.studentworkmanagementsystem.mapper.user.UserMapper;
 import edu.guet.studentworkmanagementsystem.securiy.SecurityUser;
 import edu.guet.studentworkmanagementsystem.securiy.SystemAuthority;
 import edu.guet.studentworkmanagementsystem.service.email.EmailService;
+import edu.guet.studentworkmanagementsystem.service.other.OtherService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
 import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
@@ -90,6 +92,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Qualifier("readThreadPool")
     @Autowired
     private ThreadPoolTaskExecutor readThreadPool;
+    @Autowired
+    private OtherService otherService;
 
     @Override
     public BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) {
@@ -105,8 +109,46 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.error("UserServiceImpl#login(LoginUserDTO loginUserDTO)出现JSON解析异常: {}", jsonProcessingException.getMessage());
             ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
         }
-        LoginUserVO loginUserVO = new LoginUserVO(securityUser.getUser(), (List<SystemAuthority>) securityUser.getAuthorities(), token);
+        LoginUserVO loginUserVO = createLoginUser(securityUser, token);
         return ResponseUtil.success(loginUserVO);
+    }
+
+    public LoginUserVO createLoginUser(SecurityUser securityUser, String token) {
+        List<SystemAuthority> authorities = (List<SystemAuthority>) securityUser.getAuthorities();
+        LoginUserVO.LoginUserVOBuilder builder = LoginUserVO.builder()
+                .uid(securityUser.getUser().getUid())
+                .username(securityUser.getUsername())
+                .email(securityUser.getUser().getEmail())
+                .authorities(authorities)
+                .token(token);
+        // 检查权限:
+        // 1. 若有student:status权限, 说明至少有辅导员身份, 可以查看该辅导员负责的年级和学历层次学生
+        // 2. 若有student:status:all权限, 说明至少是辅导员以上身份, 可以查看所有的学生信息
+        Set<String> set = authorities.stream().map(SystemAuthority::getAuthority).collect(Collectors.toSet());
+        boolean hasStudentStatusPermission = hasStudentStatusPermission(set);
+        boolean hasStudentStatusAllPermission = hasStudentStatusAllPermission(set);
+        //  两权限均无, 则无需查询相关信息
+        if (!hasStudentStatusPermission && !hasStudentStatusAllPermission)
+            return builder.build();
+        // 有student:status, 则查询负责信息, 在登录后返回给前端保存
+        List<Counselor> userCounselor = otherService.getCounselorByUid(securityUser.getUser().getUid());
+        if (hasStudentStatusAllPermission)
+            return builder
+                    .counselors(userCounselor)
+                    .build();
+        // 有student:status:all, 则在前端保存所有的年级和学历层次信息
+        List<Counselor> counselors = otherService.getAllCounselors();
+        return builder
+                .counselors(counselors)
+                .build();
+    }
+
+    public boolean hasStudentStatusAllPermission(Set<String> permissions) {
+        return permissions.contains(Common.STATUS_PERMISSION.getValue());
+    }
+
+    public boolean hasStudentStatusPermission(Set<String> permissions) {
+        return permissions.contains(Common.STATUS_PERMISSION.getValue());
     }
 
     private boolean RoleNotNullOrEmpty(Set<String> roles) {

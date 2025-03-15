@@ -2,7 +2,7 @@ package edu.guet.studentworkmanagementsystem.service.major;
 
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.po.major.Major;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Major;
 
 import java.util.List;
 

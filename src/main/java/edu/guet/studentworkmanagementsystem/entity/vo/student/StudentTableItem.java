@@ -39,7 +39,8 @@ public class StudentTableItem {
     private String headTeacherUsername;
     private String headTeacherName;
     private String headTeacherPhone;
-    private String politicsStatus;
+    private String politicId;
+    private String politicStatus;
     private LocalDate joiningTime;
     private Boolean isStudentLoans;
     private String height;

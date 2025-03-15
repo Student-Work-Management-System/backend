@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.table.StudentSchoolPrecautionTableDef.STUDENT_SCHOOL_PRECAUTION;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
@@ -92,7 +92,7 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
                 .from(STUDENT_SCHOOL_PRECAUTION)
                 .innerJoin(STUDENT).on(STUDENT_SCHOOL_PRECAUTION.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .where(STUDENT.GRADE.eq(query.getGrade()))
+                .where(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_SCHOOL_PRECAUTION.SCHOOL_PRECAUTION_LEVEL.eq(query.getSchoolPrecautionLevel()))
                 .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionVO.class);

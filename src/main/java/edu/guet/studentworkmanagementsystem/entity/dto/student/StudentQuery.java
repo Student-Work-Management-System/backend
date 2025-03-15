@@ -29,7 +29,7 @@ public class StudentQuery implements Serializable {
     // 民族
     private String nation;
     // 政治面貌
-    private String politicsStatus;
+    private String politicId;
     // 班号
     private String classNo;
     // 宿舍

@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.po.major;
+package edu.guet.studentworkmanagementsystem.entity.po.other;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;

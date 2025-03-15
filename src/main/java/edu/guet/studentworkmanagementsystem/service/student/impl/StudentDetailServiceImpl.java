@@ -33,7 +33,7 @@ public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, S
                 .set(STUDENT_DETAIL.NATIVE_PLACE, studentDetail.getNativePlace(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.POSTAL_CODE, studentDetail.getPostalCode(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.NATION, studentDetail.getNation(), StringUtils::hasLength)
-                .set(STUDENT_DETAIL.POLITICS_STATUS, studentDetail.getPoliticsStatus(), StringUtils::hasLength)
+                .set(STUDENT_DETAIL.POLITIC_ID, studentDetail.getPoliticId(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.GRADE_ID, studentDetail.getGradeId(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.CLASS_NO, studentDetail.getClassNo(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.DORMITORY, studentDetail.getDormitory(), StringUtils::hasLength)

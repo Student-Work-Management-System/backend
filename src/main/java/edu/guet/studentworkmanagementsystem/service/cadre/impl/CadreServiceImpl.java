@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.CadreTableDef.CADRE;
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.StudentCadreTableDef.STUDENT_CADRE;
-import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service

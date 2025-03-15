@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.controller;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.entity.po.major.Major;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Major;
 import edu.guet.studentworkmanagementsystem.service.major.MajorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

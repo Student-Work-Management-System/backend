@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cet.table.StudentCetTableDef.STUDENT_CET;
-import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
@@ -69,14 +69,14 @@ public class CetServiceImpl extends ServiceImpl<StudentCetMapper, StudentCet> im
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         Page<StudentCetVO> studentCetVOPage = QueryChain.of(StudentCet.class)
-                .select(distinct(STUDENT.STUDENT_ID), STUDENT.NAME, STUDENT.GRADE, MAJOR.MAJOR_NAME)
+                .select(distinct(STUDENT.STUDENT_ID), STUDENT.NAME, STUDENT.GRADE_ID, MAJOR.MAJOR_NAME)
                 .from(STUDENT)
                 .innerJoin(STUDENT_CET).on(STUDENT_CET.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .where(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())))
                 .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT.GRADE.eq(query.getGrade()))
+                .and(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT_CET.EXAM_TYPE.eq(query.getExamType()))
                 .and(STUDENT_CET.EXAM_DATE.eq(query.getExamDate()))
                 .pageAs(Page.of(pageNo, pageSize), StudentCetVO.class);

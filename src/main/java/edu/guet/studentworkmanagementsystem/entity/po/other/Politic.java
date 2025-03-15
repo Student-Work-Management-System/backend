@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.po.student;
+package edu.guet.studentworkmanagementsystem.entity.po.other;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -8,13 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table("degree")
+@Table("politic")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Degree {
+public class Politic {
     @Id(keyType = KeyType.Auto)
-    private String degreeId;
-    private String degreeName;
+    private String politicId;
+    private String politicStatus;
 }

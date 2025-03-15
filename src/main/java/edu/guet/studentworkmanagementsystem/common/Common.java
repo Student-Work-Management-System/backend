@@ -8,6 +8,8 @@ public enum Common {
     UPDATE_PASSWORD("code_by:"),
     ANONYMOUS_USER("anonymousUser"),
     STUDENT("学生"),
+    STATUS_PERMISSION("student:status"),
+    STATUS_PERMISSION_ALL("student:status:all"),
     ;
     private final String value;
     Common(String str) {

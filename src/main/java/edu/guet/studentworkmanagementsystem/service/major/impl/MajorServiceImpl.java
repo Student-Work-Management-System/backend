@@ -2,10 +2,10 @@ package edu.guet.studentworkmanagementsystem.service.major.impl;
 
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.po.major.Major;
+import edu.guet.studentworkmanagementsystem.entity.po.other.Major;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
-import edu.guet.studentworkmanagementsystem.mapper.major.MajorMapper;
+import edu.guet.studentworkmanagementsystem.mapper.other.MajorMapper;
 import edu.guet.studentworkmanagementsystem.service.major.MajorService;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Qualifier;

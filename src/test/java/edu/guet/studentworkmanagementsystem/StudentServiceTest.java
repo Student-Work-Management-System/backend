@@ -23,6 +23,12 @@ public class StudentServiceTest {
     private StringHttpMessageConverter stringHttpMessageConverter;
 
     @Test
+    void getStudentStatus() {
+        BaseResponse<List<Student>> studentStatus = studentService.getStudentStatus();
+        System.out.println(studentStatus.getData());
+    }
+
+    @Test
     void addStudent() {
         Student student = createStudent("22", "22", "22222222222222222222222222", "男", "22", "22@qqqq.com", "50", "2", "2021", "群众");
         BaseResponse<Object> response = studentService.addStudent(student);
@@ -114,8 +120,8 @@ public class StudentServiceTest {
                 .email(email)
                 .headTeacherUsername(headTeacherUsername)
                 .majorId(majorId)
-                .grade(grade)
-                .politicsStatus(politicsStatus)
+                .gradeId(grade)
+                .politicId(politicsStatus)
                 .enabled(true)
                 .build();
     }

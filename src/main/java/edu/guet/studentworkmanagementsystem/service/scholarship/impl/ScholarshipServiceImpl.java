@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static edu.guet.studentworkmanagementsystem.entity.po.major.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.ScholarshipTableDef.SCHOLARSHIP;
 import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.StudentScholarshipTableDef.STUDENT_SCHOLARSHIP;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
@@ -89,7 +89,7 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
                 .innerJoin(SCHOLARSHIP).on(SCHOLARSHIP.SCHOLARSHIP_ID.eq(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID))
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_SCHOLARSHIP.STUDENT_ID))
                 .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(STUDENT.GRADE.eq(query.getGrade()))
+                .where(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_SCHOLARSHIP.AWARD_YEAR.eq(query.getAwardYear()))
                 .pageAs(Page.of(pageNo, pageSize), StudentScholarshipVO.class);

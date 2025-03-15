@@ -89,7 +89,7 @@ public class Student implements Serializable {
      * 政治面貌
      */
     @NotBlank(message = "政治面貌不能为空")
-    private String politicsStatus;
+    private String politicId;
     /**
      * 出生日期
      */
