@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.service.other.impl;
 
-import com.mybatisflex.core.query.QueryChain;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.po.other.*;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -18,10 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static edu.guet.studentworkmanagementsystem.entity.po.other.table.CounselorTableDef.COUNSELOR;
 
 @Service
 public class OtherServiceImpl implements OtherService {
