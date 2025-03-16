@@ -1,13 +1,11 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.student;
 
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @Builder
@@ -58,5 +56,4 @@ public class StudentStatusItem implements Serializable {
     private Long disabilityCount;
     // 少数民族
     private Long minorityCount;
-    private List<Student> originData;
 }

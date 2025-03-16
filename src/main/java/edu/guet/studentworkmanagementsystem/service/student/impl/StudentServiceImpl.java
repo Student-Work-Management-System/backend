@@ -261,7 +261,7 @@ public class StudentServiceImpl implements StudentService {
                 .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
                 .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
                 .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
-                .innerJoin(POLITIC).on(STUDENT_DETAIL.POLITIC_ID.eq(STATUS.STATUS_ID))
+                .innerJoin(POLITIC).on(STUDENT_DETAIL.POLITIC_ID.eq(POLITIC.POLITIC_ID))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_BASIC.DEGREE_ID.eq(query.getDegreeId()))
                 .and(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch())
@@ -354,7 +354,6 @@ public class StudentServiceImpl implements StudentService {
     public BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query) {
         CompletableFuture<List<StudentStatusItem>> future = CompletableFuture.supplyAsync(()-> getAllStudent(query), readThreadPool);
         List<StudentStatusItem> list = FutureExceptionExecute.fromFuture(future).execute();
-        // List<StudentStatusItem> list = getAllStudent(query);
         return ResponseUtil.success(list);
     }
 

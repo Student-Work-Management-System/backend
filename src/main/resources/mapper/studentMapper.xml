@@ -20,6 +20,7 @@
             SUM(IF(`status`.`status_name` = '结业', 1, 0)) AS `gradCount`,
             SUM(IF(`status`.`status_name` = '退学', 1, 0)) AS `droppedCount`,
             SUM(IF(`status`.`status_name` = '更名', 1, 0)) AS `rechristenCount`,
+            SUM(IF(`status`.`status_name` = '死亡', 1, 0)) as `deathCount`,
             SUM(IF(`student_basic`.`gender` = '男', 1, 0)) AS `maleCount`,
             SUM(IF(`student_basic`.`gender` = '女', 1, 0)) AS `femaleCount`,
             SUM(IF(`politic`.`politic_status` = '群众', 1, 0)) AS `massCount`,
@@ -39,7 +40,7 @@
                 `student_detail`.`grade_id` = #{gradeId}
             </if>
             <if test="degreeId != null and degreeId != ''">
-                `student_detail`.`grade_id` = #{gradeId}
+                and `student_basic`.`degree_id` = #{degreeId}
             </if>
         </where>
         GROUP BY `major`.`major_name`;
