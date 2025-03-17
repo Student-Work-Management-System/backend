@@ -9,6 +9,7 @@ import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.Set;
 public class UserServiceTest {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void testAddUser() {
@@ -94,5 +97,11 @@ public class UserServiceTest {
                 .createdAt(LocalDate.now())
                 .enabled(true)
                 .build();
+    }
+
+    @Test
+    void getPassword() {
+        String encode = passwordEncoder.encode("admin");
+        System.out.println(encode);
     }
 }

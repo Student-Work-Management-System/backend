@@ -57,6 +57,7 @@ public class Student implements Serializable {
      * 邮政编码
      */
     private String postalCode;
+    private String statusId;
     @NotBlank(message = "手机号不能为空")
     @Size(min = 11, max = 11, message = "手机号只能由11位数字组成")
     @DigitsOnly(message = "手机号只能由11位数字组成")

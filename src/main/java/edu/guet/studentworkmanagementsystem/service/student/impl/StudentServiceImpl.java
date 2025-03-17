@@ -188,6 +188,8 @@ public class StudentServiceImpl implements StudentService {
                 .isOnlyChild(student.getIsOnlyChild())
                 .location(student.getLocation())
                 .disability(student.getDisability())
+                .statusId(student.getStatusId())
+                .politicId(student.getPoliticId())
                 .otherNotes(student.getOtherNotes())
                 .build();
     }
@@ -242,7 +244,6 @@ public class StudentServiceImpl implements StudentService {
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         return QueryChain.of(StudentBasic.class)
                 .select(
-                        // 学生基础信息、学生详细信息、专业、年级、学历层次、学籍状态、政治面貌
                         STUDENT_BASIC.ALL_COLUMNS,
                         STUDENT_DETAIL.ALL_COLUMNS,
                         MAJOR.ALL_COLUMNS,
