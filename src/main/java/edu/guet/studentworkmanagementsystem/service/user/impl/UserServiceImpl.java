@@ -37,10 +37,7 @@ import edu.guet.studentworkmanagementsystem.securiy.SystemAuthority;
 import edu.guet.studentworkmanagementsystem.service.email.EmailService;
 import edu.guet.studentworkmanagementsystem.service.other.OtherService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
-import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
-import edu.guet.studentworkmanagementsystem.utils.RedisUtil;
-import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
-import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
+import edu.guet.studentworkmanagementsystem.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -560,7 +557,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .set(USER.REAL_NAME, updateUserDTO.getRealName(), StringUtils::hasLength)
                 .set(USER.EMAIL, updateUserDTO.getEmail(), StringUtils::hasLength)
                 .set(USER.PHONE, updateUserDTO.getPhone(), StringUtils::hasLength)
-                .set(USER.PASSWORD, passwordEncoder.encode(updateUserDTO.getPassword()), StringUtils::hasLength)
+                .set(USER.PASSWORD, passwordEncoder.encode(updateUserDTO.getPassword()), StringUtils.hasLength(updateUserDTO.getPassword()))
                 .where(USER.UID.eq(updateUserDTO.getUid()))
                 .update();
         if (update)
