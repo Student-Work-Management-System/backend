@@ -5,6 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
@@ -44,6 +45,6 @@ public interface StudentService {
      */
     <T> BaseResponse<T> deleteStudent(String studentId);
     <T> BaseResponse<T> recoveryStudent(String studentId);
-    <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername);
     BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query);
+    BaseResponse<List<HeaderTeacher>> getHeaderTeachers();
 }

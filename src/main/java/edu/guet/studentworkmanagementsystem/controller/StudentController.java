@@ -5,6 +5,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
@@ -51,14 +52,15 @@ public class StudentController {
     public <T> BaseResponse<T> updateStudent(@RequestBody @Valid Student student) {
         return studentService.updateStudent(student);
     }
-    @PreAuthorize("hasAuthority('student:select')")
-    @GetMapping("/validate_teacher_existed/{headTeacherUsername}")
-    public <T> BaseResponse<T> validateHeadTeacherExists(@PathVariable String headTeacherUsername) {
-        return studentService.validateHeadTeacherExists(headTeacherUsername);
-    }
     @PreAuthorize("hasAuthority('student:status') or hasAuthority('student:status:all')")
     @PostMapping("/status")
     public BaseResponse<List<StudentStatusItem>> getAllStudents(@RequestBody StudentStatusQuery query) {
         return studentService.getStudentStatus(query);
+    }
+
+    @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select') and hasAuthority('role:select')")
+    @GetMapping("/gets/headerTeacher")
+    public BaseResponse<List<HeaderTeacher>> getAllHeaderTeachers() {
+        return studentService.getHeaderTeachers();
     }
 }

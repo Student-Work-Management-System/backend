@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.student.impl;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
@@ -42,6 +43,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeT
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserRoleTableDef.USER_ROLE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 
@@ -151,7 +154,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentDetail createStudentDetail(Student student) {
         return StudentDetail.builder()
                 .studentId(student.getStudentId())
-                .headTeacherUsername(student.getHeadTeacherUsername())
+                .headerTeacherUsername(student.getHeaderTeacherUsername())
                 .majorId(student.getMajorId())
                 .nativePlace(student.getNativePlace())
                 .postalCode(student.getPostalCode())
@@ -251,14 +254,14 @@ public class StudentServiceImpl implements StudentService {
                         DEGREE.ALL_COLUMNS,
                         STATUS.ALL_COLUMNS,
                         POLITIC.ALL_COLUMNS,
-                        USER.USERNAME.as("headTeacherUsername"),
-                        USER.REAL_NAME.as("headTeacherName"),
-                        USER.PHONE.as("headTeacherPhone")
+                        USER.USERNAME.as("headerTeacherUsername"),
+                        USER.REAL_NAME.as("headerTeacherName"),
+                        USER.PHONE.as("headerTeacherPhone")
                 )
                 .from(STUDENT_BASIC)
                 .innerJoin(STUDENT_DETAIL).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_DETAIL.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT_DETAIL.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .innerJoin(USER).on(STUDENT_DETAIL.HEAD_TEACHER_USERNAME.eq(USER.USERNAME))
+                .innerJoin(USER).on(STUDENT_DETAIL.HEADER_TEACHER_USERNAME.eq(USER.USERNAME))
                 .innerJoin(GRADE).on(STUDENT_DETAIL.GRADE_ID.eq(GRADE.GRADE_ID))
                 .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
                 .innerJoin(STATUS).on(STUDENT_DETAIL.STATUS_ID.eq(STATUS.STATUS_ID))
@@ -338,24 +341,28 @@ public class StudentServiceImpl implements StudentService {
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         return afterUpdateStudentEnabled(studentId, true);
     }
-    /**
-     * 用于添加学生前校验班主任是否存在
-     */
-    @Override
-    public <T> BaseResponse<T> validateHeadTeacherExists(String headTeacherUsername) {
-        User target = QueryChain.of(User.class)
-                .where(USER.USERNAME.eq(headTeacherUsername))
-                .one();
-        if (Objects.isNull(target))
-            throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
-        return ResponseUtil.success();
-    }
 
     @Override
     public BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query) {
         CompletableFuture<List<StudentStatusItem>> future = CompletableFuture.supplyAsync(()-> getAllStudent(query), readThreadPool);
         List<StudentStatusItem> list = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(list);
+    }
+
+    @Override
+    public BaseResponse<List<HeaderTeacher>> getHeaderTeachers() {
+        CompletableFuture<List<HeaderTeacher>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
+                .select(
+                        USER.USERNAME.as("headerTeacherUsername"),
+                        USER.REAL_NAME.as("headerTeacherRealName"),
+                        USER.PHONE.as("headerTeacherPhone")
+                )
+                .innerJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                .innerJoin(ROLE).on(ROLE.RID.eq(USER_ROLE.RID))
+                .where(ROLE.ROLE_NAME.like(Common.HEADER_TEACHER.getValue()))
+                .listAs(HeaderTeacher.class), readThreadPool);
+        List<HeaderTeacher> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 
     public List<StudentStatusItem> getAllStudent(StudentStatusQuery query) {
