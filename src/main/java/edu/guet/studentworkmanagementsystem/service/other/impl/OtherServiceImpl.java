@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.service.other.impl;
 
+import com.mybatisflex.core.query.QueryChain;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.po.other.*;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -41,7 +42,10 @@ public class OtherServiceImpl implements OtherService {
 
     @Override
     public List<Grade> getGradeList() {
-        CompletableFuture<List<Grade>> future = CompletableFuture.supplyAsync(() -> gradeMapper.selectAll(), readThreadPool);
+        CompletableFuture<List<Grade>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(Grade.class)
+                .orderBy(Grade::getGradeName)
+                .asc()
+                .list(), readThreadPool);
         return FutureExceptionExecute.fromFuture(future).execute();
     }
 
