@@ -9,13 +9,13 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.CadreMapper;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.StudentCadreMapper;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
+import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.CadreTableDef.CADRE;
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.StudentCadreTableDef.STUDENT_CADRE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 
 @Service
 public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCadre>  implements CadreService{
@@ -66,22 +66,9 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
     @Override
     public BaseResponse<List<Cadre>> getAllCadres() {
-        CompletableFuture<BaseResponse<List<Cadre>>> future = CompletableFuture.supplyAsync(() -> ResponseUtil.success(cadreMapper.selectAll()), readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+        CompletableFuture<BaseResponse<List<Cadre>>> future =
+                CompletableFuture.supplyAsync(() -> ResponseUtil.success(cadreMapper.selectAll()), readThreadPool);
+        return FutureExceptionExecute.fromFuture(future).execute();
     }
 
     @Override
@@ -148,42 +135,40 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
 
     @Override
-    public BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query) {
-        CompletableFuture<BaseResponse<Page<StudentCadreVO>>> future = CompletableFuture.supplyAsync(() -> {
+    public BaseResponse<Page<StudentCadreItem>> getAllStudentCadre(CadreQuery query) {
+        CompletableFuture<Page<StudentCadreItem>> future = CompletableFuture.supplyAsync(() -> {
             Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-            Page<StudentCadreVO> studentCadreVOPage = QueryChain.of(StudentCadre.class)
-                    .select(STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS, CADRE.ALL_COLUMNS, STUDENT_CADRE.ALL_COLUMNS)
-                    .from(STUDENT_CADRE)
-                    .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID).and(STUDENT.ENABLED.eq(true)))
-                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
+            return QueryChain.of(StudentCadre.class)
+                    .select(
+                            STUDENT_BASIC.STUDENT_ID,
+                            STUDENT_BASIC.NAME,
+                            STUDENT_BASIC.GENDER,
+                            MAJOR.MAJOR_NAME,
+                            GRADE.GRADE_NAME,
+                            CADRE.ALL_COLUMNS,
+                            STUDENT_CADRE.APPOINTMENT_START_TERM,
+                            STUDENT_CADRE.APPOINTMENT_END_TERM,
+                            STUDENT_CADRE.COMMENT
+                            )
+                    .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID))
+                    .innerJoin(STUDENT_DETAIL).on(STUDENT_DETAIL.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_DETAIL.MAJOR_ID))
                     .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
-                    .where(STUDENT.STUDENT_ID.like(query.getSearch())
-                            .or(STUDENT.NAME.like(query.getSearch()))
-                            .or(CADRE.CADRE_POSITION.like(query.getSearch())))
-                    .and(Student::getMajorId).eq(query.getMajorId())
-                    .and(Student::getGradeId).eq(query.getGrade())
-                    .and(Student::getEnabled).eq(query.getEnabled())
-                    .and(Cadre::getCadreLevel).eq(query.getCadreLevel())
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_DETAIL.GRADE_ID))
+                    .where(
+                            STUDENT_BASIC.STUDENT_ID.like(query.getSearch())
+                                    .or(STUDENT_BASIC.NAME.like(query.getSearch()))
+                                    .or(CADRE.CADRE_POSITION.like(query.getSearch()))
+                    )
+                    .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
+                    .and(STUDENT_DETAIL.GRADE_ID.eq(query.getGradeId()))
+                    .and(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
                     .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())
                     .and(StudentCadre::getAppointmentEndTerm).eq(query.getAppointmentEndTerm())
-                    .pageAs(Page.of(pageNo, pageSize), StudentCadreVO.class);
-            return ResponseUtil.success(studentCadreVOPage);
+                    .pageAs(Page.of(pageNo, pageSize), StudentCadreItem.class);
         }, readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+        Page<StudentCadreItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 }

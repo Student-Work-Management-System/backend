@@ -9,16 +9,18 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentCadreVO implements Serializable {
+public class StudentCadreItem implements Serializable {
     private String studentCadreId;
     private String studentId;
-    private String cadreId;
+    private String cadreName;
     private String name;
     private String gender;
     private String majorName;
-    private String grade;
+    private String gradeName;
+    private String cadreId;
     private String cadrePosition;
     private String cadreLevel;
+    private String cadreBelong;
     private String appointmentStartTerm;
     private String appointmentEndTerm;
     private String comment;

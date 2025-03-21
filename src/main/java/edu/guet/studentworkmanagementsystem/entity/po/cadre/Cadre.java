@@ -41,4 +41,6 @@ public class Cadre implements Serializable {
      */
     @NotBlank(message = "职位级别不能为空", groups = {InsertGroup.class})
     private String cadreLevel;
+    @NotBlank(message = "职位所属不能为空", groups = {InsertGroup.class})
+    private String cadreBelong;
 }

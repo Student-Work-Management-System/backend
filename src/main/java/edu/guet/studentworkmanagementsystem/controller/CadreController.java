@@ -6,7 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class CadreController {
             " and hasAuthority('major:select') "
     )
     @PostMapping("/student_cadre/gets")
-    public BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(@RequestBody CadreQuery cadreQuery){
-        return cadreService.getAllStudentAcademicWork(cadreQuery) ;
+    public BaseResponse<Page<StudentCadreItem>> getAllStudentAcademicWork(@RequestBody CadreQuery cadreQuery){
+        return cadreService.getAllStudentCadre(cadreQuery) ;
     }
 }

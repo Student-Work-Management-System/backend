@@ -6,7 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
 
 import java.util.List;
 
@@ -53,5 +53,5 @@ public interface CadreService extends IService<StudentCadre> {
      * @param query 查询参数
      * @return 学生任职记录
      */
-    BaseResponse<Page<StudentCadreVO>> getAllStudentAcademicWork(CadreQuery query);
+    BaseResponse<Page<StudentCadreItem>> getAllStudentCadre(CadreQuery query);
 }
