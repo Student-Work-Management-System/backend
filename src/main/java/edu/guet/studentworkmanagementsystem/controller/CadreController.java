@@ -3,12 +3,13 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +28,8 @@ public class CadreController {
     }
     @PreAuthorize("hasAuthority('cadre:update')")
     @PutMapping("/cadre/update")
-    public <T> BaseResponse<T> updateCadre(@RequestBody @Valid CadreDTO cadreDTO) {
-        return cadreService.updateCadre(cadreDTO);
+    public <T> BaseResponse<T> updateCadre(@RequestBody @Validated({UpdateGroup.class}) Cadre cadre) {
+        return cadreService.updateCadre(cadre);
     }
     @PreAuthorize("hasAuthority('cadre:select')")
     @GetMapping("/cadre/gets")
@@ -42,18 +43,18 @@ public class CadreController {
     }
     @PreAuthorize("hasAuthority('student_cadre:insert')")
     @PostMapping("/student_cadre/add")
-    public BaseResponse<StudentCadre> arrangePosition(@RequestBody @Valid InsertStudentCadreDTO insertStudentCadreDTO){
-        return cadreService.arrangePosition(insertStudentCadreDTO) ;
+    public BaseResponse<StudentCadre> arrangePosition(@RequestBody @Validated({InsertGroup.class}) StudentCadre studentCadre){
+        return cadreService.arrangePosition(studentCadre) ;
     }
     @PreAuthorize("hasAuthority('student_cadre:insert')")
     @PostMapping("/student_cadre/adds")
-    public BaseResponse<StudentCadre> arrangePositions(@RequestBody @Valid InsertStudentCadreList insertStudentCadreList){
-        return cadreService.arrangePositions(insertStudentCadreList) ;
+    public BaseResponse<StudentCadre> arrangePositions(@RequestBody @Validated({InsertGroup.class}) ValidateList<StudentCadre> studentCadreList){
+        return cadreService.arrangePositions(studentCadreList) ;
     }
     @PreAuthorize("hasAuthority('student_cadre:update')")
     @PutMapping("/student_cadre/update")
-    public BaseResponse<StudentCadre> updateStudentCadreInfo(@RequestBody @Valid UpdateStudentCadreDTO updateStudentCadreDTO){
-        return cadreService.updateStudentCadre(updateStudentCadreDTO) ;
+    public BaseResponse<StudentCadre> updateStudentCadreInfo(@RequestBody @Validated({UpdateGroup.class}) StudentCadre studentCadre){
+        return cadreService.updateStudentCadre(studentCadre) ;
     }
      @PreAuthorize("hasAuthority('student_cadre:delete')")
     @DeleteMapping("/student_cadre/delete/{studentCadreId}")

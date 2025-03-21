@@ -3,7 +3,9 @@ package edu.guet.studentworkmanagementsystem.entity.po.cadre;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.entity.dto.cadre.InsertStudentCadreDTO;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,29 +29,15 @@ public class StudentCadre implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
+    @NotBlank(message = "学生任职id不能为空", groups = {UpdateGroup.class})
     private String studentCadreId;
+    @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
     private String studentId;
-    /**
-     * 对应的职位id
-     */
+    @NotBlank(message = "职位id不能为空", groups = {InsertGroup.class})
     private String cadreId;
-    /**
-     * 任职开始学期
-     */
+    @NotBlank(message = "任职开始日期不能为空", groups = {InsertGroup.class})
     private String appointmentStartTerm;
-    /**
-     * 任职结束学期
-     */
+    @NotBlank(message = "任职结束日期不能为空", groups = {InsertGroup.class})
     private String appointmentEndTerm;
-    /**
-     * 备注
-     */
     private String comment;
-    public StudentCadre(InsertStudentCadreDTO insertStudentCadreDTO) {
-        this.cadreId = insertStudentCadreDTO.getCadreId();
-        this.studentId = insertStudentCadreDTO.getStudentId();
-        this.appointmentStartTerm = insertStudentCadreDTO.getAppointmentStartTerm();
-        this.appointmentEndTerm = insertStudentCadreDTO.getAppointmentEndTerm();
-        this.comment = insertStudentCadreDTO.getComment();
-    }
 }

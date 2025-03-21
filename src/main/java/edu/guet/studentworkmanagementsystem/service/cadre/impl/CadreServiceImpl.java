@@ -6,6 +6,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -54,16 +54,18 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
 
     @Override
     @Transactional
-    public  <T> BaseResponse<T> updateCadre(CadreDTO cadreDTO) {
+    public  <T> BaseResponse<T> updateCadre(Cadre cadre) {
         boolean update = UpdateChain.of(Cadre.class)
-                .set(Cadre::getCadrePosition, cadreDTO.getCadrePosition(), StringUtils.hasLength(cadreDTO.getCadrePosition()))
-                .set(Cadre::getCadreLevel, cadreDTO.getCadreLevel(), StringUtils.hasLength(cadreDTO.getCadreLevel()))
-                .where(Cadre::getCadreId).eq(cadreDTO.getCadreId())
+                .set(Cadre::getCadrePosition, cadre.getCadrePosition(), StringUtils.hasLength(cadre.getCadrePosition()))
+                .set(Cadre::getCadreLevel, cadre.getCadreLevel(), StringUtils.hasLength(cadre.getCadreLevel()))
+                .set(Cadre::getCadreBelong, cadre.getCadreBelong(), StringUtils.hasLength(cadre.getCadreBelong()))
+                .where(Cadre::getCadreId).eq(cadre.getCadreId())
                 .update();
         if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<List<Cadre>> getAllCadres() {
         CompletableFuture<BaseResponse<List<Cadre>>> future =
@@ -86,8 +88,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
     @Override
     @Transactional
-    public  BaseResponse<StudentCadre> arrangePosition(InsertStudentCadreDTO insertStudentCadreDTO) {
-        StudentCadre studentCadre = new StudentCadre(insertStudentCadreDTO);
+    public  BaseResponse<StudentCadre> arrangePosition(StudentCadre studentCadre) {
         int i = mapper.insert(studentCadre);
         if (i > 0)
             return ResponseUtil.success(studentCadre);
@@ -96,14 +97,9 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
 
     @Transactional
     @Override
-    public BaseResponse<StudentCadre> arrangePositions(InsertStudentCadreList insertStudentCadreList) {
-        ArrayList<StudentCadre> studentCadres = new ArrayList<>();
-        insertStudentCadreList.getInsertStudentCadreDTOList().forEach(item->{
-            StudentCadre studentCadre = new StudentCadre(item);
-            studentCadres.add(studentCadre);
-        });
-        int size = studentCadres.size();
-        int i = mapper.insertBatch(studentCadres);
+    public BaseResponse<StudentCadre> arrangePositions(ValidateList<StudentCadre> studentCadreList) {
+        int size = studentCadreList.size();
+        int i = mapper.insertBatch(studentCadreList);
         if (i == size)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -111,14 +107,14 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentCadre(UpdateStudentCadreDTO updateStudentCadreDTO) {
+    public <T> BaseResponse<T> updateStudentCadre(StudentCadre studentCadre) {
            boolean update = UpdateChain.of(StudentCadre.class)
-                   .set(StudentCadre::getStudentId, updateStudentCadreDTO.getStudentId(), StringUtils::hasLength)
-                   .set(StudentCadre::getCadreId, updateStudentCadreDTO.getCadreId(), StringUtils::hasLength)
-                   .set(StudentCadre::getAppointmentStartTerm, updateStudentCadreDTO.getAppointmentStartTerm(), StringUtils::hasLength)
-                   .set(StudentCadre::getAppointmentEndTerm, updateStudentCadreDTO.getAppointmentEndTerm(), StringUtils::hasLength)
-                   .set(StudentCadre::getComment, updateStudentCadreDTO.getComment(), StringUtils::hasLength)
-                   .where(StudentCadre::getStudentCadreId).eq(updateStudentCadreDTO.getStudentCadreId())
+                   .set(StudentCadre::getStudentId, studentCadre.getStudentId(), StringUtils::hasLength)
+                   .set(StudentCadre::getCadreId, studentCadre.getCadreId(), StringUtils::hasLength)
+                   .set(StudentCadre::getAppointmentStartTerm, studentCadre.getAppointmentStartTerm(), StringUtils::hasLength)
+                   .set(StudentCadre::getAppointmentEndTerm, studentCadre.getAppointmentEndTerm(), StringUtils::hasLength)
+                   .set(StudentCadre::getComment, studentCadre.getComment(), StringUtils::hasLength)
+                   .where(StudentCadre::getStudentCadreId).eq(studentCadre.getStudentCadreId())
                    .update();
            if (update)
                return ResponseUtil.success();
@@ -147,6 +143,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                             MAJOR.MAJOR_NAME,
                             GRADE.GRADE_NAME,
                             CADRE.ALL_COLUMNS,
+                            STUDENT_CADRE.STUDENT_CADRE_ID,
                             STUDENT_CADRE.APPOINTMENT_START_TERM,
                             STUDENT_CADRE.APPOINTMENT_END_TERM,
                             STUDENT_CADRE.COMMENT

@@ -12,7 +12,6 @@ import java.io.Serializable;
 public class StudentCadreItem implements Serializable {
     private String studentCadreId;
     private String studentId;
-    private String cadreName;
     private String name;
     private String gender;
     private String majorName;
