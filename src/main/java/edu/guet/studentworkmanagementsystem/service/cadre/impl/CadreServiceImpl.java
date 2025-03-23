@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatusItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.CadreMapper;
@@ -166,6 +167,15 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                     .pageAs(Page.of(pageNo, pageSize), StudentCadreItem.class);
         }, readThreadPool);
         Page<StudentCadreItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    @Override
+    public BaseResponse<List<StudentCadreStatusItem>> getCadreStatus(CadreStatusQuery query) {
+        // todo: 完成mapper内实现
+        CompletableFuture<List<StudentCadreStatusItem>> future =
+                CompletableFuture.supplyAsync(() -> mapper.getCadreStatus(query), readThreadPool);
+        List<StudentCadreStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }

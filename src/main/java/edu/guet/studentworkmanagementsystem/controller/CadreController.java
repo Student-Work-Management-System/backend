@@ -9,6 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatusItem;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,14 +62,14 @@ public class CadreController {
     public BaseResponse<StudentCadre> deleteStudentCadre(@PathVariable String studentCadreId){
         return cadreService.deleteStudentCadre(studentCadreId) ;
     }
-    @PreAuthorize(
-            "hasAuthority('student:select') " +
-            " and hasAuthority('student_cadre:select') " +
-            " and hasAuthority('cadre:select') " +
-            " and hasAuthority('major:select') "
-    )
+    @PreAuthorize("hasAuthority('student_cadre:select') and hasAuthority('cadre:select')")
     @PostMapping("/student_cadre/gets")
     public BaseResponse<Page<StudentCadreItem>> getAllStudentAcademicWork(@RequestBody CadreQuery cadreQuery){
         return cadreService.getAllStudentCadre(cadreQuery) ;
+    }
+    @PreAuthorize("hasAuthority('student_cadre:select') and hasAuthority('cadre:select')")
+    @PostMapping("/student_cadre/status")
+    public BaseResponse<List<StudentCadreStatusItem>> getStudentCadreStatus(@RequestBody CadreStatusQuery query) {
+        return cadreService.getCadreStatus(query);
     }
 }

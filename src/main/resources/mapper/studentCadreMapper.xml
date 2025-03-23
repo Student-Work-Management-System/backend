@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.guet.studentworkmanagementsystem.mapper.cadre.StudentCadreMapper">
+    <select id="getCadreStatus"
+            parameterType="edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreStatusQuery"
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatusItem">
+
+    </select>
+</mapper>
