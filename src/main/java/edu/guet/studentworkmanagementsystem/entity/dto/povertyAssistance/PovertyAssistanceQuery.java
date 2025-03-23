@@ -11,11 +11,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PovertyAssistanceQuery implements Serializable {
     private String search;
-    private String grade;
+    private String gradeId;
     private String majorId;
     private String povertyLevel;
     private String assistanceYear;
-    private Boolean enabled;
     private Integer pageNo;
     private Integer pageSize;
 }

@@ -4,10 +4,12 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
+import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
+import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.StudentPovertyAssistanceItem;
 import edu.guet.studentworkmanagementsystem.service.povertyAssistance.PovertyAssistanceService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +28,7 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('poverty_assistance:insert')")
     @PostMapping("/poverty_assistance/adds")
-    public <T> BaseResponse<T> importPovertyAssistance(@RequestBody @Validated({InsertGroup.class}) PovertyAssistanceList povertyAssistanceList) {
+    public <T> BaseResponse<T> importPovertyAssistance(@RequestBody @Validated({InsertGroup.class}) ValidateList<PovertyAssistance> povertyAssistanceList) {
         return povertyAssistanceService.importPovertyAssistance(povertyAssistanceList);
     }
     @PreAuthorize("hasAuthority('poverty_assistance:insert')")
@@ -46,13 +48,13 @@ public class PovertyAssistanceController {
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
     @PostMapping("/student_poverty_assistance/add")
-    public <T> BaseResponse<T> addStudentPovertyAssistance(@RequestBody @Valid InsertStudentPovertyAssistanceDTO insertStudentPovertyAssistanceDTO) {
-        return povertyAssistanceService.addStudentPovertyAssistance(insertStudentPovertyAssistanceDTO);
+    public <T> BaseResponse<T> addStudentPovertyAssistance(@RequestBody @Validated({InsertGroup.class}) StudentPovertyAssistance studentPovertyAssistance) {
+        return povertyAssistanceService.addStudentPovertyAssistance(studentPovertyAssistance);
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:insert')")
     @PostMapping("/student_poverty_assistance/adds")
-    public <T> BaseResponse<T> importStudentPovertyAssistances(@RequestBody @Valid InsertStudentPovertyAssistanceList list) {
-        return povertyAssistanceService.importStudentPovertyAssistance(list);
+    public <T> BaseResponse<T> importStudentPovertyAssistances(@RequestBody @Validated({InsertGroup.class}) ValidateList<StudentPovertyAssistance> studentPovertyAssistances) {
+        return povertyAssistanceService.importStudentPovertyAssistance(studentPovertyAssistances);
     }
     @PreAuthorize(
             "hasAuthority('student_poverty_assistance:select') " +
@@ -61,13 +63,13 @@ public class PovertyAssistanceController {
             "and hasAuthority('major:select') "
     )
     @PostMapping("/student_poverty_assistance/gets")
-    public BaseResponse<Page<StudentStudentPovertyAssistanceVO>> getStudentPovertyAssistance(@RequestBody PovertyAssistanceQuery query) {
+    public BaseResponse<Page<StudentPovertyAssistanceItem>> getStudentPovertyAssistance(@RequestBody PovertyAssistanceQuery query) {
         return povertyAssistanceService.getStudentPovertyAssistance(query);
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:update')")
     @PutMapping("/student_poverty_assistance/update")
-    public <T> BaseResponse<T> updateStudentPovertyAssistance(@RequestBody @Valid UpdateStudentPovertyAssistanceDTO updateStudentPovertyAssistanceDTO) {
-        return povertyAssistanceService.updateStudentPovertyAssistance(updateStudentPovertyAssistanceDTO);
+    public <T> BaseResponse<T> updateStudentPovertyAssistance(@RequestBody @Validated({UpdateGroup.class}) StudentPovertyAssistance studentPovertyAssistance) {
+        return povertyAssistanceService.updateStudentPovertyAssistance(studentPovertyAssistance);
     }
     @PreAuthorize("hasAuthority('student_poverty_assistance:delete')")
     @DeleteMapping("/student_poverty_assistance/delete/{studentPovertyAssistanceId}")

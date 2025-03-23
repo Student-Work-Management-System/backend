@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance;
+package edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,13 +9,13 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentStudentPovertyAssistanceVO implements Serializable {
+public class StudentPovertyAssistanceItem implements Serializable {
     private String studentPovertyAssistanceId;
     private String studentId;
-    private String povertyAssistanceId;
     private String name;
-    private String grade;
+    private String gradeName;
     private String majorName;
+    private String povertyAssistanceId;
     private String povertyLevel;
     private String povertyType;
     private String povertyAssistanceStandard;
