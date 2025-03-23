@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+// @NoArgsConstructor
 public class StudentCadreStatusItem {
 }
