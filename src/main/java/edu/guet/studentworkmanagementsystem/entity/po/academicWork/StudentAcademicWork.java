@@ -78,7 +78,7 @@ public class StudentAcademicWork implements Serializable {
         this.academicWorkName = studentAcademicWorkDTO.getAcademicWorkName();
         this.academicWorkType = studentAcademicWorkDTO.getAcademicWorkType();
         this.additionalInfoId = studentAcademicWorkDTO.getAdditionalInfoId();
-        this.authors = JsonUtil.mapper.writeValueAsString(studentAcademicWorkDTO.getAuthors());
+        this.authors = JsonUtil.getMapper().writeValueAsString(studentAcademicWorkDTO.getAuthors());
         this.evidence = studentAcademicWorkDTO.getEvidence();
         this.uploadTime = LocalDate.now();
     }

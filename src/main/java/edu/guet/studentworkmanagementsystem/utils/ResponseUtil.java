@@ -24,9 +24,9 @@ final public class ResponseUtil {
     public static <T> BaseResponse<T> failure(int code, String message) {
         return new BaseResponse<>(code, message);
     }
-    public static <T> void failure(HttpServletResponse response, ServiceExceptionEnum serviceExceptionEnum) throws IOException {
+    public static void failure(HttpServletResponse response, ServiceExceptionEnum serviceExceptionEnum) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         BaseResponse<Object> baseResponse = new BaseResponse<>(serviceExceptionEnum);
-        JsonUtil.mapper.writeValue(response.getOutputStream(), baseResponse);
+        JsonUtil.getMapper().writeValue(response.getOutputStream(), baseResponse);
     }
 }

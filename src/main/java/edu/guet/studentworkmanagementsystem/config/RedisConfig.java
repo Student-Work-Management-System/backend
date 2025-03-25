@@ -36,6 +36,7 @@ public class RedisConfig {
     private int maxActive;
     @Value("${spring.data.redis.lettuce.pool.max-wait}")
     private long maxWait;
+
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
         GenericObjectPoolConfig<Object> genericObjectPoolConfig  = new GenericObjectPoolConfig<>();
@@ -56,10 +57,11 @@ public class RedisConfig {
                 .build();
         return new LettuceConnectionFactory(redisStandaloneConfiguration, clientConfig);
     }
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        Jackson2JsonRedisSerializer<Object> jsonRedisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.mapper, Object.class);
+        Jackson2JsonRedisSerializer<Object> jsonRedisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.getMapper(), Object.class);
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         template.setConnectionFactory(factory);
         template.setKeySerializer(stringRedisSerializer);
@@ -69,4 +71,5 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
+
 }

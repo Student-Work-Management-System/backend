@@ -5,7 +5,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Permission;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionDetail;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class PermissionController {
             "and hasAuthority('role_permission:select')"
     )
     @GetMapping("/gets")
-    public BaseResponse<List<RolePermissionVO>> getAllRole() {
+    public BaseResponse<List<RolePermissionDetail>> getAllRole() {
         return userService.getAllRole();
     }
     @PreAuthorize("hasAuthority('permission:select')")

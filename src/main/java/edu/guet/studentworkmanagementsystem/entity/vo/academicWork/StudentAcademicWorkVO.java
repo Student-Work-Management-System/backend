@@ -66,12 +66,12 @@ public class StudentAcademicWorkVO implements Serializable {
         this.academicWorkName = academicWorkName;
         this.academicWorkType = academicWorkType;
         this.additionalInfoId = additionalInfoId;
-        this.authors = JsonUtil.mapper.readValue(authors, new TypeReference<>() {});
+        this.authors = JsonUtil.getMapper().readValue(authors, new TypeReference<>() {});
         this.evidence = evidence;
         this.auditState = auditState;
         this.reason = reason;
     }
     public void setAuthors(String authorsStr) throws JsonProcessingException {
-        JsonUtil.mapper.readValue(authorsStr, new TypeReference<List<Author>>() {});
+        JsonUtil.getMapper().readValue(authorsStr, new TypeReference<List<Author>>() {});
     }
 }

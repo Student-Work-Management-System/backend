@@ -240,7 +240,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         String memberJson;
         try {
-            memberJson = JsonUtil.mapper.writeValueAsString(one.getMembers());
+            memberJson = JsonUtil.getMapper().writeValueAsString(one.getMembers());
         } catch (JsonProcessingException e) {
             log.error("CompetitionServiceImpl#clearStudentCompetitionState出现JSON解析异常: {}", e.getMessage());
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -261,7 +261,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     }
 
     private Member[] convertToEntity(String membersJson) throws JsonProcessingException {
-        return JsonUtil.mapper.readValue(membersJson, new TypeReference<>(){});
+        return JsonUtil.getMapper().readValue(membersJson, new TypeReference<>(){});
     }
 
     private Boolean stateHandler(String reviewState) {

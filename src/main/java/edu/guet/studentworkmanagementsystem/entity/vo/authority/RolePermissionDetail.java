@@ -11,12 +11,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RolePermissionVO {
+public class RolePermissionDetail {
     private String rid;
     private String roleName;
     private String roleDesc;
     private List<Permission> permissionList;
-    public RolePermissionVO(Role role, List<Permission> permissions) {
+    public RolePermissionDetail(Role role, List<Permission> permissions) {
         this.rid = role.getRid();
         this.roleName = role.getRoleName();
         this.roleDesc = role.getRoleDesc();

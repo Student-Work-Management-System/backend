@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
@@ -40,12 +40,12 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @GetMapping("/detail/{username}")
-    public BaseResponse<UserDetailVO> getUserDetails(@PathVariable String username) {
+    public BaseResponse<UserDetailInfo> getUserDetails(@PathVariable String username) {
         return userService.getUserDetails(username);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @PostMapping("/gets")
-    public BaseResponse<List<UserDetailVO>> gets(@RequestBody UserQuery query) {
+    public BaseResponse<List<UserDetailInfo>> gets(@RequestBody UserQuery query) {
         return userService.gets(query);
     }
     @PreAuthorize(

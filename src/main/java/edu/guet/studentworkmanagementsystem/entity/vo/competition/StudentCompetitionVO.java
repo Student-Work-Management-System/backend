@@ -77,11 +77,11 @@ public class StudentCompetitionVO implements Serializable {
         this.evidence = evidence;
         this.awardLevel = awardLevel;
         this.awardDate = awardDate;
-        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>() {});
+        this.members = JsonUtil.getMapper().readValue(members, new TypeReference<>() {});
         this.reviewState = reviewState;
         this.rejectReason = rejectReason;
     }
     public void setMembers(String members) throws JsonProcessingException {
-        this.members = JsonUtil.mapper.readValue(members, new TypeReference<>() {});
+        this.members = JsonUtil.getMapper().readValue(members, new TypeReference<>() {});
     }
 }

@@ -162,7 +162,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             if (!flag)
                 return ResponseUtil.success();
             String authorsStr = mapper.selectOneById(studentAcademicWorkId).getAuthors();
-            Author[] authors = JsonUtil.mapper.readValue(authorsStr, new TypeReference<>() {
+            Author[] authors = JsonUtil.getMapper().readValue(authorsStr, new TypeReference<>() {
             });
             return insertStudentAcademicWorkAudit(authors, studentAcademicWorkId);
         }

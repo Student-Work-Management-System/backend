@@ -42,7 +42,8 @@ spring:
           starttls:
             enabled: true
             required: true
-
+  cache:
+    type: redis
 mybatis-flex:
   mapper-locations: classpath:/mapper/*.xml
   configuration:

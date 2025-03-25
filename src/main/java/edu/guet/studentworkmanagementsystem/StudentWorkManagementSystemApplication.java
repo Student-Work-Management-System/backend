@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @MapperScan("edu.guet.studentworkmanagementsystem.mapper.*")
 @EnableFeignClients
+@EnableCaching
 public class StudentWorkManagementSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(StudentWorkManagementSystemApplication.class, args);

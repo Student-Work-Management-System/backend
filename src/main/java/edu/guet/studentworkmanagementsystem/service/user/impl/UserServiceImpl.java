@@ -21,10 +21,10 @@ import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
 import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.authority.RolePermissionMapper;
@@ -105,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String redisKey = Common.LOGIN_UID.getValue() + securityUser.getUser().getUid();
         String token = createToken(redisKey, key);
         try {
-            redisUtil.setValue(redisKey, JsonUtil.mapper.writeValueAsString(securityUser));
+            redisUtil.setValue(redisKey, JsonUtil.getMapper().writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
             log.error("UserServiceImpl#login(LoginUserDTO loginUserDTO)出现JSON解析异常: {}", jsonProcessingException.getMessage());
             ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
@@ -292,35 +292,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<UserDetailVO> getUserDetails(String username) {
-        CompletableFuture<BaseResponse<UserDetailVO>> future = CompletableFuture.supplyAsync(() -> {
-            User userByUsername = QueryChain.of(User.class)
+    // @Cacheable(value = "userDetailCache", key = "username")
+    public BaseResponse<UserDetailInfo> getUserDetails(String username) {
+        CompletableFuture<UserDetailInfo> future = CompletableFuture.supplyAsync(() -> {
+            UserDetailInfo user = QueryChain.of(User.class)
                     .and(USER.USERNAME.eq(username))
-                    .one();
-            if (Objects.isNull(userByUsername))
+                    .oneAs(UserDetailInfo.class);
+            if (Objects.isNull(user))
                 throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
-            UserDetailVO userDetailVO = new UserDetailVO(userByUsername);
-            String uid = userDetailVO.getUid();
+            String uid = user.getUid();
             List<Role> userRole = userRoleMapper.getUserRole(uid);
             if (!Objects.isNull(userRole))
-                userDetailVO.setRoles(userRole);
-            return ResponseUtil.success(userDetailVO);
+                user.setRoles(userRole);
+            return user;
         }, readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+        UserDetailInfo info = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(info);
     }
 
     /**
@@ -460,31 +447,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<List<RolePermissionVO>> getAllRole() {
-        CompletableFuture<BaseResponse<List<RolePermissionVO>>> future = CompletableFuture.supplyAsync(() -> {
+    public BaseResponse<List<RolePermissionDetail>> getAllRole() {
+        CompletableFuture<List<RolePermissionDetail>> future = CompletableFuture.supplyAsync(() -> {
             List<Role> roles = roleMapper.selectAll();
-            ArrayList<RolePermissionVO> rolePermissionList = new ArrayList<>();
+            ArrayList<RolePermissionDetail> rolePermissionDetailList = new ArrayList<>();
             roles.forEach(item -> {
                 List<Permission> permissions = rolePermissionMapper.getRolePermission(item.getRid());
-                rolePermissionList.add(new RolePermissionVO(item, permissions));
+                rolePermissionDetailList.add(new RolePermissionDetail(item, permissions));
             });
-            return ResponseUtil.success(rolePermissionList);
+            return rolePermissionDetailList;
         }, readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+        List<RolePermissionDetail> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 
     @Override
@@ -497,33 +471,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<List<UserDetailVO>> gets(UserQuery query) {
-        CompletableFuture<BaseResponse<List<UserDetailVO>>> future = CompletableFuture.supplyAsync(() -> {
-            List<UserDetailVO> userDetailVOPage = QueryChain.of(User.class)
-                    .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
-                    .from(USER)
-                    .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
-                    .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
-                    .where(USER.ENABLED.eq(query.getEnabled()))
-                    .and(USER.REAL_NAME.like(query.getKeyword()).or(USER.USERNAME.like(query.getKeyword())))
-                    .listAs(UserDetailVO.class);
-            return ResponseUtil.success(userDetailVOPage);
-        }, readThreadPool);
-        try {
-            return future.get(3, TimeUnit.SECONDS);
-        } catch (Exception exception) {
-            Throwable cause = exception.getCause();
-            switch (cause) {
-                case ServiceException serviceException ->
-                        throw serviceException;
-                case TimeoutException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_TIMEOUT);
-                case InterruptedException ignored ->
-                        throw new ServiceException(ServiceExceptionEnum.GET_RESOURCE_INTERRUPTED);
-                default ->
-                        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
+    public BaseResponse<List<UserDetailInfo>> gets(UserQuery query) {
+        CompletableFuture<List<UserDetailInfo>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
+                        .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
+                        .from(USER)
+                        .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
+                        .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
+                        .where(USER.ENABLED.eq(query.getEnabled()))
+                        .and(USER.REAL_NAME.like(query.getKeyword()).or(USER.USERNAME.like(query.getKeyword())))
+                        .listAs(UserDetailInfo.class)
+                , readThreadPool);
+        List<UserDetailInfo> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 
     @Override

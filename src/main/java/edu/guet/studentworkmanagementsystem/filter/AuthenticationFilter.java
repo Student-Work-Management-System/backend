@@ -80,7 +80,7 @@ final public class AuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityUser parseJsonToSecurityUser(String json, HttpServletResponse response) throws IOException {
         try {
-            return JsonUtil.mapper.readValue(json, SecurityUser.class);
+            return JsonUtil.getMapper().readValue(json, SecurityUser.class);
         } catch (Exception e) {
             log.error("出现异常(可能为json解析异常): {}", e.getMessage());
             respondWithFailure(response, ServiceExceptionEnum.UN_LOGIN);

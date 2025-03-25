@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import edu.guet.studentworkmanagementsystem.entity.po.user.Role;
-import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +16,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailVO implements Serializable {
+public class UserDetailInfo implements Serializable {
     private String uid;
     private String username;
     private String realName;
@@ -30,12 +31,4 @@ public class UserDetailVO implements Serializable {
     private LocalDate createdAt;
     private Boolean enabled;
     private List<Role> roles;
-    public UserDetailVO(User user) {
-        this.uid = user.getUid();
-        this.username = user.getUsername();
-        this.realName = user.getRealName();
-        this.email = user.getEmail();
-        this.createdAt = user.getCreatedAt();
-        this.enabled = user.isEnabled();
-    }
 }
