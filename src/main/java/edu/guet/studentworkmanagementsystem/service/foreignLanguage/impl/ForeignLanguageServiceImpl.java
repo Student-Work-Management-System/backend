@@ -58,7 +58,6 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
     public <T> BaseResponse<T> updateForeignLanguage(ForeignLanguage foreignLanguage) {
         boolean update = UpdateChain.of(ForeignLanguage.class)
                 .set(FOREIGN_LANGUAGE.LANGUAGE_ID, foreignLanguage.getLanguageId(), StringUtils::hasLength)
-                .set(FOREIGN_LANGUAGE.STUDENT_ID, foreignLanguage.getStudentId(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.SCORE, foreignLanguage.getScore(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.DATE, foreignLanguage.getDate(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.CERTIFICATE, foreignLanguage.getCertificate(), StringUtils::hasLength)
