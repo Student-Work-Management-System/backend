@@ -13,13 +13,13 @@ import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
 
 import java.util.List;
 
 public interface UserService extends IService<User> {
-    BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) throws JsonProcessingException;
+    BaseResponse<LoginUserDetail> login(LoginUserDTO loginUserDTO) throws JsonProcessingException;
     <T> BaseResponse<T> addUser(RegisterUser registerUser);
     <T> BaseResponse<T> addUsers(ValidateList<RegisterUser> registerUsers);
     BaseResponse<UserDetailInfo> getUserDetails(String username);

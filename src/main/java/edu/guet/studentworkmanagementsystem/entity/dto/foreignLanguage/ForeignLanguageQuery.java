@@ -20,4 +20,6 @@ public class ForeignLanguageQuery implements Serializable {
     private String examType;
     private String examDate;
     private String certificate;
+    private Integer pageNo;
+    private Integer pageSize;
 }

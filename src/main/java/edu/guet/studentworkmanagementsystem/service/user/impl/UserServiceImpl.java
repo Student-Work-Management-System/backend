@@ -23,7 +23,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -97,7 +97,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private OtherService otherService;
 
     @Override
-    public BaseResponse<LoginUserVO> login(LoginUserDTO loginUserDTO) {
+    public BaseResponse<LoginUserDetail> login(LoginUserDTO loginUserDTO) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
@@ -110,13 +110,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.error("UserServiceImpl#login(LoginUserDTO loginUserDTO)出现JSON解析异常: {}", jsonProcessingException.getMessage());
             ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
         }
-        LoginUserVO loginUserVO = createLoginUser(securityUser, token);
-        return ResponseUtil.success(loginUserVO);
+        LoginUserDetail loginUserDetail = createLoginUser(securityUser, token);
+        return ResponseUtil.success(loginUserDetail);
     }
 
-    public LoginUserVO createLoginUser(SecurityUser securityUser, String token) {
+    public LoginUserDetail createLoginUser(SecurityUser securityUser, String token) {
         List<SystemAuthority> authorities = (List<SystemAuthority>) securityUser.getAuthorities();
-        LoginUserVO loginUser = LoginUserVO.builder()
+        LoginUserDetail loginUser = LoginUserDetail.builder()
                 .uid(securityUser.getUser().getUid())
                 .username(securityUser.getUsername())
                 .email(securityUser.getUser().getEmail())

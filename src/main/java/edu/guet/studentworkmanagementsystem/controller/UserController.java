@@ -6,7 +6,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserDetail;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
@@ -25,7 +25,7 @@ public class UserController {
     private UserService userService;
     @PermitAll
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> login(@RequestBody @Valid LoginUserDTO loginUserDTO) throws JsonProcessingException {
+    public BaseResponse<LoginUserDetail> login(@RequestBody @Valid LoginUserDTO loginUserDTO) throws JsonProcessingException {
         return userService.login(loginUserDTO);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")

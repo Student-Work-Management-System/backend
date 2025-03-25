@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginUserVO implements Serializable {
+public class LoginUserDetail implements Serializable {
     private String uid;
     private String username;
     private String realName;

@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
@@ -48,7 +49,7 @@ public class LanguageController {
     // 与学生相关的 👇
     @PreAuthorize("hasAuthority('foreign:select')")
     @GetMapping("/student/gets")
-    public BaseResponse<List<ForeignLanguageItem>> getForeignLanguages(@RequestBody ForeignLanguageQuery query) {
+    public BaseResponse<Page<ForeignLanguageItem>> getForeignLanguages(@RequestBody ForeignLanguageQuery query) {
         return foreignLanguageService.getForeignLanguages(query);
     }
     @PreAuthorize("hasAuthority('foreign:insert')")
