@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.service.foreignLanguage.impl;
 
-import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;

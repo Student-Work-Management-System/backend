@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -56,32 +55,4 @@ public class StudentCompetitionVO implements Serializable {
      * 仅当状态预修改为 已拒绝 时才可以填写
      */
     private String rejectReason;
-    public StudentCompetitionVO(
-            String competitionName,
-            String competitionNature,
-            String competitionLevel,
-            String headerId,
-            String headerName,
-            String evidence,
-            String awardLevel,
-            LocalDate awardDate,
-            String members,
-            String reviewState,
-            String rejectReason
-    ) throws JsonProcessingException {
-        this.competitionName = competitionName;
-        this.competitionNature = competitionNature;
-        this.competitionLevel = competitionLevel;
-        this.headerId = headerId;
-        this.headerName = headerName;
-        this.evidence = evidence;
-        this.awardLevel = awardLevel;
-        this.awardDate = awardDate;
-        this.members = JsonUtil.getMapper().readValue(members, new TypeReference<>() {});
-        this.reviewState = reviewState;
-        this.rejectReason = rejectReason;
-    }
-    public void setMembers(String members) throws JsonProcessingException {
-        this.members = JsonUtil.getMapper().readValue(members, new TypeReference<>() {});
-    }
 }

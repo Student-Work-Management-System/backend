@@ -2,7 +2,6 @@ package edu.guet.studentworkmanagementsystem.service.foreignLanguage;
 
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.Language;
 
 import java.util.List;
