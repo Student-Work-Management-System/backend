@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(("/language"))
+@RequestMapping("/language")
 public class LanguageController {
     @Autowired
     private LanguageService languageService;
@@ -48,7 +48,7 @@ public class LanguageController {
     }
     // 与学生相关的 👇
     @PreAuthorize("hasAuthority('foreign:select')")
-    @GetMapping("/student/gets")
+    @PostMapping("/student/gets")
     public BaseResponse<Page<ForeignLanguageItem>> getForeignLanguages(@RequestBody ForeignLanguageQuery query) {
         return foreignLanguageService.getForeignLanguages(query);
     }
@@ -71,10 +71,5 @@ public class LanguageController {
     @GetMapping("/student/option/type")
     public BaseResponse<Set<String>> getOptionType() {
         return null;
-    }
-    @PreAuthorize("hasAuthority('foreign:select')")
-    @GetMapping("/student/option/date")
-    public BaseResponse<Set<String>> getOptionDate() {
-        return foreignLanguageService.getOptionExamDate();
     }
 }

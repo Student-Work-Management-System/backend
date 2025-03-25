@@ -25,9 +25,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.table.ForeignLanguageTableDef.FOREIGN_LANGUAGE;
 import static edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.table.LanguageTableDef.LANGUAGE;
@@ -88,7 +86,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
             return QueryChain.of(ForeignLanguage.class)
                     .select(
                             FOREIGN_LANGUAGE.ALL_COLUMNS,
-                            LANGUAGE.LANGUAGE_NAME,
+                            LANGUAGE.ALL_COLUMNS,
                             STUDENT_BASIC.STUDENT_ID,
                             STUDENT_BASIC.NAME,
                             MAJOR.MAJOR_NAME,
@@ -104,6 +102,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
                     .where(
                             FOREIGN_LANGUAGE.STUDENT_ID.like(query.getSearch())
                                     .or(STUDENT_BASIC.NAME.like(query.getSearch()))
+                                    .or(FOREIGN_LANGUAGE.CERTIFICATE.eq(query.getSearch()))
                     )
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
@@ -114,16 +113,6 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
                     .pageAs(Page.of(pageNo, pageSize), ForeignLanguageItem.class);
         }, readThreadPool);
         Page<ForeignLanguageItem> execute = FutureExceptionExecute.fromFuture(future).execute();
-        return ResponseUtil.success(execute);
-    }
-
-    @Override
-    public BaseResponse<Set<String>> getOptionExamDate() {
-        CompletableFuture<Set<String>> future = CompletableFuture.supplyAsync(() -> {
-            List<ForeignLanguage> foreignLanguages = mapper.selectAll();
-            return foreignLanguages.stream().map(ForeignLanguage::getDate).collect(Collectors.toSet());
-        }, readThreadPool);
-        Set<String> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 

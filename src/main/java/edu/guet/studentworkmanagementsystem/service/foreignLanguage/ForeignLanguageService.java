@@ -11,13 +11,11 @@ import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLan
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatusItem;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ForeignLanguageService extends IService<ForeignLanguage> {
     <T> BaseResponse<T> insertForeignLanguageBatch(ValidateList<ForeignLanguage> foreignLanguages);
     <T> BaseResponse<T> updateForeignLanguage(ForeignLanguage foreignLanguage);
     <T> BaseResponse<T> deleteForeignLanguage(String foreignLanguageId);
     BaseResponse<Page<ForeignLanguageItem>> getForeignLanguages(ForeignLanguageQuery query);
-    BaseResponse<Set<String>> getOptionExamDate();
     BaseResponse<List<ForeignLanguageStatusItem>> getForeignLanguageStatus(ForeignLanguageStatusQuery query);
 }
