@@ -43,6 +43,8 @@ public class LanguageServiceImpl extends ServiceImpl<LanguageMapper, Language> i
     public <T> BaseResponse<T> updateLanguage(Language language) {
         boolean update = UpdateChain.of(Language.class)
                 .set(LANGUAGE.LANGUAGE_NAME, language.getLanguageName(), StringUtils::hasLength)
+                .set(LANGUAGE.TYPE, language.getType(), StringUtils::hasLength)
+                .set(LANGUAGE.TOTAL, language.getTotal(), StringUtils::hasLength)
                 .where(LANGUAGE.LANGUAGE_ID.eq(language.getLanguageId()))
                 .update();
         if (!update)

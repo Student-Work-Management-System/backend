@@ -70,7 +70,7 @@ public class LanguageController {
     @PreAuthorize("hasAuthority('foreign:select')")
     @GetMapping("/student/option/type")
     public BaseResponse<Set<String>> getOptionType() {
-        return foreignLanguageService.getOptionExamType();
+        return null;
     }
     @PreAuthorize("hasAuthority('foreign:select')")
     @GetMapping("/student/option/date")

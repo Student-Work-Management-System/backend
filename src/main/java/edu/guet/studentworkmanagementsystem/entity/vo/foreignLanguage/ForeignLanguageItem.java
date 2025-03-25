@@ -19,7 +19,7 @@ public class ForeignLanguageItem implements Serializable {
     private String gradeName;
     private String languageName;
     private String score;
-    private String examType;
-    private String examDate;
+    private String type;
+    private String date;
     private String certificate;
 }

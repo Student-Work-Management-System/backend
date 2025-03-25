@@ -28,9 +28,7 @@ public class ForeignLanguage implements Serializable {
     private String languageId;
     @NotBlank(message = "成绩不能为空", groups = {InsertGroup.class})
     private String score;
-    @NotBlank(message = "考试类型不能为空", groups = {InsertGroup.class})
-    private String examType;
     @NotBlank(message = "考试日期不能为空", groups = {InsertGroup.class})
-    private String examDate;
+    private String date;
     private String certificate;
 }

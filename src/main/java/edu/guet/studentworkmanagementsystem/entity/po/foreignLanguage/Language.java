@@ -22,4 +22,8 @@ public class Language {
     private String languageId;
     @NotBlank(message = "语言不能为空", groups = {InsertGroup.class})
     private String languageName;
+    @NotBlank(message = "考试类型不能为空", groups = {InsertGroup.class})
+    private String type;
+    @NotBlank(message = "考试总分不能为空", groups = {InsertGroup.class})
+    private String total;
 }

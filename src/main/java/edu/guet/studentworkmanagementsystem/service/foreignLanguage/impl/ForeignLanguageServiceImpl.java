@@ -62,8 +62,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
                 .set(FOREIGN_LANGUAGE.LANGUAGE_ID, foreignLanguage.getLanguageId(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.STUDENT_ID, foreignLanguage.getStudentId(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.SCORE, foreignLanguage.getScore(), StringUtils::hasLength)
-                .set(FOREIGN_LANGUAGE.EXAM_TYPE, foreignLanguage.getExamType(), StringUtils::hasLength)
-                .set(FOREIGN_LANGUAGE.EXAM_DATE, foreignLanguage.getExamDate(), StringUtils::hasLength)
+                .set(FOREIGN_LANGUAGE.DATE, foreignLanguage.getDate(), StringUtils::hasLength)
                 .set(FOREIGN_LANGUAGE.CERTIFICATE, foreignLanguage.getCertificate(), StringUtils::hasLength)
                 .where(FOREIGN_LANGUAGE.FOREIGN_LANGUAGE_ID.eq(foreignLanguage.getForeignLanguageId()))
                 .update();
@@ -110,8 +109,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .and(DEGREE.DEGREE_ID.eq(query.getDegreeId()))
                     .and(LANGUAGE.LANGUAGE_ID.eq(query.getLanguageId()))
-                    .and(FOREIGN_LANGUAGE.EXAM_TYPE.eq(query.getExamType()))
-                    .and(FOREIGN_LANGUAGE.EXAM_DATE.eq(query.getExamDate()))
+                    .and(FOREIGN_LANGUAGE.DATE.eq(query.getDate()))
                     .and(FOREIGN_LANGUAGE.CERTIFICATE.eq(query.getCertificate()))
                     .pageAs(Page.of(pageNo, pageSize), ForeignLanguageItem.class);
         }, readThreadPool);
@@ -120,20 +118,10 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
     }
 
     @Override
-    public BaseResponse<Set<String>> getOptionExamType() {
-        CompletableFuture<Set<String>> future = CompletableFuture.supplyAsync(() -> {
-            List<ForeignLanguage> foreignLanguages = mapper.selectAll();
-            return foreignLanguages.stream().map(ForeignLanguage::getExamType).collect(Collectors.toSet());
-        }, readThreadPool);
-        Set<String> execute = FutureExceptionExecute.fromFuture(future).execute();
-        return ResponseUtil.success(execute);
-    }
-
-    @Override
     public BaseResponse<Set<String>> getOptionExamDate() {
         CompletableFuture<Set<String>> future = CompletableFuture.supplyAsync(() -> {
             List<ForeignLanguage> foreignLanguages = mapper.selectAll();
-            return foreignLanguages.stream().map(ForeignLanguage::getExamDate).collect(Collectors.toSet());
+            return foreignLanguages.stream().map(ForeignLanguage::getDate).collect(Collectors.toSet());
         }, readThreadPool);
         Set<String> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
