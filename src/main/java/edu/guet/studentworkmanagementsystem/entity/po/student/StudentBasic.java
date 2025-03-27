@@ -23,5 +23,9 @@ public class StudentBasic implements Serializable {
     private String phone;
     private String email;
     private String degreeId;
+    private String majorId;
+    private String gradeId;
+    private String statusId;
+    private String politicId;
     private Boolean enabled;
 }

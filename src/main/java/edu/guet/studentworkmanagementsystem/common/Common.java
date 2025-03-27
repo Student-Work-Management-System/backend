@@ -11,6 +11,11 @@ public enum Common {
     STATUS_PERMISSION("student:status"),
     STATUS_PERMISSION_ALL("student:status:all"),
     HEADER_TEACHER("班主任"),
+    SOLO("单人"),
+    TEAM("团队"),
+    PASS("已通过"),
+    REJECT("已拒绝"),
+    WAITING("审核中"),
     ;
     private final String value;
     Common(String str) {

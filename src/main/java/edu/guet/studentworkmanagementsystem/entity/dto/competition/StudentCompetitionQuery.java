@@ -1,18 +1,23 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.competition;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompetitionQuery {
+public class StudentCompetitionQuery implements Serializable {
     private String search;
-    private String nature;
-    private String level;
+    private String majorId;
+    private String gradeId;
+    private String degreeId;
+    private LocalDate start;
+    private LocalDate end;
+    private String state;
     private Integer pageNo;
     private Integer pageSize;
 }

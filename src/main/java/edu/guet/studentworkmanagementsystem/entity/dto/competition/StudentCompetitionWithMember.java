@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import edu.guet.studentworkmanagementsystem.entity.po.competition.Member;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +17,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentCompetitionDTO implements Serializable {
+public class StudentCompetitionWithMember implements Serializable {
     @NotBlank(message = "竞赛id不能为空")
     private String competitionId;
     /**
@@ -36,17 +34,13 @@ public class StudentCompetitionDTO implements Serializable {
      * 奖项级别，由学生填报
      */
     @NotBlank(message = "奖项级别不能为空")
-    private String awardLevel;
+    private String level;
     /**
      * 获奖日期
      */
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate awardDate;
-    /**
-     * 团队成员, 单人比赛时为空。团队赛时应该填入的格式为 [{ order: 1, studentId:"",realName:""}....]
-     */
-    @NotNull(message = "团队成员不能为空")
-    private List<Member> members;
+    private LocalDate date;
+    private List<String> studentIds;
 }

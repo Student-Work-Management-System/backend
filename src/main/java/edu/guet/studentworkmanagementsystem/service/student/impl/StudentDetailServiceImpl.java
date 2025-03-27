@@ -28,13 +28,9 @@ public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, S
     public boolean updateStudentDetail(StudentDetail studentDetail) {
         return UpdateChain.of(StudentDetail.class)
                 .set(STUDENT_DETAIL.HEADER_TEACHER_USERNAME, studentDetail.getHeaderTeacherUsername(), StringUtils::hasLength)
-                .set(STUDENT_DETAIL.STATUS_ID, studentDetail.getStatusId(), StringUtils::hasLength)
-                .set(STUDENT_DETAIL.MAJOR_ID, studentDetail.getMajorId(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.NATIVE_PLACE, studentDetail.getNativePlace(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.POSTAL_CODE, studentDetail.getPostalCode(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.NATION, studentDetail.getNation(), StringUtils::hasLength)
-                .set(STUDENT_DETAIL.POLITIC_ID, studentDetail.getPoliticId(), StringUtils::hasLength)
-                .set(STUDENT_DETAIL.GRADE_ID, studentDetail.getGradeId(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.CLASS_NO, studentDetail.getClassNo(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.DORMITORY, studentDetail.getDormitory(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.BIRTHDATE, studentDetail.getBirthdate(), !Objects.isNull(studentDetail.getBirthdate()))

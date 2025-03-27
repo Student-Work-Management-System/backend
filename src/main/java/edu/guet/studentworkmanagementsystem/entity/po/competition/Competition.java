@@ -6,7 +6,6 @@ import com.mybatisflex.annotation.Table;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,11 +42,14 @@ public class Competition implements Serializable {
      */
     @Nullable
     @NotBlank(message = "竞赛性质不能为空", groups = {InsertGroup.class})
-    @Pattern(regexp = "^(单人|团队)$",groups = {InsertGroup.class, UpdateGroup.class})
-    private String competitionNature;
+    private Integer nature;
     /**
      * 竞赛级别
      */
     @NotBlank(message = "竞赛级别不能为空", groups = {InsertGroup.class})
-    private String competitionLevel;
+    private String level;
+    /**
+     * 备注
+     */
+    private String comment;
 }

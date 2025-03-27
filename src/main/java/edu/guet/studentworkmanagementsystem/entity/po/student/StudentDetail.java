@@ -31,14 +31,6 @@ public class StudentDetail implements Serializable {
      */
     private String headerTeacherUsername;
     /**
-     * 学籍Id
-     */
-    private String statusId;
-    /**
-     * 专业id, 由专业表进行约束
-     */
-    private String majorId;
-    /**
      * 籍贯
      */
     private String nativePlace;
@@ -50,14 +42,6 @@ public class StudentDetail implements Serializable {
      * 民族
      */
     private String nation;
-    /**
-     * 政治面貌
-     */
-    private String politicId;
-    /**
-     * 年级
-     */
-    private String gradeId;
     /**
      * 班号
      */

@@ -30,11 +30,11 @@
             SUM(IF(`student_detail`.`nation` NOT LIKE '%汉%' AND `student_detail`.`nation` NOT LIKE '%汉族%', 1, 0)) AS `minorityCount`,
             SUM(IF(`student_detail`.`disability` = 1, 1, 0)) AS `disabilityCount`
         FROM `major`
-            LEFT JOIN `student_detail` ON `major`.`major_id` = `student_detail`.`major_id`
-            LEFT JOIN `student_basic` ON `student_basic`.`student_id` = `student_detail`.`student_id`
-            LEFT JOIN `student_status` ON `student_detail`.`status_id` = `student_status`.`status_id`
+            LEFT JOIN `student_basic` ON `major`.`major_id` = `student_basic`.`major_id`
+            LEFT JOIN `student_detail` ON `student_basic`.`student_id` = `student_detail`.`student_id`
+            LEFT JOIN `student_status` ON `student_basic`.`status_id` = `student_status`.`status_id`
             LEFT JOIN `status` ON `student_status`.`status_id` = `status`.`status_id`
-            LEFT JOIN `politic` ON `student_detail`.`politic_id` = `politic`.`politic_id`
+            LEFT JOIN `politic` ON `student_basic`.`politic_id` = `politic`.`politic_id`
         <where>
             <if test="gradeId != null and gradeId != ''">
                 `student_detail`.`grade_id` = #{gradeId}
