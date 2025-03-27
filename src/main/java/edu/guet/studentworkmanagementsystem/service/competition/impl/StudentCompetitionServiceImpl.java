@@ -178,9 +178,13 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
                             STUDENT_COMPETITION.HEADER_ID.like(query.getSearch())
                                     .or(STUDENT_BASIC.NAME.like(query.getSearch()))
                                     .or(COMPETITION.COMPETITION_NAME.like(query.getSearch()))
-                                    .or(COMPETITION.NATURE.like(query.getSearch()))
-                                    .or(COMPETITION.LEVEL.like(query.getSearch()))
                     )
+                    // 竞赛性质
+                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getCompetitionNature()))
+                    // 竞赛类别: A/B/C类
+                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getCompetitionType()))
+                    // 获奖级别
+                    .and(STUDENT_COMPETITION.LEVEL.eq(query.getLevel()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .and(DEGREE.DEGREE_ID.eq(query.getDegreeId()))

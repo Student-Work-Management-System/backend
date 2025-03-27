@@ -15,6 +15,9 @@ public class StudentCompetitionQuery implements Serializable {
     private String majorId;
     private String gradeId;
     private String degreeId;
+    private Integer competitionNature;
+    private String competitionType;
+    private String level;
     private LocalDate start;
     private LocalDate end;
     private String state;

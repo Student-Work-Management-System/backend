@@ -63,8 +63,8 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
     public <T> BaseResponse<T> updateCompetition(Competition competition) {
         boolean update = UpdateChain.of(Competition.class)
                 .set(COMPETITION.COMPETITION_NAME, competition.getCompetitionName(), StringUtils::hasLength)
-                .set(COMPETITION.NATURE, competition.getNature(), !Objects.isNull(competition.getNature()))
-                .set(COMPETITION.LEVEL, competition.getLevel(), StringUtils::hasLength)
+                .set(COMPETITION.COMPETITION_NATURE, competition.getCompetitionNature(), !Objects.isNull(competition.getCompetitionNature()))
+                .set(COMPETITION.COMPETITION_TYPE, competition.getCompetitionType(), StringUtils::hasLength)
                 .set(COMPETITION.COMMENT, competition.getComment(), StringUtils::hasLength)
                 .where(COMPETITION.COMPETITION_ID.eq(competition.getCompetitionId()))
                 .update();
@@ -81,8 +81,8 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                     .select(COMPETITION.ALL_COLUMNS)
                     .from(COMPETITION)
                     .where(COMPETITION.COMPETITION_NAME.like(query.getSearch()))
-                    .and(COMPETITION.NATURE.eq(query.getNature()))
-                    .and(COMPETITION.LEVEL.eq(query.getLevel()))
+                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getNature()))
+                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getLevel()))
                     .page(Page.of(pageNo, pageSize));
         }, readThreadPool);
         Page<Competition> execute = FutureExceptionExecute.fromFuture(future).execute();
@@ -103,7 +103,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
         int nature = QueryChain.of(Competition.class)
                 .where(COMPETITION.COMPETITION_ID.eq(competitionId))
                 .one()
-                .getNature().intValue();
+                .getCompetitionNature().intValue();
         return nature == 1;
     }
 

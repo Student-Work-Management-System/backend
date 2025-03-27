@@ -42,12 +42,12 @@ public class Competition implements Serializable {
      */
     @Nullable
     @NotBlank(message = "竞赛性质不能为空", groups = {InsertGroup.class})
-    private Integer nature;
+    private Integer competitionNature;
     /**
      * 竞赛级别
      */
-    @NotBlank(message = "竞赛级别不能为空", groups = {InsertGroup.class})
-    private String level;
+    @NotBlank(message = "竞赛类别不能为空", groups = {InsertGroup.class})
+    private String competitionType;
     /**
      * 备注
      */
