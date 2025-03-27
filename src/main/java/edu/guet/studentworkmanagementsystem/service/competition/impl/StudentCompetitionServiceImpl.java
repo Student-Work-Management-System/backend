@@ -185,6 +185,7 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
                     .and(COMPETITION.COMPETITION_TYPE.eq(query.getCompetitionType()))
                     // 获奖级别
                     .and(STUDENT_COMPETITION.LEVEL.eq(query.getLevel()))
+                    .and(STUDENT_COMPETITION_AUDIT.STATE.eq(query.getState()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .and(DEGREE.DEGREE_ID.eq(query.getDegreeId()))

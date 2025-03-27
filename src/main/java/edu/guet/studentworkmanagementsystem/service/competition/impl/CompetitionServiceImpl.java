@@ -50,6 +50,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> insertCompetition(Competition competition) {
@@ -58,6 +59,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateCompetition(Competition competition) {
@@ -72,6 +74,7 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<Page<Competition>> getAllCompetitions(CompetitionQuery query) {
         CompletableFuture<Page<Competition>> future = CompletableFuture.supplyAsync(() -> {
@@ -81,13 +84,14 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                     .select(COMPETITION.ALL_COLUMNS)
                     .from(COMPETITION)
                     .where(COMPETITION.COMPETITION_NAME.like(query.getSearch()))
-                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getNature()))
-                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getLevel()))
+                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getCompetitionNature()))
+                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getCompetitionType()))
                     .page(Page.of(pageNo, pageSize));
         }, readThreadPool);
         Page<Competition> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteCompetition(String competitionId) {

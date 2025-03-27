@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CompetitionQuery {
     private String search;
-    private String nature;
-    private String level;
+    private String competitionNature;
+    private String competitionType;
     private Integer pageNo;
     private Integer pageSize;
 }
