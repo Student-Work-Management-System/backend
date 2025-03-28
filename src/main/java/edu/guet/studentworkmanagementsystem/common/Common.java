@@ -13,8 +13,8 @@ public enum Common {
     HEADER_TEACHER("班主任"),
     SOLO("单人"),
     TEAM("团队"),
-    PASS("已通过"),
-    REJECT("已拒绝"),
+    PASS("通过"),
+    REJECT("拒绝"),
     WAITING("审核中"),
     ;
     private final String value;

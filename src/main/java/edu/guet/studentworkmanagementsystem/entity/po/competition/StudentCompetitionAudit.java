@@ -26,7 +26,7 @@ public class StudentCompetitionAudit implements Serializable {
     @Id
     @NotBlank(message = "学生竞赛上报信息id不能为空", groups = {UpdateGroup.class})
     private String studentCompetitionId;
-    private Integer state;
+    private String state;
     private String rejectReason;
     private String operatorId;
     @JsonSerialize(using = LocalDateSerializer.class)

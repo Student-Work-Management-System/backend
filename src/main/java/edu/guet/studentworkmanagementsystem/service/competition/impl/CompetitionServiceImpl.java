@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.*;
@@ -103,12 +104,11 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
 
     @Override
     public boolean competitionNatureIsSolo(String competitionId) {
-        // 表中获取, 不可能为null
-        int nature = QueryChain.of(Competition.class)
+        String nature = QueryChain.of(Competition.class)
                 .where(COMPETITION.COMPETITION_ID.eq(competitionId))
                 .one()
-                .getCompetitionNature().intValue();
-        return nature == 1;
+                .getCompetitionNature();
+        return Common.SOLO.getValue().equals(nature);
     }
 
 }

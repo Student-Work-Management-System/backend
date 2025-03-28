@@ -7,7 +7,9 @@ import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 
@@ -47,4 +49,6 @@ public interface StudentService {
     <T> BaseResponse<T> recoveryStudent(String studentId);
     BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query);
     BaseResponse<List<HeaderTeacher>> getHeaderTeachers();
+    BaseResponse<List<StudentBasicItem>> getStudentBasic(String studentId);
+    BaseResponse<List<StudentBasicItem>> getStudentCompetitionTeam(List<String> studentIds);
 }

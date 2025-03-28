@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionWithMember;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
@@ -20,7 +21,6 @@ import edu.guet.studentworkmanagementsystem.service.competition.CompetitionTeamS
 import edu.guet.studentworkmanagementsystem.service.competition.StudentCompetitionService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
-import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -81,6 +81,7 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
         return StudentCompetition.builder()
                 .competitionId(studentCompetitionWithMember.getCompetitionId())
                 .headerId(studentCompetitionWithMember.getHeaderId())
+                .evidence(studentCompetitionWithMember.getEvidence())
                 .level(studentCompetitionWithMember.getLevel())
                 .date(studentCompetitionWithMember.getDate())
                 .build();
@@ -98,14 +99,16 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
     public StudentCompetitionAudit createStudentCompetitionAudit(String studentCompetitionId) {
         return StudentCompetitionAudit.builder()
                 .studentCompetitionId(studentCompetitionId)
+                .state(Common.WAITING.getValue())
                 .operatorTime(LocalDate.now())
                 .build();
     }
 
     @Override
     public BaseResponse<List<StudentCompetitionItem>> getOwnStudentCompetition() {
-        String studentId = SecurityUtil.getUserCredentials().getUsername();
-        CompletableFuture.supplyAsync(() -> {
+        // String studentId = SecurityUtil.getUserCredentials().getUsername();
+        String studentId = "1001";
+        CompletableFuture<List<StudentCompetitionItem>> future = CompletableFuture.supplyAsync(() -> {
             List<StudentCompetitionItem> items = QueryChain.of(StudentCompetition.class)
                     .select(
                             COMPETITION.ALL_COLUMNS,
@@ -117,8 +120,8 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
                     .from(STUDENT_COMPETITION)
                     .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
-                    .innerJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
-                    .innerJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                    .leftJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                    .leftJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
                     // 队长或队员存在该学号成员即可
                     .where(
                             STUDENT_COMPETITION.HEADER_ID.eq(studentId)
@@ -135,7 +138,8 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
             }
             return items;
         }, readThreadPool);
-        return ResponseUtil.success();
+        List<StudentCompetitionItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 
     @Override
@@ -169,8 +173,8 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
                     .from(STUDENT_COMPETITION)
                     .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
-                    .innerJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
-                    .innerJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                    .leftJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                    .leftJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                     .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))

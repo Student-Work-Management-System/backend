@@ -11,6 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
 import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -241,6 +242,7 @@ public class StudentServiceImpl implements StudentService {
                 CompletableFuture.supplyAsync(() -> ResponseUtil.success(getStudentTableItems(query)), readThreadPool);
         return FutureExceptionExecute.fromFuture(future).execute();
     }
+
     public Page<StudentTableItem> getStudentTableItems(StudentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
@@ -361,6 +363,48 @@ public class StudentServiceImpl implements StudentService {
                 .where(ROLE.ROLE_NAME.like(Common.HEADER_TEACHER.getValue()))
                 .listAs(HeaderTeacher.class), readThreadPool);
         List<HeaderTeacher> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    @Override
+    public BaseResponse<List<StudentBasicItem>> getStudentBasic(String studentId) {
+        CompletableFuture<List<StudentBasicItem>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(StudentBasic.class)
+                .select(
+                        STUDENT_BASIC.STUDENT_ID,
+                        STUDENT_BASIC.NAME,
+                        STUDENT_BASIC.GENDER,
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME,
+                        DEGREE.DEGREE_NAME
+                )
+                .from(STUDENT_BASIC)
+                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
+                .where(STUDENT_BASIC.STUDENT_ID.likeLeft(studentId))
+                .listAs(StudentBasicItem.class), readThreadPool);
+        List<StudentBasicItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    @Override
+    public BaseResponse<List<StudentBasicItem>> getStudentCompetitionTeam(List<String> studentIds) {
+        CompletableFuture<List<StudentBasicItem>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(StudentBasic.class)
+                .select(
+                        STUDENT_BASIC.STUDENT_ID,
+                        STUDENT_BASIC.NAME,
+                        STUDENT_BASIC.GENDER,
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME,
+                        DEGREE.DEGREE_NAME
+                )
+                .from(STUDENT_BASIC)
+                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
+                .where(STUDENT_BASIC.STUDENT_ID.in(studentIds))
+                .listAs(StudentBasicItem.class), readThreadPool);
+        List<StudentBasicItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 
