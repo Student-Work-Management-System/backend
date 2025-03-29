@@ -85,7 +85,7 @@ public class CompetitionController {
 
     @PreAuthorize("hasAuthority('student_competition:update')")
     @PutMapping("/student_competition/update")
-    public <T> BaseResponse<T> updateStudentCompetitionAudit(@RequestBody @Validated({UpdateGroup.class}) StudentCompetitionAudit studentCompetitionAudit) {
-        return competitionAuditService.updateCompetitionAudit(studentCompetitionAudit);
+    public <T> BaseResponse<T> updateStudentCompetitionAudit(@RequestBody @Validated({UpdateGroup.class}) ValidateList<StudentCompetitionAudit> studentCompetitionAudits) {
+        return competitionAuditService.updateCompetitionAudit(studentCompetitionAudits);
     }
 }
