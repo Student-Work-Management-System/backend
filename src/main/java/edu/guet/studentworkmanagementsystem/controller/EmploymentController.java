@@ -3,8 +3,8 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class EmploymentController {
     private EmploymentService employmentService;
     @PreAuthorize("hasAuthority('student_employment:select') and hasAnyAuthority('student:select') and hasAnyAuthority('major:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(@RequestBody EmploymentQuery query) {
+    public BaseResponse<Page<StudentEmploymentItem>> getStudentEmployment(@RequestBody EmploymentQuery query) {
         return employmentService.getStudentEmployment(query);
     }
     @PreAuthorize("hasAuthority('student_employment:insert')")
@@ -51,7 +51,7 @@ public class EmploymentController {
     }
     @PreAuthorize("hasAuthority('student_employment:select')")
     @PostMapping("/stat")
-    public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(@RequestBody EmploymentStatQuery query) {
+    public BaseResponse<HashMap<String, StudentEmploymentStatItem>> statistics(@RequestBody EmploymentStatQuery query) {
         return employmentService.statistics(query);
     }
 }

@@ -3,11 +3,11 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserDetail;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailItem;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
@@ -25,27 +25,27 @@ public class UserController {
     private UserService userService;
     @PermitAll
     @PostMapping("/login")
-    public BaseResponse<LoginUserDetail> login(@RequestBody @Valid LoginUserDTO loginUserDTO) throws JsonProcessingException {
-        return userService.login(loginUserDTO);
+    public BaseResponse<LoginUserDetail> login(@RequestBody @Valid LoginUserRequest loginUserRequest) throws JsonProcessingException {
+        return userService.login(loginUserRequest);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> addUser(@RequestBody @Valid RegisterUser registerUser) {
-        return userService.addUser(registerUser);
+    public <T> BaseResponse<T> addUser(@RequestBody @Valid RegisterUserRequest registerUserRequest) {
+        return userService.addUser(registerUserRequest);
     }
     @PreAuthorize("hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> addUsers(@RequestBody @Valid ValidateList<RegisterUser> registerUsers) {
-        return userService.addUsers(registerUsers);
+    public <T> BaseResponse<T> addUsers(@RequestBody @Valid ValidateList<RegisterUserRequest> registerUserRequests) {
+        return userService.addUsers(registerUserRequests);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @GetMapping("/detail/{username}")
-    public BaseResponse<UserDetailInfo> getUserDetails(@PathVariable String username) {
+    public BaseResponse<UserDetailItem> getUserDetails(@PathVariable String username) {
         return userService.getUserDetails(username);
     }
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select')")
     @PostMapping("/gets")
-    public BaseResponse<List<UserDetailInfo>> gets(@RequestBody UserQuery query) {
+    public BaseResponse<List<UserDetailItem>> gets(@RequestBody UserQuery query) {
         return userService.gets(query);
     }
     @PreAuthorize(
@@ -55,8 +55,8 @@ public class UserController {
             "and hasAuthority('role:select')"
     )
     @PutMapping("/update/role")
-    public <T> BaseResponse<T> updateUserRole(@RequestBody @Valid UserRoleDTO userRoleDTO) {
-        return userService.updateUserRole(userRoleDTO);
+    public <T> BaseResponse<T> updateUserRole(@RequestBody @Valid UserRoleRequest userRoleRequest) {
+        return userService.updateUserRole(userRoleRequest);
     }
     @PreAuthorize("hasAuthority('user:delete') and hasAuthority('user_role:delete')")
     @DeleteMapping("/delete/{uid}")
@@ -70,8 +70,8 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('user:update:all')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateUser(@RequestBody @Valid UpdateUserDTO updateUserDTO) {
-        return userService.updateUser(updateUserDTO);
+    public <T> BaseResponse<T> updateUser(@RequestBody @Valid UpdateUserRequest updateUserRequest) {
+        return userService.updateUser(updateUserRequest);
     }
     @PermitAll
     @DeleteMapping("/logout")
@@ -80,12 +80,12 @@ public class UserController {
     }
     @PermitAll
     @GetMapping("/findBackPassword/{username}")
-    public BaseResponse<FindBackPasswordVO> findBackPassword(@PathVariable String username) {
+    public BaseResponse<FindBackPasswordItem> findBackPassword(@PathVariable String username) {
         return userService.findBackPassword(username);
     }
     @PermitAll
     @PostMapping("/updatePassword")
-    public <T> BaseResponse<T> updatePassword(@RequestBody @Valid UpdatePassword updatePassword) {
-        return userService.updatePassword(updatePassword.getUsername(), updatePassword.getPassword(), updatePassword.getCode());
+    public <T> BaseResponse<T> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest) {
+        return userService.updatePassword(updatePasswordRequest.getUsername(), updatePasswordRequest.getPassword(), updatePasswordRequest.getCode());
     }
 }

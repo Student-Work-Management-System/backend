@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentList
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
-import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
 
 
 public interface PunishmentService extends IService<StudentPunishment> {
@@ -26,7 +26,7 @@ public interface PunishmentService extends IService<StudentPunishment> {
      * @param query 查询参数
      * @return 所有的学生处分记录
      */
-    BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(PunishmentQuery query);
+    BaseResponse<Page<StudentPunishmentItem>> getAllStudentPunishment(PunishmentQuery query);
     /**
      * 删除处分信息
      * @param studentPunishmentId 学生处分记录id

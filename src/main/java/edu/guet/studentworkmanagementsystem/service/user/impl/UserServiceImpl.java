@@ -13,18 +13,18 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.UsernameTrie;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleRequest;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionRequest;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
 import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
 import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
-import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.RolePermissionDetail;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.FindBackPasswordItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.user.LoginUserDetail;
-import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailInfo;
+import edu.guet.studentworkmanagementsystem.entity.vo.user.UserDetailItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.authority.RolePermissionMapper;
@@ -97,9 +97,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private OtherService otherService;
 
     @Override
-    public BaseResponse<LoginUserDetail> login(LoginUserDTO loginUserDTO) {
+    public BaseResponse<LoginUserDetail> login(LoginUserRequest loginUserRequest) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword());
+                new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(), loginUserRequest.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
         String redisKey = Common.LOGIN_UID.getValue() + securityUser.getUser().getUid();
@@ -187,29 +187,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUser(RegisterUser registerUser) {
-        ValidateList<RegisterUser> registerUsers = new ValidateList<>();
-        registerUsers.add(registerUser);
-        return addUsers(registerUsers);
+    public <T> BaseResponse<T> addUser(RegisterUserRequest registerUserRequest) {
+        ValidateList<RegisterUserRequest> registerUserRequests = new ValidateList<>();
+        registerUserRequests.add(registerUserRequest);
+        return addUsers(registerUserRequests);
     }
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> addUsers(ValidateList<RegisterUser> registerUsers) {
-        checkAccountExisted(registerUsers);
-        List<User> users = insertUserBatch(registerUsers);
-        List<UserRoleDTO> userRoleDTOS = matchUserRole(registerUsers.size(), registerUsers, users);
-        addUserRoleBatch(userRoleDTOS);
+    public <T> BaseResponse<T> addUsers(ValidateList<RegisterUserRequest> registerUserRequests) {
+        checkAccountExisted(registerUserRequests);
+        List<User> users = insertUserBatch(registerUserRequests);
+        List<UserRoleRequest> userRoleRequests = matchUserRole(registerUserRequests.size(), registerUserRequests, users);
+        addUserRoleBatch(userRoleRequests);
         return ResponseUtil.success();
     }
 
     @Transactional
-    public void checkAccountExisted(List<RegisterUser> registerUsers) {
+    public void checkAccountExisted(List<RegisterUserRequest> registerUserRequests) {
         // 从数据库中检查是否有重复的用户
         // 学生 -> username是学号, 系统唯一
         // 其他身份 -> 默认使用工号(待商榷)
-        List<String> usernames = registerUsers.stream()
-                .map(RegisterUser::getUsername)
+        List<String> usernames = registerUserRequests.stream()
+                .map(RegisterUserRequest::getUsername)
                 .toList();
         List<User> userFromDB = QueryChain.of(User.class)
                 .where(USER.USERNAME.in(usernames))
@@ -220,10 +220,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Transactional
-    public List<User> insertUserBatch(List<RegisterUser> registerUsers) {
+    public List<User> insertUserBatch(List<RegisterUserRequest> registerUserRequests) {
         // 构造数据库结构的User并插入
         ArrayList<User> users = new ArrayList<>();
-        registerUsers.forEach(it -> {
+        registerUserRequests.forEach(it -> {
             User user = createUser(it);
             users.add(user);
         });
@@ -246,11 +246,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Transactional
-    public List<UserRoleDTO> matchUserRole(int size, List<RegisterUser> registerUsers, List<User> users) {
+    public List<UserRoleRequest> matchUserRole(int size, List<RegisterUserRequest> registerUserRequests, List<User> users) {
         // username和对应身份配对
         UsernameTrie root = new UsernameTrie();
-        root.buildTrie(registerUsers);
-        ArrayList<UserRoleDTO> userRoleDTOs = new ArrayList<>();
+        root.buildTrie(registerUserRequests);
+        ArrayList<UserRoleRequest> userRoleRequests = new ArrayList<>();
         for (int idx = 0; idx < size; idx++) {
             User user = users.get(idx);
             String username = user.getUsername();
@@ -258,34 +258,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (!root.search(username))
                 continue;
             UsernameTrie.TrieNode node = root.getNode(username);
-            UserRoleDTO userRoleDTO = createUserRoleDTO(uid, node.getRoles());
-            userRoleDTOs.add(userRoleDTO);
+            UserRoleRequest userRoleRequest = createUserRoleDTO(uid, node.getRoles());
+            userRoleRequests.add(userRoleRequest);
         }
-        return userRoleDTOs;
+        return userRoleRequests;
     }
 
-    public User createUser(RegisterUser registerUser) {
+    public User createUser(RegisterUserRequest registerUserRequest) {
         return User.builder()
-                .username(registerUser.getUsername())
-                .realName(registerUser.getRealName())
-                .email(registerUser.getEmail())
-                .phone(registerUser.getPhone())
-                .password(passwordEncoder.encode(registerUser.getPassword()))
+                .username(registerUserRequest.getUsername())
+                .realName(registerUserRequest.getRealName())
+                .email(registerUserRequest.getEmail())
+                .phone(registerUserRequest.getPhone())
+                .password(passwordEncoder.encode(registerUserRequest.getPassword()))
                 .createdAt(LocalDate.now())
                 .enabled(true)
                 .build();
     }
 
-    public UserRoleDTO createUserRoleDTO(String uid, Set<String> roles) {
-        return UserRoleDTO.builder()
+    public UserRoleRequest createUserRoleDTO(String uid, Set<String> roles) {
+        return UserRoleRequest.builder()
                 .uid(uid)
                 .roles(roles)
                 .build();
     }
 
     @Transactional
-    public void addUserRoleBatch(List<UserRoleDTO> userRoleDTOs) {
-        userRoleDTOs.forEach(it -> {
+    public void addUserRoleBatch(List<UserRoleRequest> userRoleRequests) {
+        userRoleRequests.forEach(it -> {
             if (RoleNotNullOrEmpty(it.getRoles()))
                 addUserRole(it.getRoles(), it.getUid());
         });
@@ -293,11 +293,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     // @Cacheable(value = "userDetailCache", key = "username")
-    public BaseResponse<UserDetailInfo> getUserDetails(String username) {
-        CompletableFuture<UserDetailInfo> future = CompletableFuture.supplyAsync(() -> {
-            UserDetailInfo user = QueryChain.of(User.class)
+    public BaseResponse<UserDetailItem> getUserDetails(String username) {
+        CompletableFuture<UserDetailItem> future = CompletableFuture.supplyAsync(() -> {
+            UserDetailItem user = QueryChain.of(User.class)
                     .and(USER.USERNAME.eq(username))
-                    .oneAs(UserDetailInfo.class);
+                    .oneAs(UserDetailItem.class);
             if (Objects.isNull(user))
                 throw new ServiceException(ServiceExceptionEnum.ACCOUNT_NOT_FOUND);
             String uid = user.getUid();
@@ -306,7 +306,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 user.setRoles(userRole);
             return user;
         }, readThreadPool);
-        UserDetailInfo info = FutureExceptionExecute.fromFuture(future).execute();
+        UserDetailItem info = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(info);
     }
 
@@ -321,17 +321,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> updateUserRole(UserRoleDTO userRoleDTO) {
-        String uid = userRoleDTO.getUid();
+    public <T> BaseResponse<T> updateUserRole(UserRoleRequest userRoleRequest) {
+        String uid = userRoleRequest.getUid();
         List<Role> roles = userRoleMapper.getUserRole(uid);
         if (listHandler(roles)) {
-            addUserRole(userRoleDTO.getRoles(), uid);
+            addUserRole(userRoleRequest.getRoles(), uid);
         } else {
             Set<String> roleSetFromDB = roles.stream()
                     .map(Role::getRid)
                     .filter(StringUtils::hasLength)
                     .collect(Collectors.toSet());
-            Set<String> roleSetFromWeb = userRoleDTO.getRoles();
+            Set<String> roleSetFromWeb = userRoleRequest.getRoles();
             List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
             delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
             List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
@@ -356,17 +356,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> updateRolePermission(RolePermissionDTO rolePermissionDTO) {
-        String rid = rolePermissionDTO.getRid();
+    public <T> BaseResponse<T> updateRolePermission(RolePermissionRequest rolePermissionRequest) {
+        String rid = rolePermissionRequest.getRid();
         List<Permission> permissions = rolePermissionMapper.getRolePermission(rid);
         if (listHandler(permissions)) {
-            addRolePermission(rolePermissionDTO.getPermissions().stream().toList(), rid);
+            addRolePermission(rolePermissionRequest.getPermissions().stream().toList(), rid);
         } else {
             Set<String> permissionSetFromDB = permissions.stream()
                     .map(Permission::getPid)
                     .filter(StringUtils::hasLength)
                     .collect(Collectors.toSet());
-            Set<String> permissionSetFromWeb = rolePermissionDTO.getPermissions();
+            Set<String> permissionSetFromWeb = rolePermissionRequest.getPermissions();
             List<String> delete = getDelete(permissionSetFromWeb, permissionSetFromDB).stream().toList();
             delete.forEach(item -> rolePermissionMapper.delete(new RolePermission(rid, item)));
             List<String> insert = getInsert(permissionSetFromWeb, permissionSetFromDB).stream().toList();
@@ -378,15 +378,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Transactional
     @Override
-    public <T> BaseResponse<T> addRole(RoleDTO roleDTO) {
-        Role role = new Role(roleDTO);
+    public <T> BaseResponse<T> addRole(RoleRequest roleItem) {
+        Role role = new Role(roleItem);
         int i = roleMapper.insert(role);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        if (!Objects.isNull(roleDTO.getPermissions()) && !roleDTO.getPermissions().isEmpty()) {
+        if (!Objects.isNull(roleItem.getPermissions()) && !roleItem.getPermissions().isEmpty()) {
             ArrayList<RolePermission> rolePermissions = new ArrayList<>();
             String rid = role.getRid();
-            roleDTO.getPermissions().forEach(item -> rolePermissions.add(new RolePermission(rid, item.getPid())));
+            roleItem.getPermissions().forEach(item -> rolePermissions.add(new RolePermission(rid, item.getPid())));
             int j = rolePermissionMapper.insertBatch(rolePermissions);
             if (j != rolePermissions.size())
                 throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -471,17 +471,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<List<UserDetailInfo>> gets(UserQuery query) {
-        CompletableFuture<List<UserDetailInfo>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
+    public BaseResponse<List<UserDetailItem>> gets(UserQuery query) {
+        CompletableFuture<List<UserDetailItem>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
                         .select(USER.ALL_COLUMNS, ROLE.ALL_COLUMNS)
                         .from(USER)
                         .leftJoin(USER_ROLE).on(USER.UID.eq(USER_ROLE.UID))
                         .leftJoin(ROLE).on(USER_ROLE.RID.eq(ROLE.RID))
                         .where(USER.ENABLED.eq(query.getEnabled()))
                         .and(USER.REAL_NAME.like(query.getKeyword()).or(USER.USERNAME.like(query.getKeyword())))
-                        .listAs(UserDetailInfo.class)
+                        .listAs(UserDetailItem.class)
                 , readThreadPool);
-        List<UserDetailInfo> execute = FutureExceptionExecute.fromFuture(future).execute();
+        List<UserDetailItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 
@@ -511,13 +511,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateUser(UpdateUserDTO updateUserDTO) {
+    public <T> BaseResponse<T> updateUser(UpdateUserRequest updateUserRequest) {
         boolean update = UpdateChain.of(User.class)
-                .set(USER.REAL_NAME, updateUserDTO.getRealName(), StringUtils::hasLength)
-                .set(USER.EMAIL, updateUserDTO.getEmail(), StringUtils::hasLength)
-                .set(USER.PHONE, updateUserDTO.getPhone(), StringUtils::hasLength)
-                .set(USER.PASSWORD, passwordEncoder.encode(updateUserDTO.getPassword()), StringUtils.hasLength(updateUserDTO.getPassword()))
-                .where(USER.UID.eq(updateUserDTO.getUid()))
+                .set(USER.REAL_NAME, updateUserRequest.getRealName(), StringUtils::hasLength)
+                .set(USER.EMAIL, updateUserRequest.getEmail(), StringUtils::hasLength)
+                .set(USER.PHONE, updateUserRequest.getPhone(), StringUtils::hasLength)
+                .set(USER.PASSWORD, passwordEncoder.encode(updateUserRequest.getPassword()), StringUtils.hasLength(updateUserRequest.getPassword()))
+                .where(USER.UID.eq(updateUserRequest.getUid()))
                 .update();
         if (update)
             return ResponseUtil.success();
@@ -525,13 +525,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<List<PermissionTreeVO>> getPermissionTree() {
-        CompletableFuture<BaseResponse<List<PermissionTreeVO>>> future = CompletableFuture.supplyAsync(() -> {
+    public BaseResponse<List<PermissionTreeItem>> getPermissionTree() {
+        CompletableFuture<BaseResponse<List<PermissionTreeItem>>> future = CompletableFuture.supplyAsync(() -> {
             List<Permission> permissions = permissionMapper.selectAll();
-            PermissionTreeVO root =
-                    new PermissionTreeVO("root", "root", "root", new ArrayList<>());
+            PermissionTreeItem root =
+                    new PermissionTreeItem("root", "root", "root", new ArrayList<>());
             for (Permission permission : permissions) {
-                PermissionTreeVO nowAt = root;
+                PermissionTreeItem nowAt = root;
                 int beginIndex = 0;
                 String parentPrefix = "";
                 while (beginIndex != -1) {
@@ -549,14 +549,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                         parentPrefix = pid;
                         beginIndex = index + 1;
                     }
-                    PermissionTreeVO finalNowAt = nowAt;
+                    PermissionTreeItem finalNowAt = nowAt;
                     nowAt = nowAt.getChildren().stream()
                             .filter(tree -> tree.getPermissionName().equals(name))
                             .findFirst()
                             .orElseGet(() -> {
-                                        PermissionTreeVO permissionTreeVO = new PermissionTreeVO(pid, name, desc, new ArrayList<>());
-                                        finalNowAt.getChildren().add(permissionTreeVO);
-                                        return permissionTreeVO;
+                                        PermissionTreeItem permissionTreeItem = new PermissionTreeItem(pid, name, desc, new ArrayList<>());
+                                        finalNowAt.getChildren().add(permissionTreeItem);
+                                        return permissionTreeItem;
                                     }
                             );
                 }
@@ -581,7 +581,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public BaseResponse<FindBackPasswordVO> findBackPassword(String username) {
+    public BaseResponse<FindBackPasswordItem> findBackPassword(String username) {
         User user = QueryChain.of(User.class)
                 .select(USER.ALL_COLUMNS)
                 .where(USER.USERNAME.eq(username))
@@ -598,8 +598,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         int maskLength = idx + 1 - 3 - 3;
         String maskEmail = email.substring(0, 3) + String.valueOf('*').repeat(maskLength)
                 + email.substring(idx-3, idx) + suffix;
-        FindBackPasswordVO findBackPasswordVO = new FindBackPasswordVO(maskEmail);
-        return ResponseUtil.success(findBackPasswordVO);
+        FindBackPasswordItem findBackPasswordItem = new FindBackPasswordItem(maskEmail);
+        return ResponseUtil.success(findBackPasswordItem);
     }
 
     @Override

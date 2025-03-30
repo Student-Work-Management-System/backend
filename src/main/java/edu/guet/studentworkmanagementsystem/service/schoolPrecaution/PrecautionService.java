@@ -6,9 +6,9 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
-import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * 修改学业预警记录
      * @param schoolPrecautionDTO 待修改的学业预警记录
      */
-    <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionDTO schoolPrecautionDTO);
+    <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionRequest schoolPrecautionDTO);
     /**
      * 删除学业预警记录
      * @param studentSchoolPrecautionId 学业预警表id
@@ -41,7 +41,7 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * @param query 查询参数
      * @return 学业预警信息
      */
-    BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(PrecautionQuery query);
+    BaseResponse<Page<StudentSchoolPrecautionItem>> getAllRecords(PrecautionQuery query);
     BaseResponse<HashMap<String, Object>> stat(PrecautionStatQuery query);
     void download(PrecautionStatQuery query, HttpServletResponse response);
 }

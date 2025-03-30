@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.entity.po.scholarship;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,9 +34,9 @@ public class StudentScholarship implements Serializable {
      * 获奖学年, YYYY-YYYY
      */
     private String awardYear;
-    public StudentScholarship(StudentScholarshipDTO studentScholarshipDTO) {
-        this.studentId = studentScholarshipDTO.getStudentId();
-        this.scholarshipId = studentScholarshipDTO.getScholarshipId();
-        this.awardYear = studentScholarshipDTO.getAwardYear();
+    public StudentScholarship(StudentScholarshipRequest studentScholarshipRequest) {
+        this.studentId = studentScholarshipRequest.getStudentId();
+        this.scholarshipId = studentScholarshipRequest.getScholarshipId();
+        this.awardYear = studentScholarshipRequest.getAwardYear();
     }
 }

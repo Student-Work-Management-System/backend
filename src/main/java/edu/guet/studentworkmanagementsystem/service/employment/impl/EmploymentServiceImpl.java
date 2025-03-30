@@ -8,8 +8,8 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.EmploymentStatistics;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.employment.StudentEmploymentMapper;
@@ -72,7 +72,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
 
     @Override
     @Transactional
-    public BaseResponse<Page<StudentEmploymentVO>> getStudentEmployment(EmploymentQuery query) {
+    public BaseResponse<Page<StudentEmploymentItem>> getStudentEmployment(EmploymentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         QueryChain<StudentEmployment> queryChain = QueryChain.of(StudentEmployment.class)
@@ -85,7 +85,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                 .and(STUDENT.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_EMPLOYMENT.GRADUATION_YEAR.eq(query.getGraduationYear()))
                 .and(STUDENT.STUDENT_ID.like(query.getSearch()).or(STUDENT.NAME.like(query.getSearch())));
-        Page<StudentEmploymentVO> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentVO.class);
+        Page<StudentEmploymentItem> page = queryChain.pageAs(Page.of(pageNo, pageSize), StudentEmploymentItem.class);
         return ResponseUtil.success(page);
     }
 
@@ -141,7 +141,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     }
 
     @Override
-    public BaseResponse<HashMap<String, EmploymentStatistics>> statistics(EmploymentStatQuery query) {
+    public BaseResponse<HashMap<String, StudentEmploymentStatItem>> statistics(EmploymentStatQuery query) {
         Set<String> keys = new HashSet<>();
         List<String> majorIds = query.getMajorIds();
         if (majorIds.isEmpty()) {
@@ -169,9 +169,9 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
         HashMap<String, HashMap<String, Object>> jobLocation = (HashMap<String, HashMap<String, Object>>) map.get("单位所在地");
         HashMap<String, HashMap<String, Object>> jobIndustry = (HashMap<String, HashMap<String, Object>>) map.get("单位所处行业");
         HashMap<String, Double> salaryMap = (HashMap<String, Double>) map.get("平均薪资");
-        HashMap<String, EmploymentStatistics> statisticsHashMap = new HashMap<>();
+        HashMap<String, StudentEmploymentStatItem> statisticsHashMap = new HashMap<>();
         keys.forEach(key -> {
-            EmploymentStatistics tmp = new EmploymentStatistics();
+            StudentEmploymentStatItem tmp = new StudentEmploymentStatItem();
             if (graduationStatus.containsKey(key)) {
                 tmp.setGraduationStatus(graduationStatus.get(key));
             }

@@ -6,9 +6,9 @@ import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
-import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import edu.guet.studentworkmanagementsystem.service.schoolPrecaution.PrecautionService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,7 +37,7 @@ public class PrecautionController {
     }
     @PreAuthorize("hasAuthority('student_school_precaution:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateSchoolPrecaution(@RequestBody @Valid StudentSchoolPrecautionDTO schoolPrecautionDTO) {
+    public <T> BaseResponse<T> updateSchoolPrecaution(@RequestBody @Valid StudentSchoolPrecautionRequest schoolPrecautionDTO) {
         return precautionService.updateSchoolPrecaution(schoolPrecautionDTO);
     }
     @PreAuthorize("hasAuthority('student_school_precaution:delete')")
@@ -47,7 +47,7 @@ public class PrecautionController {
     }
     @PreAuthorize("hasAuthority('student_school_precaution:select') and hasAuthority('student:select') and hasAuthority('major:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(@RequestBody PrecautionQuery query) {
+    public BaseResponse<Page<StudentSchoolPrecautionItem>> getAllRecords(@RequestBody PrecautionQuery query) {
         return precautionService.getAllRecords(query);
     }
     @PreAuthorize("hasAuthority('student_school_precaution:select')")

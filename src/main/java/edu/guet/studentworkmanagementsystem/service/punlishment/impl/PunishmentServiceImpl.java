@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentList
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
-import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.punlishment.PunishmentMapper;
@@ -49,15 +49,15 @@ public class PunishmentServiceImpl extends ServiceImpl<PunishmentMapper, Student
     }
 
     @Override
-    public BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(PunishmentQuery query) {
+    public BaseResponse<Page<StudentPunishmentItem>> getAllStudentPunishment(PunishmentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentPunishmentVO> studentPunishmentVOPage = QueryChain.of(StudentPunishment.class)
+        Page<StudentPunishmentItem> studentPunishmentVOPage = QueryChain.of(StudentPunishment.class)
                 .select(STUDENT_PUNISHMENT.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_PUNISHMENT)
                 .innerJoin(STUDENT).on(STUDENT_PUNISHMENT.STUDENT_ID.eq(STUDENT.STUDENT_ID))
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .pageAs(Page.of(pageNo, pageSize), StudentPunishmentVO.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentPunishmentItem.class);
         return ResponseUtil.success(studentPunishmentVOPage);
     }
 

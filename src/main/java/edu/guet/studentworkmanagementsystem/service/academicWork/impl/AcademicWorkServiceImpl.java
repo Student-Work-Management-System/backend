@@ -13,7 +13,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkList;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.academicWork.*;
@@ -135,11 +135,11 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     }
 
     @Override
-    public BaseResponse<List<StudentAcademicWorkVO>> getOwnStudentAcademicWork(String studentId) {
-        List<StudentAcademicWorkVO> studentAcademicWorks = QueryChain.of(StudentAcademicWork.class)
+    public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(String studentId) {
+        List<StudentAcademicWorkItem> studentAcademicWorks = QueryChain.of(StudentAcademicWork.class)
                 .select(STUDENT_ACADEMIC_WORK.ALL_COLUMNS, STUDENT.ALL_COLUMNS)
                 .where(STUDENT_ACADEMIC_WORK.STUDENT_ID.eq(studentId))
-                .listAs(StudentAcademicWorkVO.class);
+                .listAs(StudentAcademicWorkItem.class);
         studentAcademicWorks.forEach(item -> {
             AcademicWork academicWork = getAcademicWork(item.getAcademicWorkType(), item.getAdditionalInfoId());
             item.setAcademicWork(academicWork);
@@ -185,16 +185,16 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     }
 
     @Override
-    public BaseResponse<Page<StudentAcademicWorkVO>> getAllStudentAcademicWork(AcademicWorkQuery query) {
+    public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentAcademicWorkVO> studentAcademicWorkVOPage = QueryChain.of(StudentAcademicWork.class)
+        Page<StudentAcademicWorkItem> studentAcademicWorkVOPage = QueryChain.of(StudentAcademicWork.class)
                 .select(STUDENT_ACADEMIC_WORK.ALL_COLUMNS, STUDENT.ALL_COLUMNS)
                 .where(STUDENT_ACADEMIC_WORK.STUDENT_ID.eq(query.getStudentId()))
                 .and(STUDENT.NAME.like(query.getName()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_ACADEMIC_WORK.UPLOAD_TIME.eq(query.getUploadTime()))
-                .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkVO.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkItem.class);
         studentAcademicWorkVOPage.getRecords().forEach(item -> {
             AcademicWork academicWork = getAcademicWork(item.getAcademicWorkType(), item.getAdditionalInfoId());
             item.setAcademicWork(academicWork);

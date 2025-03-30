@@ -8,8 +8,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public interface EnrollmentService extends IService<Enrollment> {
      * <br/>
      * @param query 查询参数
      */
-    BaseResponse<Page<EnrollmentVO>>  getAllRecords(EnrollmentQuery query);
+    BaseResponse<Page<EnrollmentItem>>  getAllRecords(EnrollmentQuery query);
     void download(EnrollmentStatQuery query, HttpServletResponse response);
-    BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(EnrollmentStatQuery query);
+    BaseResponse<HashMap<String, EnrollmentStatItem>> statistics(EnrollmentStatQuery query);
 }

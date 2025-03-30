@@ -13,7 +13,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveAudit;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.leave.StudentLeaveAuditMapper;
@@ -94,12 +94,12 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<StudentLeaveVO>> getStudentLeave(LeaveQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getStudentLeave(LeaveQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
         if (!selectStateHandler(query))
             throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
-        Page<StudentLeaveVO> studentLeaveVOPage = QueryChain.of(StudentLeave.class)
+        Page<StudentLeaveItem> studentLeaveVOPage = QueryChain.of(StudentLeave.class)
                 .select(STUDENT.ALL_COLUMNS, STUDENT_LEAVE.ALL_COLUMNS, STUDENT_LEAVE_AUDIT.AUDIT_DATE, MAJOR.ALL_COLUMNS, USER.USERNAME.as("auditorNo"), USER.REAL_NAME.as("auditorName"))
                 .from(STUDENT_LEAVE)
                 .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_LEAVE.STUDENT_ID))
@@ -110,7 +110,7 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
                 .and(Student::getMajorId).eq(query.getMajorId())
                 .and(StudentLeave::getLeaveDate).eq(query.getLeaveDate())
                 .and(STUDENT_LEAVE_AUDIT.AUDIT_STATE.eq(query.getAuditState()))
-                .pageAs(Page.of(pageNo, pageSize), StudentLeaveVO.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentLeaveItem.class);
         return ResponseUtil.success(studentLeaveVOPage);
     }
     @Override

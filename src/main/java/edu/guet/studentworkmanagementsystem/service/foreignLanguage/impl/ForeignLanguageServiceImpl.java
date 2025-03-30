@@ -7,10 +7,10 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLanguageQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLanguageStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLanguageStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.ForeignLanguage;
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.foreignLanguage.ForeignLanguageMapper;
@@ -33,7 +33,6 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeT
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 
 @Service
 public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMapper, ForeignLanguage> implements ForeignLanguageService {
@@ -94,9 +93,8 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
                     .from(FOREIGN_LANGUAGE)
                     .innerJoin(LANGUAGE).on(LANGUAGE.LANGUAGE_ID.eq(FOREIGN_LANGUAGE.LANGUAGE_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(FOREIGN_LANGUAGE.STUDENT_ID))
-                    .innerJoin(STUDENT_DETAIL).on(STUDENT_DETAIL.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
-                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_DETAIL.MAJOR_ID))
-                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_DETAIL.GRADE_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                     .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
                     .where(
                             FOREIGN_LANGUAGE.STUDENT_ID.like(query.getSearch())
@@ -116,7 +114,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
     }
 
     @Override
-    public BaseResponse<List<ForeignLanguageStatusItem>> getForeignLanguageStatus(ForeignLanguageStatusQuery query) {
+    public BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStatus(ForeignLanguageStatQuery query) {
         // todo: tobe finish
         return null;
     }

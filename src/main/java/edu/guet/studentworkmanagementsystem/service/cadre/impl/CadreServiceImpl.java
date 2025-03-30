@@ -11,7 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.CadreMapper;
@@ -35,7 +35,6 @@ import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.Student
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 
 @Service
 public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCadre>  implements CadreService{
@@ -150,17 +149,16 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                             STUDENT_CADRE.COMMENT
                             )
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_CADRE.STUDENT_ID))
-                    .innerJoin(STUDENT_DETAIL).on(STUDENT_DETAIL.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
-                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_DETAIL.MAJOR_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(CADRE).on(CADRE.CADRE_ID.eq(STUDENT_CADRE.CADRE_ID))
-                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_DETAIL.GRADE_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                     .where(
                             STUDENT_BASIC.STUDENT_ID.like(query.getSearch())
                                     .or(STUDENT_BASIC.NAME.like(query.getSearch()))
                                     .or(CADRE.CADRE_POSITION.like(query.getSearch()))
                     )
-                    .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
-                    .and(STUDENT_DETAIL.GRADE_ID.eq(query.getGradeId()))
+                    .and(STUDENT_BASIC.MAJOR_ID.eq(query.getMajorId()))
+                    .and(STUDENT_BASIC.GRADE_ID.eq(query.getGradeId()))
                     .and(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
                     .and(StudentCadre::getAppointmentStartTerm).eq(query.getAppointmentStartTerm())
                     .and(StudentCadre::getAppointmentEndTerm).eq(query.getAppointmentEndTerm())
@@ -171,11 +169,11 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
 
     @Override
-    public BaseResponse<List<StudentCadreStatusItem>> getCadreStatus(CadreStatusQuery query) {
+    public BaseResponse<List<StudentCadreStatItem>> getCadreStatus(CadreStatQuery query) {
         // todo: 完成mapper内实现
-        CompletableFuture<List<StudentCadreStatusItem>> future =
+        CompletableFuture<List<StudentCadreStatItem>> future =
                 CompletableFuture.supplyAsync(() -> mapper.getCadreStatus(query), readThreadPool);
-        List<StudentCadreStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        List<StudentCadreStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }

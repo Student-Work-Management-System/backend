@@ -8,7 +8,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
-import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
 import edu.guet.studentworkmanagementsystem.service.leave.LeaveService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class LeaveController {
             "and hasAuthority('user:select')"
     )
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentLeaveVO>> getStudentLeave(@RequestBody LeaveQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getStudentLeave(@RequestBody LeaveQuery query) {
         return leaveService.getStudentLeave(query);
     }
     @PreAuthorize("hasAuthority('student_leave:insert') and hasAuthority('student_leave_audit:insert')")

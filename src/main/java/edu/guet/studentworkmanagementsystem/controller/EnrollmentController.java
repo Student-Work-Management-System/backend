@@ -9,8 +9,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class EnrollmentController {
     }
     @PreAuthorize("hasAuthority('enrollment:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<EnrollmentVO>> getAllRecords(@RequestBody EnrollmentQuery query) {
+    public BaseResponse<Page<EnrollmentItem>> getAllRecords(@RequestBody EnrollmentQuery query) {
         return enrollmentService.getAllRecords(query);
     }
     @PreAuthorize("hasAuthority('enrollment:select')")
@@ -57,7 +57,7 @@ public class EnrollmentController {
     }
     @PreAuthorize("hasAuthority('enrollment:select')")
     @PostMapping("/stat")
-    public BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(@RequestBody EnrollmentStatQuery query) {
+    public BaseResponse<HashMap<String, EnrollmentStatItem>> statistics(@RequestBody EnrollmentStatQuery query) {
         return enrollmentService.statistics(query);
     }
 }

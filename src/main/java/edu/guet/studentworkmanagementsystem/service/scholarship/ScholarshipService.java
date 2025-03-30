@@ -5,10 +5,10 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
 
 import java.util.List;
 
@@ -44,17 +44,17 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * @param query 查询参数
      * @return 学生就业信息
      */
-    BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query);
+    BaseResponse<Page<StudentScholarshipItem>> getStudentScholarship(ScholarshipQuery query);
     /**
      * 分配奖学金
-     * @param studentScholarshipDTO 学生获得奖学金记录
+     * @param studentScholarshipRequest 学生获得奖学金记录
      */
-    <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipDTO studentScholarshipDTO);
+    <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipRequest studentScholarshipRequest);
     /**
      * 修改学生获得奖学金时间
-     * @param studentScholarshipDTO 修改需要传递的对象, 某一为空则不修改该属性
+     * @param studentScholarshipRequest 修改需要传递的对象, 某一为空则不修改该属性
      */
-    <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipDTO studentScholarshipDTO);
+    <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipRequest studentScholarshipRequest);
     /**
      * 删除学生获得奖学金记录
      * @param studentScholarshipId 学生奖学金记录id

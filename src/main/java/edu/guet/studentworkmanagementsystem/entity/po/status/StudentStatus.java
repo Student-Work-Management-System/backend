@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -31,22 +31,23 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(value = "student_status")
 public class StudentStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     @NotBlank(message = "学生学籍状态id不能为空", groups = {UpdateGroup.class})
     private String studentStatusId;
+    @NotBlank(message = "学生学号不能为空", groups = {InsertGroup.class})
     private String studentId;
+    @NotBlank(message = "学籍id不能为空", groups = {InsertGroup.class})
     private String statusId;
     /**
      * 学籍处理
      */
-    private String handle;
+    private String log;
     /**
      * 变动日期
      */
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate changedDate;
+    private LocalDate modifiedTime;
+    private Boolean statusEnabled;
 }

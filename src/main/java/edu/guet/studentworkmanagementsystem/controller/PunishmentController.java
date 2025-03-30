@@ -6,7 +6,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentList
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.PunishmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
-import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
 import edu.guet.studentworkmanagementsystem.service.punlishment.PunishmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class PunishmentController {
     private PunishmentService punishmentService;
     @PreAuthorize("hasAuthority('student_punishment:select') and hasAuthority('student:select') and hasAuthority('major:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentPunishmentVO>> getAllStudentPunishment(@RequestBody PunishmentQuery query) {
+    public BaseResponse<Page<StudentPunishmentItem>> getAllStudentPunishment(@RequestBody PunishmentQuery query) {
         return punishmentService.getAllStudentPunishment(query);
     }
     @PreAuthorize("hasAuthority('student_punishment:insert')")

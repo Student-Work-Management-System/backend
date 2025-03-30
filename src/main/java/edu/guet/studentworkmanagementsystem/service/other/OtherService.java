@@ -12,7 +12,6 @@ public interface OtherService {
     List<Degree> getDegreeList();
     BaseResponse<List<Politic>> getAllPolitics();
     List<Politic> getPoliticList();
-    List<Counselor> getCounselorList();
     <T> BaseResponse<T> addMajor(Major major);
     <T> BaseResponse<T> updateMajor(Major major);
     BaseResponse<List<Major>> getMajors();

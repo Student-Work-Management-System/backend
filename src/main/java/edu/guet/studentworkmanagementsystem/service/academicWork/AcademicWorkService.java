@@ -11,7 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcade
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Author;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @param studentId 查询学生学号
      * @return 学生上报的学术著作记录
      */
-    BaseResponse<List<StudentAcademicWorkVO>> getOwnStudentAcademicWork(String studentId);
+    BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(String studentId);
     /**
      * 审核学生学术作品认证结果
      * <br/>
@@ -71,5 +71,5 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
      * @param query 查询参数
      * @return 上报结果
      */
-    BaseResponse<Page<StudentAcademicWorkVO>> getAllStudentAcademicWork(AcademicWorkQuery query);
+    BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query);
 }

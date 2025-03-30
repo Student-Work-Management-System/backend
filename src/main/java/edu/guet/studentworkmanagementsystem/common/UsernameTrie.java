@@ -1,6 +1,6 @@
 package edu.guet.studentworkmanagementsystem.common;
 
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserRequest;
 import lombok.Getter;
 
 import java.util.List;
@@ -50,8 +50,8 @@ public class UsernameTrie {
         return node;
     }
 
-    public void buildTrie(List<RegisterUser> registerUsers) {
-        registerUsers.forEach(registerUser -> {
+    public void buildTrie(List<RegisterUserRequest> registerUserRequests) {
+        registerUserRequests.forEach(registerUser -> {
             String username = registerUser.getUsername();
             Set<String> roles = registerUser.getRoles();
             insert(username, roles);

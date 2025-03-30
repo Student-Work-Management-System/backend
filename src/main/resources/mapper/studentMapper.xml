@@ -3,8 +3,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper">
     <select id="getStudentStatusList"
-            parameterType="edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery"
-            resultType="edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem">
+            parameterType="edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery"
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem">
         SELECT
             `major`.`major_name`,
             COUNT(DISTINCT `student_basic`.`student_id`) AS `totalCount`,
@@ -29,15 +29,15 @@
             SUM(IF(`politic`.`politic_status` = '预备党员', 1, 0)) AS `prepareCount`,
             SUM(IF(`student_detail`.`nation` NOT LIKE '%汉%' AND `student_detail`.`nation` NOT LIKE '%汉族%', 1, 0)) AS `minorityCount`,
             SUM(IF(`student_detail`.`disability` = 1, 1, 0)) AS `disabilityCount`
-        FROM `major`
-            LEFT JOIN `student_basic` ON `major`.`major_id` = `student_basic`.`major_id`
+        FROM `student_basic`
             LEFT JOIN `student_detail` ON `student_basic`.`student_id` = `student_detail`.`student_id`
-            LEFT JOIN `student_status` ON `student_basic`.`status_id` = `student_status`.`status_id`
+            LEFT JOIN `major` ON `major`.`major_id` = `student_basic`.`major_id`
+            LEFT JOIN `student_status` ON `student_basic`.`student_id` = `student_status`.`student_id` and `student_status`.status_enabled = true
             LEFT JOIN `status` ON `student_status`.`status_id` = `status`.`status_id`
             LEFT JOIN `politic` ON `student_basic`.`politic_id` = `politic`.`politic_id`
         <where>
             <if test="gradeId != null and gradeId != ''">
-                `student_detail`.`grade_id` = #{gradeId}
+                `student_basic`.`grade_id` = #{gradeId}
             </if>
             <if test="degreeId != null and degreeId != ''">
                 and `student_basic`.`degree_id` = #{degreeId}

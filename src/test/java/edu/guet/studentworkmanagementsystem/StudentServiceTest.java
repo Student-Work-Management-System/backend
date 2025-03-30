@@ -4,9 +4,9 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import org.junit.jupiter.api.Test;
@@ -26,11 +26,11 @@ public class StudentServiceTest {
 
     @Test
     void getStudentStatus() {
-        StudentStatusQuery query = StudentStatusQuery.builder()
+        StudentStatQuery query = StudentStatQuery.builder()
                 // .degreeId("1")
                 // .gradeId("3")
                 .build();
-        BaseResponse<List<StudentStatusItem>> studentStatus = studentService.getStudentStatus(query);
+        BaseResponse<List<StudentStatItem>> studentStatus = studentService.getStudentStatus(query);
         System.out.println(studentStatus.getData());
     }
 

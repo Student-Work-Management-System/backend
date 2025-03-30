@@ -72,12 +72,6 @@ public class OtherServiceImpl implements OtherService {
     }
 
     @Override
-    public List<Counselor> getCounselorList() {
-        CompletableFuture<List<Counselor>> future = CompletableFuture.supplyAsync(() -> counselorMapper.selectAll(), readThreadPool);
-        return FutureExceptionExecute.fromFuture(future).execute();
-    }
-
-    @Override
     @Transactional
     public <T> BaseResponse<T> addMajor(Major major) {
         if (Objects.isNull(major.getMajorId()) || Objects.isNull(major.getMajorName()))

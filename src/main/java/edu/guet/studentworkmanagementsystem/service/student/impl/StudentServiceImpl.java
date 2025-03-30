@@ -6,13 +6,13 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatusQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUser;
+import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -21,6 +21,7 @@ import edu.guet.studentworkmanagementsystem.mapper.other.GradeMapper;
 import edu.guet.studentworkmanagementsystem.mapper.other.PoliticMapper;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
 import edu.guet.studentworkmanagementsystem.service.other.OtherService;
+import edu.guet.studentworkmanagementsystem.service.status.StatusService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentDetailService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
@@ -42,6 +43,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.Politic
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
+import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StudentStatusTableDef.STUDENT_STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RoleTableDef.ROLE;
@@ -52,16 +54,18 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTa
 @Service
 public class StudentServiceImpl implements StudentService {
     @Autowired
-    private UserService userService;
-    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     @Qualifier("readThreadPool")
     private ThreadPoolTaskExecutor readThreadPool;
     @Autowired
+    private UserService userService;
+    @Autowired
     private StudentBasicService studentBasicService;
     @Autowired
     private StudentDetailService studentDetailService;
+    @Autowired
+    private StatusService statusService;
     @Autowired
     private OtherService otherService;
     @Autowired
@@ -72,7 +76,6 @@ public class StudentServiceImpl implements StudentService {
     private PoliticMapper politicMapper;
     @Autowired
     private StudentMapper studentMapper;
-
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudent(ValidateList<Student> students) {
@@ -80,6 +83,7 @@ public class StudentServiceImpl implements StudentService {
         checkStudentIdOrIdNumberExisted(students);
         insertStudentBasicBatch(students);
         insertStudentDetailBatch(students);
+        insertStudentStatus(students);
         insertUserBatch(students);
         return ResponseUtil.success();
     }
@@ -136,7 +140,6 @@ public class StudentServiceImpl implements StudentService {
                 .gradeId(student.getGradeId())
                 .politicId(student.getPoliticId())
                 .majorId(student.getMajorId())
-                .statusId(student.getStatusId())
                 .enabled(student.getEnabled())
                 .build();
     }
@@ -212,8 +215,8 @@ public class StudentServiceImpl implements StudentService {
     /**
      * 注册学生身份用户
      */
-    public RegisterUser createRegisterUser(Student student) {
-        return RegisterUser.builder()
+    public RegisterUserRequest createRegisterUser(Student student) {
+        return RegisterUserRequest.builder()
                 .username(student.getStudentId())
                 .password(createPassword(student.getIdNumber()))
                 .realName(student.getName())
@@ -222,20 +225,28 @@ public class StudentServiceImpl implements StudentService {
                 .roles(Set.of("5"))
                 .build();
     }
-    public List<RegisterUser> createRegisterUsers(List<Student> students) {
-        ArrayList<RegisterUser> registerUsers = new ArrayList<>();
+    public List<RegisterUserRequest> createRegisterUsers(List<Student> students) {
+        ArrayList<RegisterUserRequest> registerUserRequests = new ArrayList<>();
         students.forEach(student -> {
-            RegisterUser user = createRegisterUser(student);
-            registerUsers.add(user);
+            RegisterUserRequest user = createRegisterUser(student);
+            registerUserRequests.add(user);
         });
-        return registerUsers;
+        return registerUserRequests;
     }
     public void insertUserBatch(ValidateList<Student> students) {
-        List<RegisterUser> registerUsers = createRegisterUsers(students);
-        ValidateList<RegisterUser> validateRegisterUsers = new ValidateList<>(registerUsers);
-        userService.addUsers(validateRegisterUsers);
+        List<RegisterUserRequest> registerUserRequests = createRegisterUsers(students);
+        ValidateList<RegisterUserRequest> validateRegisterUserRequests = new ValidateList<>(registerUserRequests);
+        userService.addUsers(validateRegisterUserRequests);
     }
-
+    /**
+     * 补充学生学籍信息
+     */
+    public void insertStudentStatus(ValidateList<Student> students) {
+        Set<String> studentIds = students.stream().map(Student::getStudentId).collect(Collectors.toSet());
+        boolean success = statusService.importStudentStatus(studentIds);
+        if (!success)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
     @Override
     public BaseResponse<Page<StudentTableItem>> getStudents(StudentQuery query) {
         CompletableFuture<BaseResponse<Page<StudentTableItem>>> future =
@@ -265,7 +276,8 @@ public class StudentServiceImpl implements StudentService {
                 .innerJoin(USER).on(STUDENT_DETAIL.HEADER_TEACHER_USERNAME.eq(USER.USERNAME))
                 .innerJoin(GRADE).on(STUDENT_BASIC.GRADE_ID.eq(GRADE.GRADE_ID))
                 .innerJoin(DEGREE).on(STUDENT_BASIC.DEGREE_ID.eq(DEGREE.DEGREE_ID))
-                .innerJoin(STATUS).on(STUDENT_BASIC.STATUS_ID.eq(STATUS.STATUS_ID))
+                .innerJoin(STUDENT_STATUS).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_STATUS.STUDENT_ID).and(STUDENT_STATUS.STATUS_ENABLED.eq(true)))
+                .innerJoin(STATUS).on(STATUS.STATUS_ID.eq(STUDENT_STATUS.STATUS_ID))
                 .innerJoin(POLITIC).on(STUDENT_BASIC.POLITIC_ID.eq(POLITIC.POLITIC_ID))
                 .where(STUDENT_BASIC.ENABLED.eq(query.getEnabled()))
                 .and(STUDENT_BASIC.DEGREE_ID.eq(query.getDegreeId()))
@@ -284,7 +296,6 @@ public class StudentServiceImpl implements StudentService {
                 .and(STUDENT_BASIC.GRADE_ID.eq(query.getGradeId()))
                 .and(STUDENT_BASIC.GENDER.eq(query.getGender()))
                 .and(STUDENT_BASIC.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT_BASIC.STATUS_ID.eq(query.getStatusId()))
                 .and(STUDENT_BASIC.POLITIC_ID.eq(query.getPoliticId()))
                 .and(STUDENT_DETAIL.NATIVE_PLACE.like(query.getNativePlace()))
                 .and(STUDENT_DETAIL.NATION.like(query.getNation()))
@@ -307,6 +318,7 @@ public class StudentServiceImpl implements StudentService {
                 .and(STUDENT_DETAIL.IS_ONLY_CHILD.eq(query.getIsOnlyChild()))
                 .and(STUDENT_DETAIL.LOCATION.like(query.getLocation()))
                 .and(STUDENT_DETAIL.DISABILITY.eq(query.getDisability()))
+                .and(STATUS.STATUS_ID.eq(query.getStatusId()))
                 .pageAs(Page.of(pageNo, pageSize), StudentTableItem.class);
     }
 
@@ -344,9 +356,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public BaseResponse<List<StudentStatusItem>> getStudentStatus(StudentStatusQuery query) {
-        CompletableFuture<List<StudentStatusItem>> future = CompletableFuture.supplyAsync(()-> getAllStudent(query), readThreadPool);
-        List<StudentStatusItem> list = FutureExceptionExecute.fromFuture(future).execute();
+    public BaseResponse<List<StudentStatItem>> getStudentStatus(StudentStatQuery query) {
+        CompletableFuture<List<StudentStatItem>> future = CompletableFuture.supplyAsync(()-> getAllStudent(query), readThreadPool);
+        List<StudentStatItem> list = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(list);
     }
 
@@ -408,7 +420,7 @@ public class StudentServiceImpl implements StudentService {
         return ResponseUtil.success(execute);
     }
 
-    public List<StudentStatusItem> getAllStudent(StudentStatusQuery query) {
+    public List<StudentStatItem> getAllStudent(StudentStatQuery query) {
         return studentMapper.getStudentStatusList(query);
     }
 

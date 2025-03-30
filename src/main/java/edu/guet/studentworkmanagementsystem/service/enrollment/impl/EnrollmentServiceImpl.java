@@ -10,8 +10,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatistics;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.enrollment.EnrollmentMapper;
@@ -80,10 +80,10 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<EnrollmentVO>> getAllRecords(EnrollmentQuery query) {
+    public BaseResponse<Page<EnrollmentItem>> getAllRecords(EnrollmentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<EnrollmentVO> enrollmentInfoPage = QueryChain.of(Enrollment.class)
+        Page<EnrollmentItem> enrollmentInfoPage = QueryChain.of(Enrollment.class)
                 .select(ENROLLMENT.ALL_COLUMNS, MAJOR.MAJOR_NAME.as("enrollMajor"))
                 .from(ENROLLMENT)
                 .innerJoin(MAJOR).on(ENROLLMENT.ENROLL_MAJOR_ID.eq(MAJOR.MAJOR_ID))
@@ -94,7 +94,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .and(ENROLLMENT.ENROLL_MAJOR_ID.eq(query.getEnrollMajorId()))
                 .and(ENROLLMENT.FIRST_MAJOR.eq(query.getFirstMajor()))
                 .and(ENROLLMENT.ENROLL_TIME.eq(query.getEnrollTime()))
-                .pageAs(Page.of(pageNo, pageSize), EnrollmentVO.class);
+                .pageAs(Page.of(pageNo, pageSize), EnrollmentItem.class);
         return ResponseUtil.success(enrollmentInfoPage);
     }
 
@@ -122,7 +122,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
     }
 
     @Override
-    public BaseResponse<HashMap<String, EnrollmentStatistics>> statistics(EnrollmentStatQuery query) {
+    public BaseResponse<HashMap<String, EnrollmentStatItem>> statistics(EnrollmentStatQuery query) {
         Set<String> keys = new HashSet<>();
         List<String> majorIds = query.getMajorIds();
         if (majorIds.isEmpty()) {
@@ -149,15 +149,15 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         HashMap<String, HashMap<String, Object>> originMap = (HashMap<String, HashMap<String, Object>>) map.get("生源地情况");
         HashMap<String, HashMap<String, Object>> enrollmentStateMap = (HashMap<String, HashMap<String, Object>>) map.get("录取情况");
         HashMap<String, Object> reginScoreMap = (HashMap<String, Object>) map.get("各生源地高考分数统计");
-        HashMap<String, EnrollmentStatistics> ret = new HashMap<>();
+        HashMap<String, EnrollmentStatItem> ret = new HashMap<>();
         keys.forEach(key -> {
-            EnrollmentStatistics enrollmentStatistics = new EnrollmentStatistics();
+            EnrollmentStatItem enrollmentStatItem = new EnrollmentStatItem();
             HashMap<String, HashMap<String, Object>> reginScore = new HashMap<>();
             if (originMap.containsKey(key)) {
-                enrollmentStatistics.setOrigin(originMap.get(key));
+                enrollmentStatItem.setOrigin(originMap.get(key));
             }
             if (enrollmentStateMap.containsKey(key)) {
-                enrollmentStatistics.setEnrollmentState(enrollmentStateMap.get(key));
+                enrollmentStatItem.setEnrollmentState(enrollmentStateMap.get(key));
             }
             Set<String> reginScoreKeys = reginScoreMap.keySet();
             reginScoreKeys.forEach(it -> {
@@ -166,8 +166,8 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                     reginScore.put(it, hashMap.get(key));
                 }
             });
-            enrollmentStatistics.setRegionScores(reginScore);
-            ret.put(key, enrollmentStatistics);
+            enrollmentStatItem.setRegionScores(reginScore);
+            ret.put(key, enrollmentStatItem);
         });
         return ResponseUtil.success(ret);
     }

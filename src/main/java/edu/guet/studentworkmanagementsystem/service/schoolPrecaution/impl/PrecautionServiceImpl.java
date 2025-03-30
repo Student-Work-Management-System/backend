@@ -8,9 +8,9 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
-import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
-import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.schoolPrecaution.PrecautionMapper;
@@ -60,14 +60,14 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionDTO studentSchoolPrecautionDTO) {
+    public <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionRequest studentSchoolPrecautionRequest) {
         boolean update = UpdateChain.of(StudentSchoolPrecaution.class)
-                .set(StudentSchoolPrecaution::getSchoolPrecautionLevel, studentSchoolPrecautionDTO.getSchoolPrecautionLevel(), StringUtils.hasLength(studentSchoolPrecautionDTO.getSchoolPrecautionLevel()))
-                .set(StudentSchoolPrecaution::getPrecautionTerm, studentSchoolPrecautionDTO.getPrecautionTerm(), StringUtils.hasLength(studentSchoolPrecautionDTO.getPrecautionTerm()))
-                .set(StudentSchoolPrecaution::getComment, studentSchoolPrecautionDTO.getComment(), StringUtils.hasLength(studentSchoolPrecautionDTO.getComment()))
-                .set(StudentSchoolPrecaution::getDetailReason, studentSchoolPrecautionDTO.getDetailReason(), StringUtils.hasLength(studentSchoolPrecautionDTO.getDetailReason()))
-                .set(StudentSchoolPrecaution::getStudentId, studentSchoolPrecautionDTO.getStudentId(), StringUtils.hasLength(studentSchoolPrecautionDTO.getStudentId()))
-                .where(StudentSchoolPrecaution::getStudentSchoolPrecautionId).eq(studentSchoolPrecautionDTO.getStudentSchoolPrecautionId())
+                .set(StudentSchoolPrecaution::getSchoolPrecautionLevel, studentSchoolPrecautionRequest.getSchoolPrecautionLevel(), StringUtils.hasLength(studentSchoolPrecautionRequest.getSchoolPrecautionLevel()))
+                .set(StudentSchoolPrecaution::getPrecautionTerm, studentSchoolPrecautionRequest.getPrecautionTerm(), StringUtils.hasLength(studentSchoolPrecautionRequest.getPrecautionTerm()))
+                .set(StudentSchoolPrecaution::getComment, studentSchoolPrecautionRequest.getComment(), StringUtils.hasLength(studentSchoolPrecautionRequest.getComment()))
+                .set(StudentSchoolPrecaution::getDetailReason, studentSchoolPrecautionRequest.getDetailReason(), StringUtils.hasLength(studentSchoolPrecautionRequest.getDetailReason()))
+                .set(StudentSchoolPrecaution::getStudentId, studentSchoolPrecautionRequest.getStudentId(), StringUtils.hasLength(studentSchoolPrecautionRequest.getStudentId()))
+                .where(StudentSchoolPrecaution::getStudentSchoolPrecautionId).eq(studentSchoolPrecautionRequest.getStudentSchoolPrecautionId())
                 .update();
         if (update)
             return ResponseUtil.success();
@@ -84,10 +84,10 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
     }
 
     @Override
-    public BaseResponse<Page<StudentSchoolPrecautionVO>> getAllRecords(PrecautionQuery query) {
+    public BaseResponse<Page<StudentSchoolPrecautionItem>> getAllRecords(PrecautionQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentSchoolPrecautionVO> studentSchoolPrecautionVOPage = QueryChain.of(StudentSchoolPrecaution.class)
+        Page<StudentSchoolPrecautionItem> studentSchoolPrecautionVOPage = QueryChain.of(StudentSchoolPrecaution.class)
                 .select(STUDENT_SCHOOL_PRECAUTION.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_SCHOOL_PRECAUTION)
                 .innerJoin(STUDENT).on(STUDENT_SCHOOL_PRECAUTION.STUDENT_ID.eq(STUDENT.STUDENT_ID))
@@ -95,7 +95,7 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
                 .where(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_SCHOOL_PRECAUTION.SCHOOL_PRECAUTION_LEVEL.eq(query.getSchoolPrecautionLevel()))
-                .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionVO.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionItem.class);
         return ResponseUtil.success(studentSchoolPrecautionVOPage);
     }
 

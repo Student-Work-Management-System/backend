@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
-import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.StudentPovertyAssistanceItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -34,7 +34,6 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTa
 import static edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.table.PovertyAssistanceTableDef.POVERTY_ASSISTANCE;
 import static edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.table.StudentPovertyAssistanceTableDef.STUDENT_POVERTY_ASSISTANCE;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 
 @Service
 public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssistanceMapper, StudentPovertyAssistance> implements PovertyAssistanceService {
@@ -128,17 +127,16 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
                     .from(STUDENT_POVERTY_ASSISTANCE)
                     .innerJoin(POVERTY_ASSISTANCE).on(POVERTY_ASSISTANCE.POVERTY_ASSISTANCE_ID.eq(STUDENT_POVERTY_ASSISTANCE.POVERTY_ASSISTANCE_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_POVERTY_ASSISTANCE.STUDENT_ID))
-                    .innerJoin(STUDENT_DETAIL).on(STUDENT_DETAIL.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
-                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_DETAIL.GRADE_ID))
-                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_DETAIL.MAJOR_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .where(
                             STUDENT_BASIC.STUDENT_ID.like(query.getSearch())
                                     .or(STUDENT_BASIC.NAME.like(query.getSearch()))
                                     .or(POVERTY_ASSISTANCE.POVERTY_TYPE.like(query.getSearch()))
                                     .or(POVERTY_ASSISTANCE.POVERTY_ASSISTANCE_STANDARD.like(query.getSearch()))
                     )
-                    .and(STUDENT_DETAIL.GRADE_ID.eq(query.getGradeId()))
-                    .and(STUDENT_DETAIL.MAJOR_ID.eq(query.getMajorId()))
+                    .and(STUDENT_BASIC.GRADE_ID.eq(query.getGradeId()))
+                    .and(STUDENT_BASIC.MAJOR_ID.eq(query.getMajorId()))
                     .and(STUDENT_POVERTY_ASSISTANCE.ASSISTANCE_YEAR.eq(query.getAssistanceYear()))
                     .and(POVERTY_ASSISTANCE.POVERTY_LEVEL.eq(query.getPovertyLevel()))
                     .pageAs(Page.of(pageNo, pageSize), StudentPovertyAssistanceItem.class);
@@ -171,11 +169,11 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     }
 
     @Override
-    public BaseResponse<List<PovertyAssistanceStatusItem>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatusQuery query) {
+    public BaseResponse<List<PovertyAssistanceStatItem>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query) {
         // todo: 需要完成mapper层
-        CompletableFuture<List<PovertyAssistanceStatusItem>> future =
+        CompletableFuture<List<PovertyAssistanceStatItem>> future =
                 CompletableFuture.supplyAsync(() -> povertyAssistanceMapper.getPovertyAssistanceStatus(query));
-        List<PovertyAssistanceStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        List<PovertyAssistanceStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }

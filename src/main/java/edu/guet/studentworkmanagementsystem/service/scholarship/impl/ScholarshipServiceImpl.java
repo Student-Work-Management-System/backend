@@ -8,10 +8,10 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
-import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.scholarship.ScholarshipMapper;
@@ -80,10 +80,10 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
     @Override
-    public BaseResponse<Page<StudentScholarshipVO>> getStudentScholarship(ScholarshipQuery query) {
+    public BaseResponse<Page<StudentScholarshipItem>> getStudentScholarship(ScholarshipQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentScholarshipVO> studentScholarshipVOPage = QueryChain.of(StudentScholarship.class)
+        Page<StudentScholarshipItem> studentScholarshipVOPage = QueryChain.of(StudentScholarship.class)
                 .select(STUDENT.ALL_COLUMNS, SCHOLARSHIP.ALL_COLUMNS, STUDENT_SCHOLARSHIP.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
                 .from(STUDENT_SCHOLARSHIP)
                 .innerJoin(SCHOLARSHIP).on(SCHOLARSHIP.SCHOLARSHIP_ID.eq(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID))
@@ -92,13 +92,13 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
                 .where(STUDENT.GRADE_ID.eq(query.getGrade()))
                 .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
                 .and(STUDENT_SCHOLARSHIP.AWARD_YEAR.eq(query.getAwardYear()))
-                .pageAs(Page.of(pageNo, pageSize), StudentScholarshipVO.class);
+                .pageAs(Page.of(pageNo, pageSize), StudentScholarshipItem.class);
         return ResponseUtil.success(studentScholarshipVOPage);
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipDTO studentScholarshipDTO) {
-        StudentScholarship studentScholarship = new StudentScholarship(studentScholarshipDTO);
+    public <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipRequest studentScholarshipRequest) {
+        StudentScholarship studentScholarship = new StudentScholarship(studentScholarshipRequest);
         int i = mapper.insert(studentScholarship);
         if (i > 0)
             return ResponseUtil.success();
@@ -106,12 +106,12 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
     }
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipDTO studentScholarshipDTO) {
+    public <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipRequest studentScholarshipRequest) {
         boolean update = UpdateChain.of(StudentScholarship.class)
-                .set(StudentScholarship::getAwardYear, studentScholarshipDTO.getAwardYear(), StringUtils::hasLength)
-                .set(StudentScholarship::getStudentId, studentScholarshipDTO.getStudentId(), StringUtils::hasLength)
-                .set(StudentScholarship::getScholarshipId, studentScholarshipDTO.getScholarshipId(), StringUtils::hasLength)
-                .where(StudentScholarship::getStudentScholarshipId).eq(studentScholarshipDTO.getStudentScholarshipId())
+                .set(StudentScholarship::getAwardYear, studentScholarshipRequest.getAwardYear(), StringUtils::hasLength)
+                .set(StudentScholarship::getStudentId, studentScholarshipRequest.getStudentId(), StringUtils::hasLength)
+                .set(StudentScholarship::getScholarshipId, studentScholarshipRequest.getScholarshipId(), StringUtils::hasLength)
+                .where(StudentScholarship::getStudentScholarshipId).eq(studentScholarshipRequest.getStudentScholarshipId())
                 .update();
         if (update)
             return ResponseUtil.success();

@@ -3,23 +3,28 @@ package edu.guet.studentworkmanagementsystem.service.status;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusList;
-import edu.guet.studentworkmanagementsystem.entity.dto.status.StatusQuery;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
+import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
-import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusDetailItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusItem;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface StatusService extends IService<StudentStatus> {
     BaseResponse<List<Status>> getAllStatus();
+    <T> BaseResponse<T> addStatus(Status status);
+    <T> BaseResponse<T> updateStatus(Status status);
+    <T> BaseResponse<T> deleteStatus(String statusId);
     /**
      * 批量导入学生学籍变动信息记录
-     * @param statusList 学生学籍信息列表
      */
-    <T> BaseResponse<T> importStudentStatus(StatusList statusList);
+    <T> BaseResponse<T> importStudentStatus(ValidateList<StudentStatus> studentStatuses);
+    boolean importStudentStatus(Set<String> studentIds);
     /**
      * 添加学生学籍变动记录
      * @param studentStatus 学籍变动信息
@@ -40,5 +45,6 @@ public interface StatusService extends IService<StudentStatus> {
      * <br/>
      * @param query 查询参数
      */
-    BaseResponse<Page<StudentStatusVO>> getAllRecords(StatusQuery query);
+    BaseResponse<Page<StudentStatusItem>> getAllRecords(StudentStatusQuery query);
+    BaseResponse<StudentStatusDetailItem> getStudentStatusDetail(String studentId);
 }

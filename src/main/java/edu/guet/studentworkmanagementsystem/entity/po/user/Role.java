@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.entity.po.user;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleDTO;
+import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,8 +17,8 @@ public class Role {
     private String rid;
     private String roleName;
     private String roleDesc;
-    public Role(RoleDTO roleDTO) {
-        this.roleName = roleDTO.getRoleName();
-        this.roleDesc = roleDTO.getRoleDesc();
+    public Role(RoleRequest roleItem) {
+        this.roleName = roleItem.getRoleName();
+        this.roleDesc = roleItem.getRoleDesc();
     }
 }

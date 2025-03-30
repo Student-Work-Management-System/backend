@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkDTO;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkList;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkVO;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,12 @@ public class AcademicController {
     private AcademicWorkService academicWorkService;
     @PreAuthorize("hasAuthority('student_academic_work:select') and hasAuthority('student:select') and hasAuthority('academic:select')")
     @GetMapping("/get/{studentId}")
-    public BaseResponse<List<StudentAcademicWorkVO>> getOwnStudentAcademicWork(@PathVariable String studentId) {
+    public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(@PathVariable String studentId) {
         return academicWorkService.getOwnStudentAcademicWork(studentId);
     }
     @PreAuthorize("hasAuthority('student_academic_work:select') and hasAuthority('student:select') and hasAuthority('academic:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentAcademicWorkVO>> getAllStudentAcademicWork(@RequestBody AcademicWorkQuery query) {
+    public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(@RequestBody AcademicWorkQuery query) {
         return academicWorkService.getAllStudentAcademicWork(query);
     }
     @PreAuthorize("hasAuthority('student_academic_work:insert') and hasAuthority('academic:insert')")
