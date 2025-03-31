@@ -76,6 +76,7 @@ public class StudentServiceImpl implements StudentService {
     private PoliticMapper politicMapper;
     @Autowired
     private StudentMapper studentMapper;
+
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudent(ValidateList<Student> students) {

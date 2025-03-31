@@ -11,6 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class StudentStatusQuery implements Serializable {
     private String search;
+    private String statusId;
     private String gradeId;
     private String majorId;
     private Integer pageNo;

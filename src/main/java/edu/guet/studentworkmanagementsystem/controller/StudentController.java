@@ -61,7 +61,7 @@ public class StudentController {
     }
 
     @PreAuthorize("hasAuthority('student:status') or hasAuthority('student:status:all')")
-    @PostMapping("/status")
+    @PostMapping("/stat")
     public BaseResponse<List<StudentStatItem>> getAllStudents(@RequestBody StudentStatQuery query) {
         return studentService.getStudentStatus(query);
     }

@@ -10,7 +10,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusQuery
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
-import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusDetailItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -92,10 +91,6 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
         return ResponseUtil.success();
     }
 
-    public Status getStatus(String statusId) {
-        return statusMapper.selectOneById(statusId);
-    }
-
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudentStatus(ValidateList<StudentStatus> studentStatuses) {
@@ -140,10 +135,8 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
     @Override
     @Transactional
     public <T> BaseResponse<T> updateStudentStatus(StudentStatus studentStatus) {
-        // 需要记录学籍状态变化, 要获取到原先的学籍状态
-        StudentStatus origin = getStudentStatus(studentStatus.getStudentStatusId());
-        // 创建并添加到数据库中
-        StudentStatus newStudentStatus = preUpdateStudentStatus(studentStatus, origin.getStatusId());
+        // 创建新纪录添加到数据库中
+        StudentStatus newStudentStatus = preUpdateStudentStatus(studentStatus);
         int i = mapper.insert(newStudentStatus);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -154,20 +147,11 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
         return ResponseUtil.success();
     }
 
-    public StudentStatus getStudentStatus(String studentStatusId) {
-        return mapper.selectOneById(studentStatusId);
-    }
-
-    public StudentStatus preUpdateStudentStatus(StudentStatus studentStatus, String oldStatusId) {
-        String newStatusId = studentStatus.getStatusId();
-        Status newStatus = getStatus(newStatusId);
-        Status oldStatus = getStatus(oldStatusId);
-        String log = "学籍状态: id=" + oldStatus.getStatusId() + ", 名称=" + oldStatus.getStatusName() +
-                " -> " + "id=" + newStatus.getStatusId() + ", 名称=" + newStatus.getStatusName();
+    public StudentStatus preUpdateStudentStatus(StudentStatus studentStatus) {
         return StudentStatus.builder()
-                .statusId(newStatusId)
+                .statusId(studentStatus.getStatusId())
                 .studentId(studentStatus.getStudentId())
-                .log(log)
+                .log(studentStatus.getLog())
                 .modifiedTime(studentStatus.getModifiedTime())
                 .statusEnabled(true)
                 .build();
@@ -181,15 +165,6 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
     }
 
     @Override
-    @Transactional
-    public <T> BaseResponse<T> deleteStudentStatus(String studentStatusId) {
-        int i = mapper.deleteById(studentStatusId);
-        if (i > 0)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
-    @Override
     public BaseResponse<Page<StudentStatusItem>> getAllRecords(StudentStatusQuery query) {
         CompletableFuture<Page<StudentStatusItem>> future = CompletableFuture.supplyAsync(() -> {
             Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
@@ -197,7 +172,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
             return QueryChain.of(StudentStatus.class)
                     .select(
                             STUDENT_STATUS.ALL_COLUMNS,
-                            STATUS.STATUS_NAME,
+                            STATUS.ALL_COLUMNS,
                             STUDENT_BASIC.STUDENT_ID,
                             STUDENT_BASIC.NAME,
                             MAJOR.MAJOR_NAME,
@@ -214,6 +189,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                                     .or(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch()))
                                     .or(STUDENT_BASIC.NAME.like(query.getSearch()))
                     )
+                    .and(STATUS.STATUS_ID.eq(query.getStatusId()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .pageAs(Page.of(pageNo, pageSize), StudentStatusItem.class);
@@ -223,11 +199,24 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
     }
 
     @Override
-    public BaseResponse<StudentStatusDetailItem> getStudentStatusDetail(String studentId) {
-        CompletableFuture<StudentStatusDetailItem> future = CompletableFuture.supplyAsync(() -> QueryChain.of(StudentStatus.class)
-                .where(STUDENT_BASIC.STUDENT_ID.eq(studentId))
-                .oneAs(StudentStatusDetailItem.class), readThreadPool);
-        StudentStatusDetailItem execute = FutureExceptionExecute.fromFuture(future).execute();
+    public BaseResponse<List<StudentStatusItem>> getStudentStatusDetail(String studentId) {
+        CompletableFuture<List<StudentStatusItem>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(StudentStatus.class)
+                .select(
+                        STUDENT_STATUS.ALL_COLUMNS,
+                        STATUS.ALL_COLUMNS,
+                        STUDENT_BASIC.STUDENT_ID,
+                        STUDENT_BASIC.NAME,
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME
+                )
+                .from(STUDENT_STATUS)
+                .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_STATUS.STUDENT_ID))
+                .innerJoin(STATUS).on(STATUS.STATUS_ID.eq(STUDENT_STATUS.STATUS_ID))
+                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .where(STUDENT_STATUS.STUDENT_ID.eq(studentId))
+                .listAs(StudentStatusItem.class), readThreadPool);
+        List<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 

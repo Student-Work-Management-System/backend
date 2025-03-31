@@ -8,7 +8,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusQuery
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
-import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusDetailItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusItem;
 
 import java.util.List;
@@ -36,15 +35,10 @@ public interface StatusService extends IService<StudentStatus> {
      */
     <T> BaseResponse<T> updateStudentStatus(StudentStatus studentStatus);
     /**
-     * 删除学生学籍变动记录
-     * @param studentStatusId 学生学籍变动表id
-     */
-    <T> BaseResponse<T> deleteStudentStatus(String studentStatusId);
-    /**
      * 分页查询学生学籍变动信息
      * <br/>
      * @param query 查询参数
      */
     BaseResponse<Page<StudentStatusItem>> getAllRecords(StudentStatusQuery query);
-    BaseResponse<StudentStatusDetailItem> getStudentStatusDetail(String studentId);
+    BaseResponse<List<StudentStatusItem>> getStudentStatusDetail(String studentId);
 }

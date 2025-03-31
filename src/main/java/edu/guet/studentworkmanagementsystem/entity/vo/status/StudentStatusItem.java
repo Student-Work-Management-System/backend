@@ -15,6 +15,7 @@ public class StudentStatusItem implements Serializable {
     private String name;
     private String majorName;
     private String gradeName;
+    private String statusId;
     private String statusName;
     private String log;
     private String modifiedTime;

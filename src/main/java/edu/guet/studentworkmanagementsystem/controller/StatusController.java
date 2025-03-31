@@ -69,13 +69,13 @@ public class StatusController {
 
     @PreAuthorize("hasAuthority('student_status:update')")
     @PutMapping("/student/update")
-    public  <T> BaseResponse<T> updateStudentStatus(@RequestBody @Validated({UpdateGroup.class}) StudentStatus studentStatus) {
+    public <T> BaseResponse<T> updateStudentStatus(@RequestBody @Validated({UpdateGroup.class}) StudentStatus studentStatus) {
         return statusService.updateStudentStatus(studentStatus);
     }
 
-    @PreAuthorize("hasAuthority('student_status:delete')")
-    @DeleteMapping("/student/delete/{studentStatusId}")
-    public <T> BaseResponse<T> deleteStudentStatus(@PathVariable String studentStatusId) {
-        return statusService.deleteStudentStatus(studentStatusId);
+    @PreAuthorize("hasAuthority('student_status:select')")
+    @GetMapping("/student/detail/{studentId}")
+    public BaseResponse<List<StudentStatusItem>> getStudentStatusDetail(@PathVariable String studentId) {
+        return statusService.getStudentStatusDetail(studentId);
     }
 }
