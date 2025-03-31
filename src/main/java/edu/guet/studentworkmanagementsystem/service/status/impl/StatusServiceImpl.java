@@ -192,6 +192,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                     .and(STATUS.STATUS_ID.eq(query.getStatusId()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
+                    .orderBy(STUDENT_STATUS.STUDENT_ID.asc())
                     .pageAs(Page.of(pageNo, pageSize), StudentStatusItem.class);
         }, readThreadPool);
         Page<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
@@ -215,6 +216,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                 .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                 .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                 .where(STUDENT_STATUS.STUDENT_ID.eq(studentId))
+                .orderBy(STUDENT_STATUS.STUDENT_STATUS_ID.desc())
                 .listAs(StudentStatusItem.class), readThreadPool);
         List<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
