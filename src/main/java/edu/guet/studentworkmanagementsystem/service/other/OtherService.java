@@ -1,15 +1,20 @@
 package edu.guet.studentworkmanagementsystem.service.other;
 
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.other.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.other.CounselorItem;
 
 import java.util.List;
 
 public interface OtherService {
     BaseResponse<List<Grade>> getAllGrades();
     List<Grade> getGradeList();
+    <T> BaseResponse<T> addGrade(Grade grade);
     BaseResponse<List<Degree>> getAllDegrees();
     List<Degree> getDegreeList();
+    <T> BaseResponse<T> addDegree(Degree degree);
     BaseResponse<List<Politic>> getAllPolitics();
     List<Politic> getPoliticList();
     <T> BaseResponse<T> addMajor(Major major);
@@ -17,4 +22,6 @@ public interface OtherService {
     BaseResponse<List<Major>> getMajors();
     List<Major> getMajorList();
     <T> BaseResponse<T> deleteMajor(String majorId);
+    BaseResponse<Page<CounselorItem>> getAllCounselors(CounselorQuery query);
+    <T> BaseResponse<T> deleteCounselor(String uid);
 }

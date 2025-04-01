@@ -1,12 +1,12 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Major;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Politic;
+import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.other.*;
+import edu.guet.studentworkmanagementsystem.entity.vo.other.CounselorItem;
 import edu.guet.studentworkmanagementsystem.service.other.OtherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,10 +25,20 @@ public class OtherController {
     public BaseResponse<List<Grade>> getAllGrades() {
         return otherService.getAllGrades();
     }
+    @PreAuthorize("hasAuthority('grade:insert')")
+    @PostMapping("/addGrade")
+    public <T> BaseResponse <T> addGrade(@RequestBody @Validated({InsertGroup.class}) Grade grade) {
+        return otherService.addGrade(grade);
+    }
     @PreAuthorize("hasAuthority('degree:select')")
     @GetMapping("/allDegree")
     public BaseResponse<List<Degree>> getAllDegree() {
         return otherService.getAllDegrees();
+    }
+    @PreAuthorize("hasAuthority('degree:insert')")
+    @PostMapping("/addDegree")
+    public <T> BaseResponse <T> addDegree(@RequestBody @Validated({InsertGroup.class}) Degree degree) {
+        return otherService.addDegree(degree);
     }
     @PreAuthorize("hasAuthority('politic:select')")
     @GetMapping("/allPolitic")
@@ -54,5 +64,15 @@ public class OtherController {
     @PostMapping("/addMajor")
     public <T> BaseResponse<T> addMajor(@RequestBody @Validated({InsertGroup.class}) Major major) {
         return otherService.addMajor(major);
+    }
+    @PreAuthorize("hasAuthority('counselor:select')")
+    @PostMapping("/counselor/gets")
+    public BaseResponse<Page<CounselorItem>> getCounselors(@RequestBody CounselorQuery query) {
+        return otherService.getAllCounselors(query);
+    }
+    @PreAuthorize("hasAuthority('counselor:delete')")
+    @DeleteMapping("/counselor/delete/{uid}")
+    public <T> BaseResponse<T> deleteCounselor(@PathVariable String uid) {
+        return otherService.deleteCounselor(uid);
     }
 }
