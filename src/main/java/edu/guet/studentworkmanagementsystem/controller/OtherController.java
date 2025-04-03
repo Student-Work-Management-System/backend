@@ -5,8 +5,10 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.other.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.other.CounselorItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.other.UserWithCounselorRole;
 import edu.guet.studentworkmanagementsystem.service.other.OtherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,5 +76,20 @@ public class OtherController {
     @DeleteMapping("/counselor/delete/{uid}")
     public <T> BaseResponse<T> deleteCounselor(@PathVariable String uid) {
         return otherService.deleteCounselor(uid);
+    }
+    @PreAuthorize("hasAuthority('counselor:update')")
+    @PutMapping("/counselor/update")
+    public <T> BaseResponse<T> updateCounselor(@RequestBody CounselorRequest counselor) {
+        return otherService.updateCounselor(counselor);
+    }
+    @PreAuthorize("hasAuthority('counselor:select')")
+    @GetMapping("/counselor/optional")
+    public BaseResponse<List<UserWithCounselorRole>> getCounselorsOptional() {
+        return otherService.getOptionalCounselors();
+    }
+    @PreAuthorize("hasAuthority('counselor:insert')")
+    @PostMapping("/counselor/add")
+    public <T> BaseResponse<T> addCounselor(@RequestBody CounselorRequest counselor) {
+        return otherService.addCounselors(counselor);
     }
 }

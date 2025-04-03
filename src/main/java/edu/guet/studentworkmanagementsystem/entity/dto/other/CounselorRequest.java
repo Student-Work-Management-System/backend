@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CounselorQuery {
-    private String search;
-    private Integer pageNo;
-    private Integer pageSize;
+public class CounselorRequest {
+    private String uid;
+    private Set<String> chargeGrade;
 }

@@ -17,6 +17,4 @@ public class Counselor {
     private String uid;
     @Id
     private String gradeId;
-    @Id
-    private String degreeId;
 }

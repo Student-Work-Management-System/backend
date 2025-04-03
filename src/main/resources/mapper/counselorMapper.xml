@@ -8,30 +8,12 @@
             c.uid,
             u.username AS counselorUsername,
             u.real_name AS counselorName,
-            u.phone AS counselorPhone,
-            GROUP_CONCAT(DISTINCT g.grade_name ORDER BY g.grade_id SEPARATOR ',') AS chargeGrade,
-            GROUP_CONCAT(DISTINCT d.degree_name ORDER BY d.degree_id SEPARATOR ',') AS chargeDegree
+            u.phone AS counselorPhone
         FROM counselor c
-                 INNER JOIN `user` u ON c.uid = u.uid AND u.enabled = TRUE
-                 INNER JOIN `user_role` ur ON u.uid = ur.uid
-                 INNER JOIN `role` r ON ur.rid = r.rid AND r.rid = 3
-                 INNER JOIN swms.degree d ON c.degree_id = d.degree_id
-                 INNER JOIN swms.grade g ON c.grade_id = g.grade_id
-        <where>
-            <if test="search != null">
-                AND (
-                u.username LIKE CONCAT('%', #{search})
-                OR u.real_name LIKE CONCAT('%', #{search})
-                OR u.phone LIKE CONCAT('%', #{search})
-                )
-            </if>
-            <if test="gradeId != null and gradeId != ''">
-                c.grade_id = #{gradeId}
-            </if>
-            <if test="degreeId != null and degreeId != ''">
-                c.degree_id = #{degreeId}
-            </if>
-        </where>
+                 LEFT JOIN `user` u ON c.uid = u.uid AND u.enabled = TRUE
+                 LEFT JOIN `user_role` ur ON u.uid = ur.uid and ur.rid = 3
+        where u.username LIKE CONCAT(#{search}, '%')
+                OR u.real_name LIKE CONCAT(#{search}, '%')
         GROUP BY c.uid, u.username, u.real_name, u.phone
         limit #{offset}, #{pageSize}
     </select>

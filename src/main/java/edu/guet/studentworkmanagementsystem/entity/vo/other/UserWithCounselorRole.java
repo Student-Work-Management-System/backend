@@ -5,16 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CounselorItem {
+public class UserWithCounselorRole {
     private String uid;
-    private String counselorUsername;
-    private String counselorName;
-    private String counselorPhone;
-    private Set<String> chargeGrade;
+    private String username;
+    private String realName;
 }

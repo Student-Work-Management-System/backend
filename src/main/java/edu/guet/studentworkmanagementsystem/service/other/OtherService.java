@@ -2,9 +2,12 @@ package edu.guet.studentworkmanagementsystem.service.other;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.other.CounselorRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.other.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.other.CounselorItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.other.UserWithCounselorRole;
 
 import java.util.List;
 
@@ -24,4 +27,7 @@ public interface OtherService {
     <T> BaseResponse<T> deleteMajor(String majorId);
     BaseResponse<Page<CounselorItem>> getAllCounselors(CounselorQuery query);
     <T> BaseResponse<T> deleteCounselor(String uid);
+    <T> BaseResponse<T> updateCounselor(CounselorRequest counselor);
+    BaseResponse<List<UserWithCounselorRole>> getOptionalCounselors();
+    <T> BaseResponse<T> addCounselors(CounselorRequest request);
 }
