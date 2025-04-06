@@ -12,7 +12,7 @@ import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishme
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.punlishment.PunishmentMapper;
-import edu.guet.studentworkmanagementsystem.service.punlishment.PunishmentService;
+import edu.guet.studentworkmanagementsystem.service.punlishment.StudentPunishmentService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,11 +31,11 @@ import static edu.guet.studentworkmanagementsystem.entity.po.punishment.table.St
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 
 @Service
-public class PunishmentServiceImpl extends ServiceImpl<PunishmentMapper, StudentPunishment> implements PunishmentService {
+public class StudentPunishmentServiceImpl extends ServiceImpl<PunishmentMapper, StudentPunishment> implements StudentPunishmentService {
 
     private final ThreadPoolTaskExecutor readThreadPool;
 
-    public PunishmentServiceImpl(@Qualifier("readThreadPool") ThreadPoolTaskExecutor readThreadPool) {
+    public StudentPunishmentServiceImpl(@Qualifier("readThreadPool") ThreadPoolTaskExecutor readThreadPool) {
         this.readThreadPool = readThreadPool;
     }
 

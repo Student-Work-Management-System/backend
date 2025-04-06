@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishme
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
 
 
-public interface PunishmentService extends IService<StudentPunishment> {
+public interface StudentPunishmentService extends IService<StudentPunishment> {
     /**
      * 批量导入学生处分信息
      */
