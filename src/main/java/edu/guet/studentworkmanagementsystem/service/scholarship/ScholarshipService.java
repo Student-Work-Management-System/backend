@@ -3,9 +3,8 @@ package edu.guet.studentworkmanagementsystem.service.scholarship;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipList;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
@@ -14,14 +13,7 @@ import java.util.List;
 
 public interface ScholarshipService extends IService<StudentScholarship> {
     /**
-     * 批量导入奖学金信息记录
-     * @param scholarshipList 奖学金信息列表
-     * @return 存入数据库中的奖学金记录
-     */
-    <T> BaseResponse<T> importScholarship(ScholarshipList scholarshipList);
-    /**
      * 对象添加奖学金记录
-     * @param scholarship 奖学金记录对象
      */
     <T> BaseResponse<T> insertScholarship(Scholarship scholarship);
     /**
@@ -47,14 +39,12 @@ public interface ScholarshipService extends IService<StudentScholarship> {
     BaseResponse<Page<StudentScholarshipItem>> getStudentScholarship(ScholarshipQuery query);
     /**
      * 分配奖学金
-     * @param studentScholarshipRequest 学生获得奖学金记录
      */
-    <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipRequest studentScholarshipRequest);
+    <T> BaseResponse<T> insertStudentScholarship(ValidateList<StudentScholarship> studentScholarship);
     /**
      * 修改学生获得奖学金时间
-     * @param studentScholarshipRequest 修改需要传递的对象, 某一为空则不修改该属性
      */
-    <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipRequest studentScholarshipRequest);
+    <T> BaseResponse<T> updateStudentScholarship(StudentScholarship studentScholarship);
     /**
      * 删除学生获得奖学金记录
      * @param studentScholarshipId 学生奖学金记录id

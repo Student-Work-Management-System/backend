@@ -10,8 +10,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScholarshipQuery implements Serializable {
-    private String grade;
+    private String search;
+    private String gradeId;
     private String majorId;
+    private String scholarshipLevel;
     private String awardYear;
     private Integer pageNo;
     private Integer pageSize;

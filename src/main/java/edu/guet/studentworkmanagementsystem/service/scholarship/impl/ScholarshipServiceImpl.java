@@ -6,9 +6,8 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipList;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.StudentScholarshipRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
@@ -17,33 +16,32 @@ import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.scholarship.ScholarshipMapper;
 import edu.guet.studentworkmanagementsystem.mapper.scholarship.StudentScholarshipMapper;
 import edu.guet.studentworkmanagementsystem.service.scholarship.ScholarshipService;
+import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.ScholarshipTableDef.SCHOLARSHIP;
 import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.StudentScholarshipTableDef.STUDENT_SCHOLARSHIP;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 
 @Service
 public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper, StudentScholarship> implements ScholarshipService {
     @Autowired
     private ScholarshipMapper scholarshipMapper;
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> importScholarship(ScholarshipList scholarshipList) {
-        List<Scholarship> scholarships = scholarshipList.getScholarships();
-        int i = scholarshipMapper.insertBatch(scholarships);
-        if (i > 0)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
+    @Qualifier("readThreadPool")
+    @Autowired
+    private ThreadPoolTaskExecutor readThreadPool;
 
     @Override
     @Transactional
@@ -58,19 +56,23 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
     @Transactional
     public <T> BaseResponse<T> updateScholarship(Scholarship scholarship) {
         boolean update = UpdateChain.of(Scholarship.class)
-                .set(Scholarship::getScholarshipName, scholarship.getScholarshipName(), StringUtils.hasLength(scholarship.getScholarshipName()))
-                .set(Scholarship::getScholarshipLevel, scholarship.getScholarshipLevel(), StringUtils.hasLength(scholarship.getScholarshipLevel()))
-                .where(Scholarship::getScholarshipId).eq(scholarship.getScholarshipId())
+                .set(SCHOLARSHIP.SCHOLARSHIP_NAME, scholarship.getScholarshipName(), StringUtils::hasLength)
+                .set(SCHOLARSHIP.SCHOLARSHIP_LEVEL, scholarship.getScholarshipLevel(), StringUtils::hasLength)
+                .where(SCHOLARSHIP.SCHOLARSHIP_ID.eq(scholarship.getScholarshipId()))
                 .update();
         if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<List<Scholarship>> getScholarships() {
-        List<Scholarship> scholarships = QueryChain.of(Scholarship.class).list();
-        return ResponseUtil.success(scholarships);
+        CompletableFuture<List<Scholarship>> future =
+                CompletableFuture.supplyAsync(() -> scholarshipMapper.selectAll(), readThreadPool);
+        List<Scholarship> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteScholarship(String scholarshipId) {
@@ -79,44 +81,63 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<Page<StudentScholarshipItem>> getStudentScholarship(ScholarshipQuery query) {
-        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
-        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentScholarshipItem> studentScholarshipVOPage = QueryChain.of(StudentScholarship.class)
-                .select(STUDENT.ALL_COLUMNS, SCHOLARSHIP.ALL_COLUMNS, STUDENT_SCHOLARSHIP.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
-                .from(STUDENT_SCHOLARSHIP)
-                .innerJoin(SCHOLARSHIP).on(SCHOLARSHIP.SCHOLARSHIP_ID.eq(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID))
-                .innerJoin(STUDENT).on(STUDENT.STUDENT_ID.eq(STUDENT_SCHOLARSHIP.STUDENT_ID))
-                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT.MAJOR_ID))
-                .where(STUDENT.GRADE_ID.eq(query.getGrade()))
-                .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT_SCHOLARSHIP.AWARD_YEAR.eq(query.getAwardYear()))
-                .pageAs(Page.of(pageNo, pageSize), StudentScholarshipItem.class);
-        return ResponseUtil.success(studentScholarshipVOPage);
+        CompletableFuture<Page<StudentScholarshipItem>> future = CompletableFuture.supplyAsync(() -> {
+            int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+            int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
+            return QueryChain.of(StudentScholarship.class)
+                    .select(
+                            STUDENT_BASIC.STUDENT_ID,
+                            STUDENT_BASIC.NAME,
+                            SCHOLARSHIP.ALL_COLUMNS,
+                            STUDENT_SCHOLARSHIP.STUDENT_SCHOLARSHIP_ID,
+                            STUDENT_SCHOLARSHIP.AWARD_YEAR,
+                            MAJOR.MAJOR_NAME,
+                            GRADE.GRADE_NAME
+                    )
+                    .from(STUDENT_SCHOLARSHIP)
+                    .innerJoin(SCHOLARSHIP).on(SCHOLARSHIP.SCHOLARSHIP_ID.eq(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID))
+                    .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_SCHOLARSHIP.STUDENT_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                    .where(
+                            STUDENT_BASIC.NAME.likeLeft(query.getSearch())
+                                    .or(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch()))
+                    )
+                    .and(STUDENT_BASIC.GRADE_ID.eq(query.getGradeId()))
+                    .and(STUDENT_BASIC.MAJOR_ID.eq(query.getMajorId()))
+                    .and(SCHOLARSHIP.SCHOLARSHIP_LEVEL.eq(query.getScholarshipLevel()))
+                    .and(STUDENT_SCHOLARSHIP.AWARD_YEAR.eq(query.getAwardYear()))
+                    .pageAs(Page.of(pageNo, pageSize), StudentScholarshipItem.class);
+        }, readThreadPool);
+        Page<StudentScholarshipItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
+
     @Override
     @Transactional
-    public <T> BaseResponse<T> arrangeStudentScholarship(StudentScholarshipRequest studentScholarshipRequest) {
-        StudentScholarship studentScholarship = new StudentScholarship(studentScholarshipRequest);
-        int i = mapper.insert(studentScholarship);
+    public <T> BaseResponse<T> insertStudentScholarship(ValidateList<StudentScholarship> studentScholarship) {
+        int i = mapper.insertBatch(studentScholarship);
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentScholarship(StudentScholarshipRequest studentScholarshipRequest) {
+    public <T> BaseResponse<T> updateStudentScholarship(StudentScholarship studentScholarship) {
         boolean update = UpdateChain.of(StudentScholarship.class)
-                .set(StudentScholarship::getAwardYear, studentScholarshipRequest.getAwardYear(), StringUtils::hasLength)
-                .set(StudentScholarship::getStudentId, studentScholarshipRequest.getStudentId(), StringUtils::hasLength)
-                .set(StudentScholarship::getScholarshipId, studentScholarshipRequest.getScholarshipId(), StringUtils::hasLength)
-                .where(StudentScholarship::getStudentScholarshipId).eq(studentScholarshipRequest.getStudentScholarshipId())
+                .set(STUDENT_SCHOLARSHIP.AWARD_YEAR, studentScholarship.getAwardYear(), StringUtils::hasLength)
+                .set(STUDENT_SCHOLARSHIP.SCHOLARSHIP_ID, studentScholarship.getScholarshipId(), StringUtils::hasLength)
+                .where(STUDENT_SCHOLARSHIP.STUDENT_SCHOLARSHIP_ID.eq(studentScholarship.getStudentScholarshipId()))
                 .update();
         if (update)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId) {
