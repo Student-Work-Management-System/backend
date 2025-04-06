@@ -20,19 +20,20 @@ public class StudentPunishmentItem implements Serializable {
     private String studentId;
     private String name;
     private String majorName;
+    private String gradeName;
     /**
      * 处分级别：警告、严重警告、记过、留校查看、开除学籍
      */
-    private String punishmentLevel;
+    private String level;
     /**
      * 处分理由
      */
-    private String punishmentReason;
+    private String reason;
     /**
      * 处分日期
      */
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate punishmentDate;
+    private LocalDate date;
 }

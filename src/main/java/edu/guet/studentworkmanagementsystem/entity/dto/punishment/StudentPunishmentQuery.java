@@ -9,9 +9,11 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PunishmentQuery implements Serializable {
-    private String studentId;
-    private String name;
+public class StudentPunishmentQuery implements Serializable {
+    private String search;
+    private String gradeId;
+    private String majorId;
+    private String level;
     private Integer pageNo;
     private Integer pageSize;
 }
