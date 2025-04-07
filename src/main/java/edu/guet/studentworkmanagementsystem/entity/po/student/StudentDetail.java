@@ -31,6 +31,21 @@ public class StudentDetail implements Serializable {
      */
     private String headerTeacherUsername;
     /**
+     * 身高
+     */
+    private String height;
+    /**
+     * 体重
+     */
+    private String weight;
+    /**
+     * 入学日期
+     */
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate enrollmentTime;
+    /**
      * 籍贯
      */
     private String nativePlace;
@@ -102,6 +117,10 @@ public class StudentDetail implements Serializable {
      */
     private String guardianPhone;
     /**
+     * 生源所在地
+     */
+    private String studentFrom;
+    /**
      * 中学名称
      */
     private String highSchool;
@@ -140,14 +159,7 @@ public class StudentDetail implements Serializable {
      * 是否学生贷款
      */
     private Boolean isStudentLoans;
-    /**
-     * 身高
-     */
-    private String height;
-    /**
-     * 体重
-     */
-    private String weight;
+
     /**
      * 宗教信仰
      */

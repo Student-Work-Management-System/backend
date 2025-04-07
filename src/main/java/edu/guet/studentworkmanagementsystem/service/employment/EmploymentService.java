@@ -3,6 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.employment;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
@@ -14,14 +15,8 @@ import java.util.HashMap;
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
      * 批量导入学生就业信息
-     * @param insertEmploymentDTOList 学生就业信息列表
      */
-    <T> BaseResponse<T> importStudentEmployment(InsertEmploymentDTOList insertEmploymentDTOList);
-    /**
-     * 对象添加就业信息
-     * @param insertStudentEmploymentDTO 学生就业信息对象
-     */
-    <T> BaseResponse<T> insertStudentEmployment(InsertStudentEmploymentDTO insertStudentEmploymentDTO);
+    <T> BaseResponse<T> importStudentEmployment(ValidateList<StudentEmployment> studentEmployments);
     /**
      * 分页查询学生就业信息
      * <br/>
@@ -31,9 +26,8 @@ public interface EmploymentService extends IService<StudentEmployment> {
     BaseResponse<Page<StudentEmploymentItem>> getStudentEmployment(EmploymentQuery query);
     /**
      * 修改学生就业信息记录
-     * @param updateStudentEmploymentDTO 学生就业信息对象(学号定位)
      */
-    <T> BaseResponse<T> updateStudentEmployment(UpdateStudentEmploymentDTO updateStudentEmploymentDTO);
+    <T> BaseResponse<T> updateStudentEmployment(StudentEmployment studentEmployment);
     /**
      * 删除学生就业信息
      */

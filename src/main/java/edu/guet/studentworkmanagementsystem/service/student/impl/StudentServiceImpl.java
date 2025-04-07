@@ -197,6 +197,8 @@ public class StudentServiceImpl implements StudentService {
                 .isOnlyChild(student.getIsOnlyChild())
                 .location(student.getLocation())
                 .disability(student.getDisability())
+                .enrollmentTime(student.getEnrollmentTime())
+                .studentFrom(student.getStudentFrom())
                 .otherNotes(student.getOtherNotes())
                 .build();
     }

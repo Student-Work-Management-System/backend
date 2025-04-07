@@ -73,10 +73,21 @@ public class Student implements Serializable {
     @NotBlank(message = "专业id不能为空")
     private String majorId;
     /**
+     * 入学日期
+     */
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate enrollmentTime;
+    /**
      * 年级
      */
     @NotBlank(message = "年级不能为空")
     private String gradeId;
+    /**
+     * 生源所在地
+     */
+    private String studentFrom;
     /**
      * 班号
      */
