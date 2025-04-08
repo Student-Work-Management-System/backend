@@ -27,6 +27,8 @@ public class StudentDetailServiceImpl extends ServiceImpl<StudentDetailMapper, S
     @Override
     public boolean updateStudentDetail(StudentDetail studentDetail) {
         return UpdateChain.of(StudentDetail.class)
+                .set(STUDENT_DETAIL.STUDENT_FROM, studentDetail.getStudentFrom(), StringUtils::hasLength)
+                .set(STUDENT_DETAIL.ENROLLMENT_TIME, studentDetail.getEnrollmentTime(), !Objects.isNull(studentDetail.getEnrollmentTime()))
                 .set(STUDENT_DETAIL.HEADER_TEACHER_USERNAME, studentDetail.getHeaderTeacherUsername(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.NATIVE_PLACE, studentDetail.getNativePlace(), StringUtils::hasLength)
                 .set(STUDENT_DETAIL.POSTAL_CODE, studentDetail.getPostalCode(), StringUtils::hasLength)

@@ -8,6 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +35,7 @@ public class StudentEmployment implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
+    @NotBlank(message = "学生就业id不能为空", groups = {UpdateGroup.class})
     private String studentEmploymentId;
     private String studentId;
     /**
@@ -41,6 +45,7 @@ public class StudentEmployment implements Serializable {
     /**
      * 毕业去向
      */
+    @NotBlank(message = "毕业去向不能为空", groups = {InsertGroup.class})
     private String whereabouts;
     /**
      * 单位机构组织代码
@@ -73,6 +78,7 @@ public class StudentEmployment implements Serializable {
     /**
      * 毕业后的状态：就业、待就业、升学、地方/国家基层项目、科研/管理助理
      */
+    @NotBlank(message = "毕业状态不能为空", groups = {InsertGroup.class})
     private String state;
     /**
      * 联系人信息

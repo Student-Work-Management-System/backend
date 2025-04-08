@@ -103,9 +103,9 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     @Transactional
     public <T> BaseResponse<T> updateStudentEmployment(StudentEmployment studentEmployment) {
         boolean update = UpdateChain.of(StudentEmployment.class)
-                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear(), StringUtils::hasLength)
                 .set(STUDENT_EMPLOYMENT.WHEREABOUTS, studentEmployment.getWhereabouts(), StringUtils::hasLength)
                 .set(STUDENT_EMPLOYMENT.STATE, studentEmployment.getState(), StringUtils::hasLength)
+                .set(STUDENT_EMPLOYMENT.GRADUATION_YEAR, studentEmployment.getGraduationYear())
                 .set(STUDENT_EMPLOYMENT.CODE, studentEmployment.getCode())
                 .set(STUDENT_EMPLOYMENT.ORGANIZATION_NAME, studentEmployment.getOrganizationName())
                 .set(STUDENT_EMPLOYMENT.JOB_NATURE, studentEmployment.getJobNature())
