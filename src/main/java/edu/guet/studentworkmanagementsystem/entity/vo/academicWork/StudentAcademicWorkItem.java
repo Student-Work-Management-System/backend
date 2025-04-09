@@ -1,7 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.academicWork;
 
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkMember;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

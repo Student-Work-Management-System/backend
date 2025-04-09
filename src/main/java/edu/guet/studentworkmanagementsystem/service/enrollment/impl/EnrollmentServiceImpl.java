@@ -9,7 +9,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
-import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
