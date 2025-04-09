@@ -70,6 +70,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         String studentAcademicWorkId = studentAcademicWork.getStudentAcademicWorkId();
         insertStudentAcademicWorkTeam(request.getTeam(), studentAcademicWorkId);
+        insertStudentAcademicWorkAudit(studentAcademicWorkId);
         return ResponseUtil.success();
     }
 
@@ -124,6 +125,17 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             studentAcademicWorkMembers.add(build);
         });
         return studentAcademicWorkMembers;
+    }
+
+    @Transactional
+    public void insertStudentAcademicWorkAudit(String studentAcademicWorkId) {
+        StudentAcademicWorkAudit build = StudentAcademicWorkAudit.builder()
+                .studentAcademicWorkId(studentAcademicWorkId)
+                .state(Common.WAITING.getValue())
+                .build();
+        int i = auditMapper.insert(build);
+        if (i <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
     @Override
