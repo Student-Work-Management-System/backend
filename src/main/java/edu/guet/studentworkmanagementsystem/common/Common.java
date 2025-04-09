@@ -16,6 +16,9 @@ public enum Common {
     PASS("通过"),
     REJECT("拒绝"),
     WAITING("审核中"),
+    PAPER("paper"),
+    SOFT("soft"),
+    PATENT("patent"),
     ;
     private final String value;
     Common(String str) {

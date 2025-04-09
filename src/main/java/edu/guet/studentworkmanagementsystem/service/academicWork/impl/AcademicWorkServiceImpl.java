@@ -1,38 +1,46 @@
 package edu.guet.studentworkmanagementsystem.service.academicWork.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkAuditDTO;
+import edu.guet.studentworkmanagementsystem.common.Common;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkDTO;
-import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.StudentAcademicWorkList;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkMemberItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.academicWork.*;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
-import edu.guet.studentworkmanagementsystem.utils.JsonUtil;
+import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkAuditTableDef.STUDENT_ACADEMIC_WORK_AUDIT;
+import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkMemberTableDef.STUDENT_ACADEMIC_WORK_MEMBER;
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkTableDef.STUDENT_ACADEMIC_WORK;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
+import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 
 @Service
 @Slf4j
@@ -44,201 +52,197 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     @Autowired
     private StudentSoftMapper softMapper;
     @Autowired
-    private StudentAcademicWorkClaimMapper claimMapper;
+    private StudentAcademicWorkAuditMapper auditMapper;
+    @Autowired
+    private StudentAcademicWorkMemberMapper memberMapper;
+    @Qualifier("readThreadPool")
+    @Autowired
+    private ThreadPoolTaskExecutor readThreadPool;
+
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> importStudentAcademicWork(StudentAcademicWorkList studentAcademicWorkList) {
-        List<StudentAcademicWorkDTO> studentAcademicWorkDTOList = studentAcademicWorkList.getStudentAcademicWorks();
-        int size = studentAcademicWorkDTOList.size();
-        ArrayList<StudentAcademicWork> studentAcademicWorks = new ArrayList<>();
-        for (StudentAcademicWorkDTO item : studentAcademicWorkDTOList) {
-            Long id = insertAcademicWork(item.getAcademicWork(), item.getAcademicWorkType());
-            item.setAdditionalInfoId(id);
-            try {
-                studentAcademicWorks.add(new StudentAcademicWork(item));
-            } catch (JsonProcessingException exception) {
-                log.error(
-                        "AcademicWorkServiceImpl#importStudentAcademicWork(StudentAcademicWorkList studentAcademicWorkList): " +
-                        "解析学术学术作品JSON时出现异常: {}", exception.getMessage());
-                throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-            }
-        }
-        int i = mapper.insertBatch(studentAcademicWorks);
-        if (i == size)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public <T> BaseResponse<T> insertStudentAcademicWork(AcademicWorkRequest request) {
+        String referenceId = insertAcademicWork(request.getAcademicWork());
+        StudentAcademicWork studentAcademicWork = createStudentAcademicWork(request, referenceId);
+        int i = mapper.insert(studentAcademicWork);
+        if (i <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        String studentAcademicWorkId = studentAcademicWork.getStudentAcademicWorkId();
+        insertStudentAcademicWorkTeam(request.getTeam(), studentAcademicWorkId);
+        return ResponseUtil.success();
     }
 
-    @Override
     @Transactional
-    public <T> BaseResponse<T> insertStudentAcademicWork(StudentAcademicWorkDTO studentAcademicWorkDTO) {
-        Long id = insertAcademicWork(studentAcademicWorkDTO.getAcademicWork(), studentAcademicWorkDTO.getAcademicWorkType());
-        studentAcademicWorkDTO.setAdditionalInfoId(id);
-        try {
-            StudentAcademicWork studentAcademicWork = new StudentAcademicWork(studentAcademicWorkDTO);
-            int i = mapper.insert(studentAcademicWork);
-            if (i > 0)
-                return ResponseUtil.success();
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        } catch (JsonProcessingException exception) {
-            log.error("AcademicWorkServiceImpl#insertStudentAcademicWork(StudentAcademicWorkDTO studentAcademicWorkDTO): " +
-                    "在解析学生学术作品JSON时出现了错误: {}", exception.getMessage());
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public String insertAcademicWork(AcademicWork academicWork) {
+        int effect = -1;
+        String id = "";
+        if (academicWork instanceof StudentPaper studentPaper) {
+            effect = paperMapper.insert(studentPaper);
+            id = studentPaper.getStudentPaperId();
+        } else if (academicWork instanceof StudentPatent studentPatent) {
+            effect = patentMapper.insert(studentPatent);
+            id = studentPatent.getStudentPatentId();
+        } else if (academicWork instanceof StudentSoft studentSoft) {
+            effect = softMapper.insert(studentSoft);
+            id = studentSoft.getStudentSoftId();
         }
+        if (effect <= 0 || !StringUtils.hasLength(id))
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        return id;
     }
 
-    @Override
+    public StudentAcademicWork createStudentAcademicWork(AcademicWorkRequest request, String referenceId) {
+        return StudentAcademicWork.builder()
+                .workName(request.getWorkName())
+                .type(request.getType())
+                .uid(request.getUid())
+                .evidence(request.getEvidence())
+                .referenceId(referenceId)
+                .time(LocalDate.now())
+                .build();
+    }
+
     @Transactional
-    public Long insertAcademicWork(AcademicWork academicWork, String typeId) {
-        Long id = null;
-        switch (typeId) {
-            case "1" -> {
-                StudentPaper studentPaper = (StudentPaper) academicWork;
-                int i = paperMapper.insert(studentPaper);
-                if (i > 0)
-                    id = studentPaper.getStudentPaperId();
-            }
-            case "2" -> {
-                StudentPatent studentPatent = (StudentPatent) academicWork;
-                int i = patentMapper.insert(studentPatent);
-                if (i > 0)
-                    id = studentPatent.getStudentPatentId();
-            }
-            case "3" -> {
-                StudentSoft studentSoft = (StudentSoft) academicWork;
-                int i = softMapper.insert(studentSoft);
-                if (i > 0)
-                    id = studentSoft.getStudentSoftId();
-            }
-            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
-        }
-        if (!Objects.isNull(id))
-            return id;
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public void insertStudentAcademicWorkTeam(List<AcademicWorkMember> members, String studentAcademicWorkId) {
+        List<StudentAcademicWorkMember> studentAcademicWorkTeam = createStudentAcademicWorkTeam(members, studentAcademicWorkId);
+        int i = memberMapper.insertBatch(studentAcademicWorkTeam);
+        int size = studentAcademicWorkTeam.size();
+        if (i != size)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    public List<StudentAcademicWorkMember> createStudentAcademicWorkTeam(List<AcademicWorkMember> members, String studentAcademicWorkId) {
+        ArrayList<StudentAcademicWorkMember> studentAcademicWorkMembers = new ArrayList<>();
+        members.forEach(member -> {
+            StudentAcademicWorkMember build = StudentAcademicWorkMember.builder()
+                    .studentAcademicWorkId(studentAcademicWorkId)
+                    .uid(member.getUid())
+                    .memberOrder(member.getMemberOrder())
+                    .isStudent(member.getIsStudent())
+                    .build();
+            studentAcademicWorkMembers.add(build);
+        });
+        return studentAcademicWorkMembers;
     }
 
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteStudentAcademicWork(String studentAcademicWorkId) {
-        QueryWrapper wrapper = QueryWrapper.create().where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId));
-        long claimNumber = claimMapper.selectCountByQuery(wrapper);
-        int i = claimMapper.deleteByQuery(wrapper);
-        if (i == claimNumber) {
-            StudentAcademicWork studentAcademicWork = mapper.selectOneById(studentAcademicWorkId);
-            deleteAcademicWork(studentAcademicWork.getAdditionalInfoId(), studentAcademicWork.getAcademicWorkType());
-            int j = mapper.deleteById(studentAcademicWorkId);
-            if (j > 0)
-                return ResponseUtil.success();
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        QueryWrapper deleteStudentAcademicWorkAuditWrapper =
+                QueryWrapper.create()
+                        .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId));
+        int i = auditMapper.deleteByQuery(deleteStudentAcademicWorkAuditWrapper);
+        if (i <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        QueryWrapper deleteStudentAcademicWorkMemberWrapper =
+                QueryWrapper.create()
+                        .where(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId));
+        int j = memberMapper.deleteByQuery(deleteStudentAcademicWorkMemberWrapper);
+        if (j <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        int k = mapper.deleteById(studentAcademicWorkId);
+        if (k <= 0)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        return ResponseUtil.success();
     }
 
     @Override
     public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(String studentId) {
-        List<StudentAcademicWorkItem> studentAcademicWorks = QueryChain.of(StudentAcademicWork.class)
-                .select(STUDENT_ACADEMIC_WORK.ALL_COLUMNS, STUDENT.ALL_COLUMNS)
-                .where(STUDENT_ACADEMIC_WORK.STUDENT_ID.eq(studentId))
-                .listAs(StudentAcademicWorkItem.class);
-        studentAcademicWorks.forEach(item -> {
-            AcademicWork academicWork = getAcademicWork(item.getAcademicWorkType(), item.getAdditionalInfoId());
-            item.setAcademicWork(academicWork);
-        });
-        return ResponseUtil.success(studentAcademicWorks);
+        CompletableFuture<List<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentAcademicWorkItem> items = QueryChain.of(StudentAcademicWork.class)
+                    .select(
+                            USER.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
+                    )
+                    .from(STUDENT_ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK.UID))
+                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                    .where(USER.USERNAME.eq(studentId))
+                    .listAs(StudentAcademicWorkItem.class);
+            items.forEach(this::getStudentAcademicWorkTeam);
+            return items;
+        }, readThreadPool);
+        List<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    public void getStudentAcademicWorkTeam(StudentAcademicWorkItem item) {
+        String studentAcademicWorkId = item.getStudentAcademicWorkId();
+        List<StudentAcademicWorkMemberItem> memberItems = QueryChain.of(StudentAcademicWorkMember.class)
+                .select(
+                        STUDENT_ACADEMIC_WORK_MEMBER.ALL_COLUMNS,
+                        USER.USERNAME,
+                        USER.REAL_NAME,
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME,
+                        DEGREE.DEGREE_NAME
+                )
+                .from(STUDENT_ACADEMIC_WORK_MEMBER)
+                .leftJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK_MEMBER.UID))
+                .leftJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(USER.USERNAME))
+                .leftJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .leftJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .leftJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
+                .where(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId))
+                .listAs(StudentAcademicWorkMemberItem.class);
+        item.setTeam(memberItems);
+        String type = item.getType();
+        String referenceId = item.getReferenceId();
+        if (Common.PAPER.getValue().equals(type)) {
+            StudentPaper studentPaper = paperMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentPaper);
+        } else if (Common.SOFT.getValue().equals(type)) {
+            StudentSoft studentSoft = softMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentSoft);
+        } else if (Common.PATENT.getValue().equals(type)) {
+            StudentPatent studentPatent = patentMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentPatent);
+        }
     }
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> auditStudentAcademicWork(AcademicWorkAuditDTO academicWorkAuditDTO) throws JsonProcessingException {
-        String studentAcademicWorkId = academicWorkAuditDTO.getStudentAcademicWorkId();
-        boolean update = UpdateChain.of(StudentAcademicWork.class)
-                .set(STUDENT_ACADEMIC_WORK.AUDITOR_ID, academicWorkAuditDTO.getAuditorId(), StringUtils::hasLength)
-                .set(STUDENT_ACADEMIC_WORK.AUDIT_STATE, academicWorkAuditDTO.getAuditState(), StringUtils::hasLength)
-                .set(STUDENT_ACADEMIC_WORK.REASON, academicWorkAuditDTO.getReason(), StringUtils::hasLength)
-                .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId))
+    public <T> BaseResponse<T> updateStudentAcademicWorkAudit(StudentAcademicWorkAudit audit)  {
+        boolean update = UpdateChain.of(StudentAcademicWorkAudit.class)
+                .set(STUDENT_ACADEMIC_WORK_AUDIT.STATE, audit.getState(), StringUtils::hasLength)
+                .set(STUDENT_ACADEMIC_WORK_AUDIT.REJECT_REASON, audit.getRejectReason(), StringUtils::hasLength)
+                .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_ID, audit.getOperatorId(), StringUtils::hasLength)
+                .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_TIME, LocalDate.now())
+                .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(audit.getStudentAcademicWorkId()))
                 .update();
-        Boolean flag = stateHandler(academicWorkAuditDTO.getAuditState());
-        if (update) {
-            if (!flag)
-                return ResponseUtil.success();
-            String authorsStr = mapper.selectOneById(studentAcademicWorkId).getAuthors();
-            Author[] authors = JsonUtil.getMapper().readValue(authorsStr, new TypeReference<>() {
-            });
-            return insertStudentAcademicWorkAudit(authors, studentAcademicWorkId);
-        }
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> insertStudentAcademicWorkAudit(Author[] authors, String studentAcademicWorkId) {
-        ArrayList<StudentAcademicWorkClaim> studentAcademicWorkClaims = new ArrayList<>();
-        int size = authors.length;
-        for (Author author : authors) {
-            StudentAcademicWorkClaim claim = new StudentAcademicWorkClaim(studentAcademicWorkId, author.getStudentId());
-            studentAcademicWorkClaims.add(claim);
-        }
-        int i = claimMapper.insertBatch(studentAcademicWorkClaims);
-        if (i == size)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (!update)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        return ResponseUtil.success();
     }
 
     @Override
     public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query) {
-        Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
-        Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentAcademicWorkItem> studentAcademicWorkVOPage = QueryChain.of(StudentAcademicWork.class)
-                .select(STUDENT_ACADEMIC_WORK.ALL_COLUMNS, STUDENT.ALL_COLUMNS)
-                .where(STUDENT_ACADEMIC_WORK.STUDENT_ID.eq(query.getStudentId()))
-                .and(STUDENT.NAME.like(query.getName()))
-                .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT_ACADEMIC_WORK.UPLOAD_TIME.eq(query.getUploadTime()))
-                .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkItem.class);
-        studentAcademicWorkVOPage.getRecords().forEach(item -> {
-            AcademicWork academicWork = getAcademicWork(item.getAcademicWorkType(), item.getAdditionalInfoId());
-            item.setAcademicWork(academicWork);
-        });
-        return ResponseUtil.success(studentAcademicWorkVOPage);
-    }
-
-    private AcademicWork getAcademicWork(String typeId, String additionalInfoId) {
-        switch (typeId) {
-            case "1" -> {
-                return paperMapper.selectOneById(additionalInfoId);
-            }
-            case "2" -> {
-                return patentMapper.selectOneById(additionalInfoId);
-            }
-            case "3" -> {
-                return softMapper.selectOneById(additionalInfoId);
-            }
-            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
-        }
-    }
-
-    private void deleteAcademicWork(Long additionalInfoId, String typeId) {
-        int i;
-        switch (typeId) {
-            case "1" -> i = paperMapper.deleteById(additionalInfoId);
-            case "2" -> i = patentMapper.deleteById(additionalInfoId);
-            case "3" -> i = softMapper.deleteById(additionalInfoId);
-            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
-        }
-        if (i > 0)
-            return;
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
-
-    private Boolean stateHandler(String state) {
-        switch (state) {
-            case "已通过" -> {
-                return true;
-            }
-            case "已拒绝" -> {
-                return false;
-            }
-            default -> throw new ServiceException(ServiceExceptionEnum.SELECT_NOT_IN);
-        }
+        CompletableFuture<Page<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
+            int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
+            int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
+            Page<StudentAcademicWorkItem> items = QueryChain.of(StudentAcademicWork.class)
+                    .select(
+                            USER.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
+                    )
+                    .from(STUDENT_ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK.UID))
+                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                    .where(
+                            USER.USERNAME.likeLeft(query.getSearch())
+                                    .or(USER.REAL_NAME.likeLeft(query.getSearch()))
+                                    .or(STUDENT_ACADEMIC_WORK.WORK_NAME.likeLeft(query.getSearch()))
+                    )
+                    .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(query.getState()))
+                    .and(STUDENT_ACADEMIC_WORK.TYPE.eq(query.getType()))
+                    .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkItem.class);
+            items.getRecords().forEach(this::getStudentAcademicWorkTeam);
+            return items;
+        }, readThreadPool);
+        Page<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 }

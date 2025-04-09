@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * 著作详细信息表(软著) 实体类。
@@ -27,7 +27,7 @@ public class StudentSoft implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentSoftId;
+    private String studentSoftId;
     /**
      * 发表单位
      */
@@ -35,5 +35,5 @@ public class StudentSoft implements Serializable, AcademicWork {
     /**
      * 发表日期
      */
-    private Date publishDate;
+    private LocalDate publishDate;
 }

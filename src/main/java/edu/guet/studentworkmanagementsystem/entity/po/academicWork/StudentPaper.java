@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * 著作详细信息表(论文) 实体类。
@@ -28,7 +28,7 @@ public class StudentPaper implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentPaperId;
+    private String studentPaperId;
     /**
      * 期刊名称
      */
@@ -44,11 +44,11 @@ public class StudentPaper implements Serializable, AcademicWork {
     /**
      * 录稿时间
      */
-    private Date recordedTime;
+    private LocalDate recordedTime;
     /**
      * 检索时间
      */
-    private Date searchedTime;
+    private LocalDate searchedTime;
     /**
      * 是否会议文章
      */

@@ -1,6 +1,5 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.user;
 
-import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
 import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
 import edu.guet.studentworkmanagementsystem.securiy.SystemAuthority;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,6 @@ public class LoginUserDetail implements Serializable {
     private String realName;
     private String email;
     private List<Grade> chargeGrades;
-    private List<Degree> chargeDegrees;
     private List<SystemAuthority> authorities;
     private String token;
 }

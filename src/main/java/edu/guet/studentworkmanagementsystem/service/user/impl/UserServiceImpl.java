@@ -17,7 +17,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.authority.RoleRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.RolePermissionRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.authority.UserRoleRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.*;
-import edu.guet.studentworkmanagementsystem.entity.po.other.Degree;
 import edu.guet.studentworkmanagementsystem.entity.po.other.Grade;
 import edu.guet.studentworkmanagementsystem.entity.po.user.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.authority.PermissionTreeItem;
@@ -61,7 +60,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.CounselorTableDef.COUNSELOR;
-import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.PermissionTableDef.PERMISSION;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.RolePermissionTableDef.ROLE_PERMISSION;
@@ -136,12 +134,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (hasStudentStatusPermission && !hasStudentStatusAllPermission) {
             String uid = securityUser.getUser().getUid();
             loginUser.setChargeGrades(getChargeGrade(uid));
-            loginUser.setChargeDegrees(getChargeDegree(uid));
             return loginUser;
         }
         // 有student:status:all, 则在前端保存所有的年级和学历层次信息
         loginUser.setChargeGrades(otherService.getGradeList());
-        loginUser.setChargeDegrees(otherService.getDegreeList());
         return loginUser;
     }
 
@@ -149,15 +145,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return QueryChain.of(Grade.class)
                 .select(GRADE.ALL_COLUMNS)
                 .innerJoin(COUNSELOR).on(COUNSELOR.GRADE_ID.eq(GRADE.GRADE_ID))
-                .innerJoin(USER).on(USER.UID.eq(USER.UID))
-                .where(USER.UID.eq(uid))
-                .list();
-    }
-
-    public List<Degree> getChargeDegree(String uid) {
-        return QueryChain.of(Degree.class)
-                .select(DEGREE.ALL_COLUMNS)
-                .innerJoin(COUNSELOR).on(COUNSELOR.DEGREE_ID.eq(DEGREE.DEGREE_ID))
                 .innerJoin(USER).on(USER.UID.eq(USER.UID))
                 .where(USER.UID.eq(uid))
                 .list();

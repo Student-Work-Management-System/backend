@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * 著作详细信息表(专利) 实体类。
@@ -27,7 +27,7 @@ public class StudentPatent implements Serializable, AcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentPatentId;
+    private String studentPatentId;
     /**
      * 发表状态：受理、公开或授权
      */
@@ -35,13 +35,13 @@ public class StudentPatent implements Serializable, AcademicWork {
     /**
      * 发表日期
      */
-    private Date publishDate;
+    private LocalDate publishDate;
     /**
      * 受理日期
      */
-    private Date acceptDate;
+    private LocalDate acceptDate;
     /**
      * 授权日期
      */
-    private Date authorizationDate;
+    private LocalDate authorizationDate;
 }

@@ -1,0 +1,36 @@
+package edu.guet.studentworkmanagementsystem.entity.dto.academicWork;
+
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class AcademicWorkRequest implements Serializable {
+    @NotBlank(message = "学术作品id不能为空", groups = {UpdateGroup.class})
+    private String studentAcademicWorkId;
+    @NotBlank(message = "uid不能为空", groups = {InsertGroup.class})
+    private String uid;
+    @NotBlank(message = "学术作品名称不能为空", groups = {InsertGroup.class})
+    private String workName;
+    @Pattern(regexp = "^(papar|soft|patent)$", message = "三种类型: 论文、专利和软著", groups = {InsertGroup.class})
+    private String type;
+    @NotNull(message = "作者不能为空", groups = {InsertGroup.class})
+    private List<AcademicWorkMember> team;
+    @NotBlank(message = "证明材料地址不能为空", groups = {InsertGroup.class})
+    private String evidence;
+    @NotNull(message = "学生作品信息不能为空", groups = {InsertGroup.class})
+    private AcademicWork academicWork;
+}

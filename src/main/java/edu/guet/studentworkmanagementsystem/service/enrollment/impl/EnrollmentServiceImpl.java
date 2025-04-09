@@ -46,14 +46,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
-    @Override
-    @Transactional
-    public BaseResponse<Scholarship> insertEnrollment(Enrollment enrollment) {
-        int i = mapper.insert(enrollment);
-        if (i > 0)
-            return ResponseUtil.success();
-        throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-    }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateEnrollment(Enrollment enrollment) {
@@ -71,6 +64,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> deleteEnrollment(String enrollmentInfoId) {
@@ -79,6 +73,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
+
     @Override
     public BaseResponse<Page<EnrollmentItem>> getAllRecords(EnrollmentQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);

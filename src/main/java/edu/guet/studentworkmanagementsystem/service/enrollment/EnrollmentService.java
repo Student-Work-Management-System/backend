@@ -21,11 +21,6 @@ public interface EnrollmentService extends IService<Enrollment> {
      */
     <T> BaseResponse<T> importEnrollment(EnrollmentList enrollmentList);
     /**
-     * 添加招生记录
-     * @param enrollment 招生信息
-     */
-    BaseResponse<Scholarship> insertEnrollment(Enrollment enrollment);
-    /**
      * 修改招生信息记录
      * @param enrollment 待修改的招生信息记录
      */
