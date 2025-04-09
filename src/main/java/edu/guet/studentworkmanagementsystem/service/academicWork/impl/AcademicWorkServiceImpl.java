@@ -173,14 +173,14 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                     .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
                     .where(USER.USERNAME.eq(studentId))
                     .listAs(StudentAcademicWorkItem.class);
-            items.forEach(this::getStudentAcademicWorkTeam);
+            items.forEach(this::getStudentAcademicWorkTeamAndDetail);
             return items;
         }, readThreadPool);
         List<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 
-    public void getStudentAcademicWorkTeam(StudentAcademicWorkItem item) {
+    public void getStudentAcademicWorkTeamAndDetail(StudentAcademicWorkItem item) {
         String studentAcademicWorkId = item.getStudentAcademicWorkId();
         List<StudentAcademicWorkMemberItem> memberItems = QueryChain.of(StudentAcademicWorkMember.class)
                 .select(
@@ -251,7 +251,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                     .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(query.getState()))
                     .and(STUDENT_ACADEMIC_WORK.TYPE.eq(query.getType()))
                     .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkItem.class);
-            items.getRecords().forEach(this::getStudentAcademicWorkTeam);
+            items.getRecords().forEach(this::getStudentAcademicWorkTeamAndDetail);
             return items;
         }, readThreadPool);
         Page<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();

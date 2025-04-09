@@ -1,9 +1,13 @@
 package edu.guet.studentworkmanagementsystem;
 
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPaper;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPatent;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentSoft;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +50,56 @@ public class AcademicWorkTest {
                 .academicWork(paper)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
-        System.out.println(response.getCode());
+        System.out.println(response.getCode() + ": " + response.getMessage());
+    }
+
+    @Test
+    void addSoft() {
+        StudentSoft soft = StudentSoft.builder()
+                .publishInstitution("测试")
+                .publishDate(LocalDate.now())
+                .build();
+        AcademicWorkMember member1 = new AcademicWorkMember("1", "1", false);
+        ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
+        AcademicWorkRequest build = AcademicWorkRequest.builder()
+                .uid("1")
+                .workName("测试论文")
+                .type("paper")
+                .evidence("https://www.baidu.com")
+                .team(team)
+                .academicWork(soft)
+                .build();
+        BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
+        System.out.println(response.getCode() + ": " + response.getMessage());
+    }
+
+    @Test
+    void addPatent() {
+        StudentPatent patent = StudentPatent.builder()
+                .publishState(Common.WAITING.getValue())
+                .acceptDate(LocalDate.now())
+                .authorizationDate(LocalDate.now())
+                .publishDate(LocalDate.now())
+                .build();
+        AcademicWorkMember member1 = new AcademicWorkMember("1", "1", false);
+        ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
+        AcademicWorkRequest build = AcademicWorkRequest.builder()
+                .uid("1")
+                .workName("测试论文")
+                .type("paper")
+                .evidence("https://www.baidu.com")
+                .team(team)
+                .academicWork(patent)
+                .build();
+        BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
+        System.out.println(response.getCode() + ": " + response.getMessage());
+    }
+
+    @Test
+    void getOwn() {
+        String studentId = "admin";
+        BaseResponse<List<StudentAcademicWorkItem>> own = academicWorkService.getOwnStudentAcademicWork(studentId);
+        List<StudentAcademicWorkItem> data = own.getData();
+        System.out.println(data);
     }
 }
