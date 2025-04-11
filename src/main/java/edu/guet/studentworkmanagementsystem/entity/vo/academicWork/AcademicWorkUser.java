@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.dto.academicWork;
+package edu.guet.studentworkmanagementsystem.entity.vo.academicWork;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AcademicWorkMember {
-    private String memberOrder;
+public class AcademicWorkUser {
     private String uid;
+    private String username;
+    private String realName;
 }

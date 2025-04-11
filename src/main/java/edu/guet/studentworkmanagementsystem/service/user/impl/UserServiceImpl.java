@@ -117,6 +117,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LoginUserDetail loginUser = LoginUserDetail.builder()
                 .uid(securityUser.getUser().getUid())
                 .username(securityUser.getUsername())
+                .realName(securityUser.getUser().getRealName())
+                .isStudent(securityUser.getUser().isEnabled())
                 .email(securityUser.getUser().getEmail())
                 .authorities(authorities)
                 .token(token)

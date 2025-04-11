@@ -15,4 +15,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = StudentPatent.class, name = "patent")
 })
 public interface AcademicWork {
+
 }

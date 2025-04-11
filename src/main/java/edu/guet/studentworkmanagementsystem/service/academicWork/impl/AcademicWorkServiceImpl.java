@@ -11,6 +11,8 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
+import edu.guet.studentworkmanagementsystem.entity.po.user.User;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkMemberItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -120,7 +122,6 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                     .studentAcademicWorkId(studentAcademicWorkId)
                     .uid(member.getUid())
                     .memberOrder(member.getMemberOrder())
-                    .isStudent(member.getIsStudent())
                     .build();
             studentAcademicWorkMembers.add(build);
         });
@@ -255,6 +256,16 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
             return items;
         }, readThreadPool);
         Page<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    @Override
+    public BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(String username) {
+        CompletableFuture<List<AcademicWorkUser>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
+                .select(USER.UID, USER.USERNAME, USER.REAL_NAME)
+                .where(USER.USERNAME.likeLeft(username))
+                .listAs(AcademicWorkUser.class), readThreadPool);
+        List<AcademicWorkUser> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }

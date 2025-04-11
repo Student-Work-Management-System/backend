@@ -1,8 +1,10 @@
 package edu.guet.studentworkmanagementsystem;
 
+import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPaper;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPatent;
@@ -96,10 +98,20 @@ public class AcademicWorkTest {
     }
 
     @Test
-    void getOwn() {
+    void getOwnTest() {
         String studentId = "admin";
         BaseResponse<List<StudentAcademicWorkItem>> own = academicWorkService.getOwnStudentAcademicWork(studentId);
         List<StudentAcademicWorkItem> data = own.getData();
+        System.out.println(data);
+    }
+
+    @Test
+    void pageTest() {
+        AcademicWorkQuery build = AcademicWorkQuery.builder()
+                .search("")
+                .build();
+        BaseResponse<Page<StudentAcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllStudentAcademicWork(build);
+        Page<StudentAcademicWorkItem> data = allStudentAcademicWork.getData();
         System.out.println(data);
     }
 }

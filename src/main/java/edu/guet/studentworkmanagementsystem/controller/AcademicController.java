@@ -7,6 +7,7 @@ import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkAudit;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,11 @@ public class AcademicController {
     @DeleteMapping("/delete/{studentAcademicWorkId}")
     public <T> BaseResponse<T> deleteStudentAcademicWork(@PathVariable String studentAcademicWorkId) {
         return academicWorkService.deleteStudentAcademicWork(studentAcademicWorkId);
+    }
+
+    @PreAuthorize("hasAuthority('student_academic_work:select:own') or hasAuthority('student_academic_work:select')")
+    @GetMapping("/user/{username}")
+    public BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(@PathVariable String username) {
+        return academicWorkService.getOptionalUserByUsername(username);
     }
 }

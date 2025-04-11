@@ -19,6 +19,7 @@ public class LoginUserDetail implements Serializable {
     private String username;
     private String realName;
     private String email;
+    private Boolean isStudent;
     private List<Grade> chargeGrades;
     private List<SystemAuthority> authorities;
     private String token;
