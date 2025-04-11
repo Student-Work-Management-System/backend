@@ -37,11 +37,11 @@ public class AcademicWorkTest {
                 .isEI(true)
                 .isEIRecorded(true)
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1", false);
-        AcademicWorkMember member2 = new AcademicWorkMember("2", "1001",true );
-        AcademicWorkMember member3 = new AcademicWorkMember("3", "1002",true );
-        AcademicWorkMember member4 = new AcademicWorkMember("4", "1003",true );
-        AcademicWorkMember member5 = new AcademicWorkMember("5", "1004",true );
+        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
+        AcademicWorkMember member2 = new AcademicWorkMember("2", "1001");
+        AcademicWorkMember member3 = new AcademicWorkMember("3", "1002");
+        AcademicWorkMember member4 = new AcademicWorkMember("4", "1003");
+        AcademicWorkMember member5 = new AcademicWorkMember("5", "1004");
         ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1, member2, member3, member4, member5));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
                 .uid("1")
