@@ -67,4 +67,6 @@ public class StudentPaper implements Serializable, AcademicWork {
      */
     @Column(value = "is_EI_recorded")
     private Boolean isEIRecorded;
+    @Column(ignore = true)
+    private String type;
 }

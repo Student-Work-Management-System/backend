@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.po.academicWork;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -44,4 +45,6 @@ public class StudentPatent implements Serializable, AcademicWork {
      * 授权日期
      */
     private LocalDate authorizationDate;
+    @Column(ignore = true)
+    private String type;
 }

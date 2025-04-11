@@ -1,5 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.po.academicWork;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -36,4 +37,6 @@ public class StudentSoft implements Serializable, AcademicWork {
      * 发表日期
      */
     private LocalDate publishDate;
+    @Column(ignore = true)
+    private String type;
 }
