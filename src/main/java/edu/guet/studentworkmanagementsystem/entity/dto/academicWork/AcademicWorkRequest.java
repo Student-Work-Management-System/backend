@@ -20,8 +20,8 @@ import java.util.List;
 public class AcademicWorkRequest implements Serializable {
     @NotBlank(message = "学术作品id不能为空", groups = {UpdateGroup.class})
     private String studentAcademicWorkId;
-    @NotBlank(message = "uid不能为空", groups = {InsertGroup.class})
-    private String uid;
+    @NotBlank(message = "学号 / 工号 不能为空", groups = {InsertGroup.class})
+    private String username;
     @NotBlank(message = "学术作品名称不能为空", groups = {InsertGroup.class})
     private String workName;
     private String type;

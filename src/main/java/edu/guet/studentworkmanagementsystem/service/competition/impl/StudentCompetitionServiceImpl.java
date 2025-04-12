@@ -21,6 +21,7 @@ import edu.guet.studentworkmanagementsystem.service.competition.CompetitionTeamS
 import edu.guet.studentworkmanagementsystem.service.competition.StudentCompetitionService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
+import edu.guet.studentworkmanagementsystem.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -106,8 +107,7 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
 
     @Override
     public BaseResponse<List<StudentCompetitionItem>> getOwnStudentCompetition() {
-        // String studentId = SecurityUtil.getUserCredentials().getUsername();
-        String studentId = "1001";
+        String studentId = SecurityUtil.getUserCredentials().getUsername();
         CompletableFuture<List<StudentCompetitionItem>> future = CompletableFuture.supplyAsync(() -> {
             List<StudentCompetitionItem> items = QueryChain.of(StudentCompetition.class)
                     .select(
@@ -162,7 +162,39 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
         CompletableFuture<Page<StudentCompetitionItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-            Page<StudentCompetitionItem> items = QueryChain.of(StudentCompetition.class)
+
+            Page<String> idPage = QueryChain.of(StudentCompetition.class)
+                    .select(STUDENT_COMPETITION.STUDENT_COMPETITION_ID)
+                    .from(STUDENT_COMPETITION)
+                    .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
+                    .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                    .leftJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                    .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
+                    .where(
+                            STUDENT_COMPETITION.HEADER_ID.like(query.getSearch())
+                                    .or(STUDENT_BASIC.NAME.like(query.getSearch()))
+                                    .or(COMPETITION.COMPETITION_NAME.like(query.getSearch()))
+                    )
+                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getCompetitionNature()))
+                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getCompetitionType()))
+                    .and(STUDENT_COMPETITION.LEVEL.eq(query.getLevel()))
+                    .and(STUDENT_COMPETITION_AUDIT.STATE.eq(query.getState()))
+                    .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
+                    .and(GRADE.GRADE_ID.eq(query.getGradeId()))
+                    .and(DEGREE.DEGREE_ID.eq(query.getDegreeId()))
+                    .and(
+                            STUDENT_COMPETITION.DATE.le(query.getEnd())
+                                    .and(STUDENT_COMPETITION.DATE.ge(query.getStart()))
+                    )
+                    .pageAs(Page.of(pageNo, pageSize), String.class);
+
+            if (idPage.getRecords().isEmpty()) {
+                return Page.of(pageNo, pageSize);
+            }
+
+            List<StudentCompetitionItem> items = QueryChain.of(StudentCompetition.class)
                     .select(
                             COMPETITION.ALL_COLUMNS,
                             STUDENT_COMPETITION.ALL_COLUMNS,
@@ -174,39 +206,17 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
                     .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
                     .leftJoin(STUDENT_COMPETITION_AUDIT).on(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
-                    .leftJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
-                    .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
-                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
-                    .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
-                    .where(
-                            STUDENT_COMPETITION.HEADER_ID.like(query.getSearch())
-                                    .or(STUDENT_BASIC.NAME.like(query.getSearch()))
-                                    .or(COMPETITION.COMPETITION_NAME.like(query.getSearch()))
-                    )
-                    // 竞赛性质
-                    .and(COMPETITION.COMPETITION_NATURE.eq(query.getCompetitionNature()))
-                    // 竞赛类别: A/B/C类
-                    .and(COMPETITION.COMPETITION_TYPE.eq(query.getCompetitionType()))
-                    // 获奖级别
-                    .and(STUDENT_COMPETITION.LEVEL.eq(query.getLevel()))
-                    .and(STUDENT_COMPETITION_AUDIT.STATE.eq(query.getState()))
-                    .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
-                    .and(GRADE.GRADE_ID.eq(query.getGradeId()))
-                    .and(DEGREE.DEGREE_ID.eq(query.getDegreeId()))
-                    .and(
-                            STUDENT_COMPETITION.DATE.le(query.getEnd())
-                                    .and(STUDENT_COMPETITION.DATE.ge(query.getStart()))
-                    )
-                    .pageAs(Page.of(pageNo, pageSize), StudentCompetitionItem.class);
-            for (StudentCompetitionItem item : items.getRecords()) {
+                    .where(STUDENT_COMPETITION.STUDENT_COMPETITION_ID.in(idPage.getRecords()))
+                    .listAs(StudentCompetitionItem.class);
+
+            for (StudentCompetitionItem item : items) {
                 String competitionId = item.getCompetitionId();
-                if (competitionService.competitionNatureIsSolo(competitionId))
-                    continue;
+                if (competitionService.competitionNatureIsSolo(competitionId)) continue;
                 String studentCompetitionId = item.getStudentCompetitionId();
                 List<TeamItem> team = competitionTeamService.getTeamByStudentCompetitionId(studentCompetitionId);
                 item.setTeam(team);
             }
-            return items;
+            return new Page<>(items, pageNo, pageSize, idPage.getTotalRow());
         }, readThreadPool);
         Page<StudentCompetitionItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AcademicWorkMember {
     private String memberOrder;
-    private String uid;
+    private String username;
 }

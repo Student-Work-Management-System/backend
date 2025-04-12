@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AcademicWorkUser {
-    private String uid;
     private String username;
     private String realName;
 }

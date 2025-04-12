@@ -18,5 +18,5 @@ public class StudentAcademicWorkMember {
     private String memberId;
     private String studentAcademicWorkId;
     private String memberOrder;
-    private String uid;
+    private String username;
 }

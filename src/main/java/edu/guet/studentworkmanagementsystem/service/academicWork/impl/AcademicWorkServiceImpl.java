@@ -99,7 +99,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         return StudentAcademicWork.builder()
                 .workName(request.getWorkName())
                 .type(request.getType())
-                .uid(request.getUid())
+                .username(request.getUsername())
                 .evidence(request.getEvidence())
                 .referenceId(referenceId)
                 .time(LocalDate.now())
@@ -120,7 +120,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         members.forEach(member -> {
             StudentAcademicWorkMember build = StudentAcademicWorkMember.builder()
                     .studentAcademicWorkId(studentAcademicWorkId)
-                    .uid(member.getUid())
+                    .username(member.getUsername())
                     .memberOrder(member.getMemberOrder())
                     .build();
             studentAcademicWorkMembers.add(build);
@@ -170,9 +170,10 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                             STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
                     )
                     .from(STUDENT_ACADEMIC_WORK)
-                    .innerJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK.UID))
+                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
                     .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
-                    .where(USER.USERNAME.eq(studentId))
+                    .innerJoin(STUDENT_ACADEMIC_WORK_MEMBER).on(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                    .where(USER.USERNAME.eq(studentId).or(STUDENT_ACADEMIC_WORK_MEMBER.USERNAME.eq(studentId)))
                     .listAs(StudentAcademicWorkItem.class);
             items.forEach(this::getStudentAcademicWorkTeamAndDetail);
             return items;
@@ -193,7 +194,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                         DEGREE.DEGREE_NAME
                 )
                 .from(STUDENT_ACADEMIC_WORK_MEMBER)
-                .leftJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK_MEMBER.UID))
+                .leftJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK_MEMBER.USERNAME))
                 .leftJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(USER.USERNAME))
                 .leftJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                 .leftJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
@@ -217,16 +218,18 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentAcademicWorkAudit(StudentAcademicWorkAudit audit)  {
-        boolean update = UpdateChain.of(StudentAcademicWorkAudit.class)
-                .set(STUDENT_ACADEMIC_WORK_AUDIT.STATE, audit.getState(), StringUtils::hasLength)
-                .set(STUDENT_ACADEMIC_WORK_AUDIT.REJECT_REASON, audit.getRejectReason(), StringUtils::hasLength)
-                .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_ID, audit.getOperatorId(), StringUtils::hasLength)
-                .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_TIME, LocalDate.now())
-                .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(audit.getStudentAcademicWorkId()))
-                .update();
-        if (!update)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    public <T> BaseResponse<T> updateStudentAcademicWorkAudit(List<StudentAcademicWorkAudit> audits)  {
+        audits.forEach(audit -> {
+            boolean update = UpdateChain.of(StudentAcademicWorkAudit.class)
+                    .set(STUDENT_ACADEMIC_WORK_AUDIT.STATE, audit.getState(), StringUtils::hasLength)
+                    .set(STUDENT_ACADEMIC_WORK_AUDIT.REJECT_REASON, audit.getRejectReason())
+                    .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_ID, audit.getOperatorId(), StringUtils::hasLength)
+                    .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_TIME, LocalDate.now())
+                    .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(audit.getStudentAcademicWorkId()))
+                    .update();
+            if (!update)
+                throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        });
         return ResponseUtil.success();
     }
 
@@ -235,15 +238,13 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         CompletableFuture<Page<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-            Page<StudentAcademicWorkItem> items = QueryChain.of(StudentAcademicWork.class)
-                    .select(
-                            USER.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
-                    )
+
+            Page<String> idPage = QueryChain.of(StudentAcademicWork.class)
+                    .select(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
                     .from(STUDENT_ACADEMIC_WORK)
-                    .innerJoin(USER).on(USER.UID.eq(STUDENT_ACADEMIC_WORK.UID))
-                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
+                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
+                    .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
                     .where(
                             USER.USERNAME.likeLeft(query.getSearch())
                                     .or(USER.REAL_NAME.likeLeft(query.getSearch()))
@@ -251,9 +252,29 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
                     )
                     .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(query.getState()))
                     .and(STUDENT_ACADEMIC_WORK.TYPE.eq(query.getType()))
-                    .pageAs(Page.of(pageNo, pageSize), StudentAcademicWorkItem.class);
-            items.getRecords().forEach(this::getStudentAcademicWorkTeamAndDetail);
-            return items;
+                    .pageAs(Page.of(pageNo, pageSize), String.class);
+
+            if (idPage.getRecords().isEmpty()) {
+                return Page.of(pageNo, pageSize);
+            }
+
+            List<StudentAcademicWorkItem> records = QueryChain.of(StudentAcademicWork.class)
+                    .select(
+                            USER.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
+                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
+                    )
+                    .from(STUDENT_ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
+                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(
+                            STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
+                    )
+                    .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.in(idPage.getRecords()))
+                    .listAs(StudentAcademicWorkItem.class);
+
+            records.forEach(this::getStudentAcademicWorkTeamAndDetail);
+
+            return new Page<>(records, pageNo, pageSize, idPage.getTotalRow());
         }, readThreadPool);
         Page<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
@@ -262,7 +283,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     @Override
     public BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(String username) {
         CompletableFuture<List<AcademicWorkUser>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
-                .select(USER.UID, USER.USERNAME, USER.REAL_NAME)
+                .select(USER.USERNAME, USER.REAL_NAME)
                 .where(USER.USERNAME.likeLeft(username))
                 .listAs(AcademicWorkUser.class), readThreadPool);
         List<AcademicWorkUser> execute = FutureExceptionExecute.fromFuture(future).execute();

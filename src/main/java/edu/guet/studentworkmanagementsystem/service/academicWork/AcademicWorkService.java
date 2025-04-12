@@ -17,7 +17,7 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
     <T> BaseResponse<T> insertStudentAcademicWork(AcademicWorkRequest academicWorkRequest);
     <T> BaseResponse<T> deleteStudentAcademicWork(String studentAcademicWorkId);
     BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(String uid);
-    <T> BaseResponse<T> updateStudentAcademicWorkAudit(StudentAcademicWorkAudit audit);
+    <T> BaseResponse<T> updateStudentAcademicWorkAudit(List<StudentAcademicWorkAudit> audits);
     BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query);
     BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(String username);
 }

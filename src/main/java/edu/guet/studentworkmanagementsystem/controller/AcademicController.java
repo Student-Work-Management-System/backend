@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkAudit;
@@ -43,8 +44,8 @@ public class AcademicController {
 
     @PreAuthorize("hasAuthority('student_academic_work:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudentAcademicWork(@RequestBody @Validated({UpdateGroup.class}) StudentAcademicWorkAudit audit) {
-        return academicWorkService.updateStudentAcademicWorkAudit(audit);
+    public <T> BaseResponse<T> updateStudentAcademicWork(@RequestBody @Validated({UpdateGroup.class}) ValidateList<StudentAcademicWorkAudit> audits) {
+        return academicWorkService.updateStudentAcademicWorkAudit(audits);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:delete')")

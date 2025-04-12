@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionAuditTableDef.STUDENT_COMPETITION_AUDIT;
 
@@ -41,7 +40,7 @@ public class CompetitionAuditServiceImpl extends ServiceImpl<CompetitionAuditMap
         studentCompetitionAudits.forEach((studentCompetitionAudit) -> {
             boolean update = UpdateChain.of(StudentCompetitionAudit.class)
                     .set(STUDENT_COMPETITION_AUDIT.STATE, studentCompetitionAudit.getState(), !Objects.isNull(studentCompetitionAudit.getState()))
-                    .set(STUDENT_COMPETITION_AUDIT.REJECT_REASON, studentCompetitionAudit.getRejectReason(), StringUtils::hasLength)
+                    .set(STUDENT_COMPETITION_AUDIT.REJECT_REASON, studentCompetitionAudit.getRejectReason())
                     .set(STUDENT_COMPETITION_AUDIT.OPERATOR_ID, studentCompetitionAudit.getOperatorId(), StringUtils::hasLength)
                     .set(STUDENT_COMPETITION_AUDIT.OPERATOR_TIME, LocalDate.now())
                     .where(STUDENT_COMPETITION_AUDIT.STUDENT_COMPETITION_ID.eq(studentCompetitionAudit.getStudentCompetitionId()))

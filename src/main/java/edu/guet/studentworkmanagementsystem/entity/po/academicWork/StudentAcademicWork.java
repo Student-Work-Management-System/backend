@@ -32,7 +32,7 @@ public class StudentAcademicWork implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
     private String studentAcademicWorkId;
-    private String uid;
+    private String username;
     private String workName;
     private String type;
     private String referenceId;
