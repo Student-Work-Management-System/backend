@@ -3,16 +3,10 @@ package edu.guet.studentworkmanagementsystem.entity.po.enrollment;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
-import edu.guet.studentworkmanagementsystem.common.InsertGroup;
-import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.io.Serial;
 import java.io.Serializable;
 
 /**

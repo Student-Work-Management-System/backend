@@ -16,7 +16,6 @@ import java.util.HashMap;
 public interface EnrollmentService extends IService<Enrollment> {
     /**
      * 批量导入招生信息记录
-     * @param enrollmentList 招生信息列表
      */
     <T> BaseResponse<T> importEnrollment(ValidateList<Enrollment> enrollments);
     /**
