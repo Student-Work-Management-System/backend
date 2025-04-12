@@ -10,13 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EnrollmentQuery implements Serializable {
-    private String name;
-    private String examineeId;
-    private String id;
-    private String origin;
-    private String enrollMajorId;
-    private String firstMajor;
-    private String enrollTime;
+    private String search;
     private Integer pageNo;
     private Integer pageSize;
 }

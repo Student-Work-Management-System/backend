@@ -27,44 +27,59 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Table(value = "enrollment")
 public class Enrollment implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private String enrollmentId;
-    @NotBlank(message = "准考证号不能为空", groups = {InsertGroup.class})
-    private String examineeId;
-    @NotBlank(message = "身份证号不能为空", groups = {InsertGroup.class, UpdateGroup.class})
-    @Size(min = 18, max = 18, message = "请输入正确的身份证号", groups = {UpdateGroup.class, InsertGroup.class})
-    private String id;
-    /**
-     * 考生姓名
-     */
-    @NotBlank(message = "学生姓名不能为空", groups = {InsertGroup.class})
-    private String name;
-    /**
-     * 生源地
-     */
-    @NotBlank(message = "生源地不能为空", groups = {InsertGroup.class})
-    private String origin;
-    /**
-     * 录取专业
-     */
-    @NotBlank(message = "录取专业不能为空", groups = {InsertGroup.class})
-    private String enrollMajorId;
-    /**
-     * 第一志愿专业
-     */
-    @NotBlank(message = "第一志愿专业不能为空", groups = {InsertGroup.class})
-    private String firstMajor;
-    /**
-     * 高考总分
-     */
-    @NotBlank(message = "高考分数不能为空", groups = {InsertGroup.class})
-    private String score;
-    /**
-     * 录取年份
-     */
-    @NotBlank(message = "录取时间不能为空", groups = {InsertGroup.class})
-    @Pattern(regexp = "^2\\d{3}$", message = "输入合法年份")
-    private String enrollTime;
+    private String enrollmentId;  // 主键
+
+    private String studentId;     // 学号
+    private String idNumber;      // 身份证号
+    private String majorId;       // 专业
+    private String degreeId;      // 培养层次
+    private String classNo;       // 班级
+    private String name;          // 姓名
+    private String gender;        // 性别
+    private String nation;        // 民族
+    private String studentType;   // 类型
+    private String admissionBatch; // 批次
+    private String subjectCategory; // 科类
+    private String provinceName;  // 省份名称
+    private String examId;        // 考生号
+    private String admittedMajor; // 录取专业
+    private String volunteerMajor; // 投档志愿
+    private String volunteerCollege; // 投档单位
+    private String totalExamScore;  // 高考总分
+    private String convertedScore;  // 总分
+    private String specialScore;    // 特征成绩
+    private String feature;         // 考生特征
+    private String isAdjusted;      // 调剂
+    private String volunteer1;      // 志愿1
+    private String volunteer2;      // 志愿2
+    private String volunteer3;      // 志愿3
+    private String volunteer4;      // 志愿4
+    private String volunteer5;      // 志愿5
+    private String volunteer6;      // 志愿6
+    private String receiver;        // 收件人
+    private String receiverPhone;   // 联系电话
+    private String postalCode;      // 邮政编码
+    private String address;         // 地址
+    private String highSchoolCode;  // 中学代码
+    private String highSchoolName;  // 中学名称
+    private String politicId;      // 政治面貌
+    private String candidateCategoryClassification; // 考生类别分类
+    private String graduationCategoryClassification; // 毕业类别分类
+    private String graduationCategory; // 毕业类别
+    private String candidateCategory; // 考生类别
+    private String foreignLanguageId;  // 外语语种
+    private String scoreChinese;        // 语文
+    private String scoreMath;           // 数学
+    private String scoreForeignLanguage; // 外语
+    private String scoreComprehensive;  // 综合
+    private String scorePhysics;        // 物理
+    private String scoreChemistry;      // 化学
+    private String scoreBiology;        // 生物
+    private String scorePolitics;       // 政治
+    private String scoreHistory;        // 历史
+    private String scoreGeography;      // 地理
+    private String scoreTechnology;     // 技术
+    private String selectedSubjects;    // 选考科目
+    private String phone;               // 联系手机
 }

@@ -3,7 +3,7 @@ package edu.guet.studentworkmanagementsystem.service.enrollment;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
@@ -18,7 +18,7 @@ public interface EnrollmentService extends IService<Enrollment> {
      * 批量导入招生信息记录
      * @param enrollmentList 招生信息列表
      */
-    <T> BaseResponse<T> importEnrollment(EnrollmentList enrollmentList);
+    <T> BaseResponse<T> importEnrollment(ValidateList<Enrollment> enrollments);
     /**
      * 修改招生信息记录
      * @param enrollment 待修改的招生信息记录

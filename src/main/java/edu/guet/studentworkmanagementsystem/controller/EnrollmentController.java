@@ -4,7 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentList;
+import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
@@ -27,8 +27,8 @@ public class EnrollmentController {
 
     @PreAuthorize("hasAuthority('enrollment:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> importEnrollment(@RequestBody @Validated({InsertGroup.class}) EnrollmentList enrollmentList) {
-        return enrollmentService.importEnrollment(enrollmentList);
+    public <T> BaseResponse<T> importEnrollment(@RequestBody @Validated({InsertGroup.class}) ValidateList<Enrollment> enrollments) {
+        return enrollmentService.importEnrollment(enrollments);
     }
 
     @PreAuthorize("hasAuthority('enrollment:update')")
