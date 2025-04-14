@@ -40,6 +40,9 @@ public class EnrollmentItem implements Serializable {
     /**
      * 在校信息
      */
+    private String headerTeacherUsername; // 班主任工号
+    private String headerTeacherRealName; // 班主任姓名
+    private String headerTeacherPhone;    // 班主任联系方式
     private String dormitory;     // 宿舍号
     private String classNo;       // 班级
     private String majorId;       // 专业id

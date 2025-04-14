@@ -49,6 +49,7 @@ public class Enrollment implements Serializable {
     /**
      * 在校信息
      */
+    private String headerTeacherUsername; // 班主任工号
     private String dormitory;     // 宿舍号
     private String classNo;       // 班级
     private String majorId;       // 专业
