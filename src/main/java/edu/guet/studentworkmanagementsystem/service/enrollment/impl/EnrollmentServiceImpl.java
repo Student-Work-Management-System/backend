@@ -75,6 +75,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .set(ENROLLMENT.WEIGHT, enrollment.getWeight())
                 .set(ENROLLMENT.POLITIC_ID, enrollment.getPoliticId(), StringUtils::hasLength)
                 .set(ENROLLMENT.PHONE, enrollment.getPhone())
+                .set(ENROLLMENT.EMAIL, enrollment.getEmail())
                 // 在校信息
                 .set(ENROLLMENT.HEADER_TEACHER_USERNAME, enrollment.getHeaderTeacherUsername(), StringUtils::hasLength)
                 .set(ENROLLMENT.DORMITORY, enrollment.getDormitory())
