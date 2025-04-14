@@ -25,9 +25,8 @@ public interface EnrollmentService extends IService<Enrollment> {
     <T> BaseResponse<T> updateEnrollment(Enrollment enrollment);
     /**
      * 删除招生信息记录
-     * @param enrollmentInfoId 招生信息表id
      */
-    <T> BaseResponse<T> deleteEnrollment(String enrollmentInfoId);
+    <T> BaseResponse<T> deleteEnrollment(String enrollmentId);
     /**
      * 分页查询招生信息
      * <br/>

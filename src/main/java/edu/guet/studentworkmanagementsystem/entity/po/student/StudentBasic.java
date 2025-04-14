@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Table(value = "student_basic")
 public class StudentBasic implements Serializable {
     @Id
-    private String  studentId;
+    private String studentId;
     private String idNumber;
     private String name;
     private String gender;
