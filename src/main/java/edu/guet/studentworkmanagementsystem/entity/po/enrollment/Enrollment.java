@@ -46,6 +46,7 @@ public class Enrollment implements Serializable {
     private String weight;        // 体重
     private String politicId;     // 政治面貌
     private String phone;         // 联系手机
+    private String email;         // 邮箱
     /**
      * 在校信息
      */

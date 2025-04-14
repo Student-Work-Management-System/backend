@@ -37,6 +37,7 @@ public class EnrollmentItem implements Serializable {
     private String politicId;     // 政治面貌id
     private String politicStatus; // 政治面貌
     private String phone;         // 联系手机
+    private String email;         // 邮箱
     /**
      * 在校信息
      */

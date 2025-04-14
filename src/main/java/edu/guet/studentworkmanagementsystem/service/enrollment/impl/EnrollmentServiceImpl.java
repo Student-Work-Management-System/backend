@@ -17,6 +17,7 @@ import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.enrollment.EnrollmentMapper;
 import edu.guet.studentworkmanagementsystem.network.EnrollmentFeign;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
+import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +44,8 @@ import static edu.guet.studentworkmanagementsystem.entity.po.other.table.Politic
 public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollment> implements EnrollmentService {
     @Autowired
     private EnrollmentFeign enrollmentFeign;
+    @Autowired
+    private StudentService studentService;
     @Qualifier("readThreadPool")
     @Autowired
     private ThreadPoolTaskExecutor readThreadPool;
@@ -54,6 +57,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         int size = enrollments.size();
         if (i != size)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        // todo: 创建学生信息(student_basic)
         return ResponseUtil.success();
     }
 
@@ -148,6 +152,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .update();
         if (!update)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        // todo: 涉及外键id的修改也需要同步
         return ResponseUtil.success();
     }
 
@@ -159,6 +164,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         int i = mapper.deleteByQuery(deleteWrapper);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        // todo: 删除学生信息
         return ResponseUtil.success();
     }
 
