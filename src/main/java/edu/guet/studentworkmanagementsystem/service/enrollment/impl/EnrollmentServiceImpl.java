@@ -10,6 +10,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
+import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -37,6 +38,7 @@ import java.util.concurrent.CompletableFuture;
 import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
+import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.PoliticTableDef.POLITIC;
 
@@ -61,6 +63,22 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         return ResponseUtil.success();
     }
 
+    public StudentBasic createStudentBasic(Enrollment enrollment) {
+        return StudentBasic.builder()
+                .studentId(enrollment.getStudentId())
+                .name(enrollment.getName())
+                .gender(enrollment.getGender())
+                .idNumber(enrollment.getIdNumber())
+                .gradeId(enrollment.getGradeId())
+                .degreeId(enrollment.getDegreeId())
+                .majorId(enrollment.getMajorId())
+                .politicId(enrollment.getPoliticId())
+                .phone(enrollment.getPhone())
+                .email(enrollment.getEmail())
+                .enabled(true)
+                .build();
+    }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> updateEnrollment(Enrollment enrollment) {
@@ -81,6 +99,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                 .set(ENROLLMENT.DORMITORY, enrollment.getDormitory())
                 .set(ENROLLMENT.CLASS_NO, enrollment.getAddress())
                 .set(ENROLLMENT.MAJOR_ID, enrollment.getMajorId(), StringUtils::hasLength)
+                .set(ENROLLMENT.GRADE_ID, enrollment.getGradeId(), StringUtils::hasLength)
                 .set(ENROLLMENT.DEGREE_ID, enrollment.getDegreeId(), StringUtils::hasLength)
                 // 高考信息
                 .set(ENROLLMENT.STUDENT_TYPE, enrollment.getStudentType())
@@ -179,12 +198,14 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                             ENROLLMENT.ALL_COLUMNS,
                             MAJOR.ALL_COLUMNS,
                             POLITIC.ALL_COLUMNS,
-                            DEGREE.ALL_COLUMNS
+                            DEGREE.ALL_COLUMNS,
+                            GRADE.ALL_COLUMNS
                             )
                     .from(ENROLLMENT)
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(ENROLLMENT.MAJOR_ID))
                     .innerJoin(POLITIC).on(POLITIC.POLITIC_ID.eq(ENROLLMENT.POLITIC_ID))
                     .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(ENROLLMENT.DEGREE_ID))
+                    .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(ENROLLMENT.GRADE_ID))
                     // todo: 补充where查询逻辑
                     .pageAs(Page.of(pageNo, pageSize), EnrollmentItem.class);
         }, readThreadPool);

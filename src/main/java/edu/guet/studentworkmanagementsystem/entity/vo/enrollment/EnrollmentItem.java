@@ -50,6 +50,8 @@ public class EnrollmentItem implements Serializable {
     private String majorName;     // 专业名
     private String degreeId;      // 培养层次id
     private String degreeName;    // 培养层次名
+    private String gradeId;       // 年级id
+    private String gradeName;     // 年级名
     /**
      * 高考信息
      */

@@ -54,6 +54,7 @@ public class Enrollment implements Serializable {
     private String dormitory;     // 宿舍号
     private String classNo;       // 班级
     private String majorId;       // 专业
+    private String gradeId;       // 年级
     private String degreeId;      // 培养层次
     /**
      * 高考信息
