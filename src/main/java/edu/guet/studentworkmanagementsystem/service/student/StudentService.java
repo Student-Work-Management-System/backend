@@ -4,7 +4,6 @@ import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
@@ -12,7 +11,6 @@ import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 
 import java.util.List;
 
