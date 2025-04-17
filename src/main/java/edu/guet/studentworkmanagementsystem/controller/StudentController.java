@@ -3,13 +3,13 @@ package edu.guet.studentworkmanagementsystem.controller;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
-import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentTableItem;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +26,14 @@ public class StudentController {
 
     @PreAuthorize("hasAuthority('student:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentTableItem>> getAllStudent(@RequestBody StudentQuery query) {
+    public BaseResponse<Page<EnrollmentItem>> getAllStudent(@RequestBody EnrollmentQuery query) {
         return studentService.getStudents(query);
     }
 
     @PreAuthorize("hasAuthority('student:insert') and hasAuthority('user:insert') and hasAuthority('user_role:insert')")
-    @PostMapping("/add")
-    public <T> BaseResponse<T> addStudent(@RequestBody @Valid Student student) {
-        return studentService.addStudent(student);
-    }
-
-    @PreAuthorize("hasAuthority('student:insert') and hasAuthority('user:insert') and hasAuthority('user_role:insert')")
     @PostMapping("/adds")
-    public <T> BaseResponse<T> addStudents(@RequestBody @Valid ValidateList<Student> students) {
-        return studentService.importStudent(students);
+    public <T> BaseResponse<T> addStudents(@RequestBody @Valid ValidateList<Enrollment> enrollments) {
+        return studentService.importStudent(enrollments);
     }
 
     @PreAuthorize("hasAuthority('student:delete') and hasAuthority('user:delete') and hasAuthority('user_role:delete')")
@@ -56,8 +50,8 @@ public class StudentController {
 
     @PreAuthorize("hasAuthority('student:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudent(@RequestBody @Valid Student student) {
-        return studentService.updateStudent(student);
+    public <T> BaseResponse<T> updateStudent(@RequestBody @Valid Enrollment enrollment) {
+        return studentService.updateStudent(enrollment);
     }
 
     @PreAuthorize("hasAuthority('student:status') or hasAuthority('student:status:all')")

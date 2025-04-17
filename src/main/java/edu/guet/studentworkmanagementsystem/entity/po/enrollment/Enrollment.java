@@ -113,7 +113,7 @@ public class Enrollment implements Serializable {
     private String graduationCategoryClassification; // 毕业类别分类
     private String graduationCategory; // 毕业类别
     private String candidateCategory; // 考生类别
-    private String foreignLanguageId;  // 外语语种
+    private String foreignLanguage;  // 外语语种
     private String scoreChinese;        // 语文
     private String scoreMath;           // 数学
     private String scoreForeignLanguage; // 外语
@@ -131,8 +131,13 @@ public class Enrollment implements Serializable {
      */
     private Boolean studentLoans; // 助学贷款
     private Boolean disability; // 残疾
+    private String religiousBeliefs; // 宗教信仰
     /**
      * 备注
      */
     private String otherNotes; // 备注
+    /**
+     * 启用状态
+     */
+    private Boolean enabled;
 }

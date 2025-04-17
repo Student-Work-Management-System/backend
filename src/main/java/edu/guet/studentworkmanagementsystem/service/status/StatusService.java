@@ -23,7 +23,7 @@ public interface StatusService extends IService<StudentStatus> {
      * 批量导入学生学籍变动信息记录
      */
     <T> BaseResponse<T> importStudentStatus(ValidateList<StudentStatus> studentStatuses);
-    boolean importStudentStatus(Set<String> studentIds);
+    boolean enrollmentStudent(Set<String> studentIds);
     /**
      * 添加学生学籍变动记录
      * @param studentStatus 学籍变动信息

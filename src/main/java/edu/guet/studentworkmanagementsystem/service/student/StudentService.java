@@ -3,10 +3,12 @@ package edu.guet.studentworkmanagementsystem.service.student;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
+import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
+import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
@@ -20,26 +22,19 @@ import java.util.List;
 public interface StudentService {
     /**
      * 批量导入学生
-     * @param students 学生列表
      */
-    <T> BaseResponse<T> importStudent(ValidateList<Student> students);
-    /**
-     * 单个导入学生
-     * @param student 学生对象
-     */
-    <T> BaseResponse<T> addStudent(Student student);
+    <T> BaseResponse<T> importStudent(ValidateList<Enrollment> enrollments);
     /**
      * 分页获取学生
      * @param query 学生查询参数
      * @return 学生列表
      */
-    BaseResponse<Page<StudentTableItem>> getStudents(StudentQuery query);
+    BaseResponse<Page<EnrollmentItem>> getStudents(EnrollmentQuery query);
     BaseResponse<StudentArchive> getStudentArchive(String studentId);
     /**
-     * 修改学生信息
-     * @param student 学生信息对象
+     * 修改学生信息(从档案上修改)
      */
-    <T> BaseResponse<T> updateStudent(Student student);
+    <T> BaseResponse<T> updateStudent(Enrollment enrollment);
     /**
      * 使用学号删除学生
      * @param studentId 学号

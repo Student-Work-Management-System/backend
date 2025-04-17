@@ -103,10 +103,10 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
 
     @Override
     @Transactional
-    public boolean importStudentStatus(Set<String> studentIds) {
+    public boolean enrollmentStudent(Set<String> studentIds) {
         ArrayList<StudentStatus> studentStatuses = new ArrayList<>();
         for (String studentId : studentIds) {
-            StudentStatus studentStatus = createStudentStatusFromStudentService(studentId);
+            StudentStatus studentStatus = enrollmentStatus(studentId);
             studentStatuses.add(studentStatus);
         }
         int size = studentStatuses.size();
@@ -114,11 +114,11 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
         return i == size;
     }
 
-    public StudentStatus createStudentStatusFromStudentService(String studentId) {
+    public StudentStatus enrollmentStatus(String studentId) {
         return StudentStatus.builder()
                 .studentId(studentId)
-                .statusId("1")
-                .log("学生入学")
+                .statusId("14")
+                .log("录入该生档案")
                 .modifiedTime(LocalDate.now())
                 .build();
     }

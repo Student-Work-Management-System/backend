@@ -51,11 +51,11 @@ public class StudentQuery implements Serializable {
     // 外语语种
     private String foreignLanguage;
     // 外语分数
-    private String foreignScore;
+    private String scoreForeignLanguage;
     // 个人兴趣爱好特长
     private String hobbies;
     // 是否学生贷款
-    private Boolean isStudentLoans;
+    private Boolean studentLoans;
     // 宗教信仰
     private String religiousBeliefs;
     // 家庭人口
@@ -63,7 +63,7 @@ public class StudentQuery implements Serializable {
     // 是否独生子女
     private Boolean isOnlyChild;
     // 家庭所在地省/市/县
-    private String location;
+    private String familyLocation;
     //
     private Boolean disability;
     // 其他标签备注

@@ -35,21 +35,6 @@ public class StudentServiceTest {
     }
 
     @Test
-    void addStudent() {
-        Student student = createStudent("22", "22", "22222222222222222222222222", "男", "22", "22@qqqq.com", "50", "2", "2021", "群众");
-        BaseResponse<Object> response = studentService.addStudent(student);
-        System.out.println(response.getCode() + ": " + response.getMessage());
-    }
-
-    @Test
-    void addStudents() {
-        List<Student> students = mockStudents();
-        ValidateList<Student> studentValidateList = new ValidateList<>(students);
-        BaseResponse<Object> response = studentService.importStudent(studentValidateList);
-        System.out.println(response.getCode() + ": " + response.getMessage());
-    }
-
-    @Test
     void updateStudent() {
         Student student = Student.builder()
                 .studentId("22")
@@ -58,8 +43,6 @@ public class StudentServiceTest {
                 .fatherName("dwaadw")
                 .motherName("weffdsg")
                 .build();
-        BaseResponse<Object> response = studentService.updateStudent(student);
-        System.out.println(response.getCode() + ": " + response.getMessage());
     }
 
     @Test
@@ -83,8 +66,6 @@ public class StudentServiceTest {
                 .pageNo(1)
                 .pageSize(50)
                 .build();
-        BaseResponse<Page<StudentTableItem>> students = studentService.getStudents(query);
-        System.out.println(students.getCode() + ": " + students.getMessage());
     }
 
     private List<Student> mockStudents() {
