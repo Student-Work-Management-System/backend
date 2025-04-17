@@ -129,6 +129,7 @@ public class EnrollmentItem implements Serializable {
      */
     private Boolean studentLoans; // 助学贷款
     private Boolean disability; // 残疾
+    private String religiousBeliefs; // 宗教信仰
     /**
      * 备注
      */
