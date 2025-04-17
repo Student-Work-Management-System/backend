@@ -12,7 +12,6 @@ import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveAuditDT
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveDTO;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveAudit;
-import edu.guet.studentworkmanagementsystem.entity.po.student.Student;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -106,8 +105,8 @@ public class LeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, StudentLea
                 .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
                 .leftJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.STUDENT_LEAVE_ID.eq(STUDENT_LEAVE.STUDENT_LEAVE_ID))
                 .leftJoin(USER).on(USER.UID.eq(STUDENT_LEAVE_AUDIT.AUDITOR_ID))
-                .where(Student::getGradeId).eq(query.getGrade())
-                .and(Student::getMajorId).eq(query.getMajorId())
+                // .where(Student::getGradeId).eq(query.getGrade())
+                // .and(Student::getMajorId).eq(query.getMajorId())
                 .and(StudentLeave::getLeaveDate).eq(query.getLeaveDate())
                 .and(STUDENT_LEAVE_AUDIT.AUDIT_STATE.eq(query.getAuditState()))
                 .pageAs(Page.of(pageNo, pageSize), StudentLeaveItem.class);
