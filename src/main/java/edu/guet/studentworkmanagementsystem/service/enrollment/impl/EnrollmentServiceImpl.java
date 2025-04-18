@@ -374,6 +374,8 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
                     .and(ENROLLMENT.CANDIDATE_CATEGORY.likeLeft(query.getCandidateCategory()))
                     .and(ENROLLMENT.STUDENT_TYPE.likeLeft(query.getStudentType()))
                     .and(ENROLLMENT.ADMISSION_BATCH.likeLeft(query.getAdmissionBatch()))
+                    // 性别
+                    .and(ENROLLMENT.GENDER.eq(query.getGender()))
                     // 专业
                     .and(ENROLLMENT.MAJOR_ID.eq(query.getMajorId()))
                     // 年级

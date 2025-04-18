@@ -33,6 +33,7 @@ public class EnrollmentItem implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;  // 生日
     private String hobbies;       // 个人兴趣爱好特长
+    private String nativePlace;     // 籍贯
     private String nation;        // 民族
     private String height;        // 身高
     private String weight;        // 体重
@@ -77,10 +78,6 @@ public class EnrollmentItem implements Serializable {
     private String volunteer6;      // 志愿6
     private String studentFrom;     // 生源地
     private Boolean isAdjusted;     // 调剂
-    /**
-     * 收件人信息
-     */
-    private String nativePlace;     // 籍贯
     private String receiver;        // 收件人
     private String receiverPhone;   // 联系电话
     private String postalCode;      // 邮政编码
