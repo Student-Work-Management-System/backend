@@ -32,26 +32,32 @@ public class StudentLeaveAudit implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long studentLeaveAuditId;
-    /**
-     * 审批人id
-     */
-    private String auditorId;
+    private Long auditId;
     /**
      * 请假记录id
      */
-    private String studentLeaveId;
+    private String leaveId;
     /**
-     * 审批日期
+     * 辅导员审核信息
+     */
+    private String counselorId;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate counselorHandleTime;
+    private String counselorState;
+    /**
+     * 副书记审核信息
      */
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate auditDate;
+    private String leaderId;
+    private LocalDate leaderHandleTime;
+    private String leaderState;
     /**
-     * 审核状态
-     * <br/>
-     * 审核中, 通过, 拒绝
+     * 学生是否撤销
      */
-    private String auditState = "审核中";
+    private boolean revoked;
+
 }

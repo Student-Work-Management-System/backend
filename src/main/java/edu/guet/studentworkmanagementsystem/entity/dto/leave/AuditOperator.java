@@ -11,12 +11,9 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveQuery implements Serializable {
-    private String search;
-    private String gradeId;
-    private String majorId;
-    private String day;
+public class AuditOperator implements Serializable {
+    private String auditId;
+    private String username;
     private String state;
-    private Integer pageNo;
-    private Integer pageSize;
+    private boolean hasNext;
 }

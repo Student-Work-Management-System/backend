@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
+import edu.guet.studentworkmanagementsystem.entity.po.precaution.StudentPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import edu.guet.studentworkmanagementsystem.service.schoolPrecaution.PrecautionService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,7 +32,7 @@ public class PrecautionController {
     }
     @PreAuthorize("hasAuthority('student_school_precaution:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertSchoolPrecaution(@RequestBody @Validated({InsertGroup.class})  StudentSchoolPrecaution schoolPrecaution) {
+    public <T> BaseResponse<T> insertSchoolPrecaution(@RequestBody @Validated({InsertGroup.class}) StudentPrecaution schoolPrecaution) {
         return precautionService.insertSchoolPrecaution(schoolPrecaution);
     }
     @PreAuthorize("hasAuthority('student_school_precaution:update')")

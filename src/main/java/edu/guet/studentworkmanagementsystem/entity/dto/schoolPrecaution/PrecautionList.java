@@ -1,6 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution;
 
-import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
+import edu.guet.studentworkmanagementsystem.entity.po.precaution.StudentPrecaution;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +14,5 @@ import java.util.List;
 @NoArgsConstructor
 public class PrecautionList implements Serializable {
     @Valid
-    private List<StudentSchoolPrecaution> precautions;
+    private List<StudentPrecaution> precautions;
 }

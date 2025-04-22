@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
+import edu.guet.studentworkmanagementsystem.entity.po.precaution.StudentPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -31,17 +31,16 @@ import java.util.List;
 import java.util.Optional;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
-import static edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.table.StudentSchoolPrecautionTableDef.STUDENT_SCHOOL_PRECAUTION;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
-public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, StudentSchoolPrecaution> implements PrecautionService {
+public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, StudentPrecaution> implements PrecautionService {
     @Autowired
     private PrecautionFeign precautionFeign;
     @Override
     @Transactional
     public <T> BaseResponse<T> importSchoolPrecaution(PrecautionList schoolPrecautionList) {
-        List<StudentSchoolPrecaution> schoolPrecautions = schoolPrecautionList.getPrecautions();
+        List<StudentPrecaution> schoolPrecautions = schoolPrecautionList.getPrecautions();
         int size = schoolPrecautions.size();
         int i = mapper.insertBatch(schoolPrecautions);
         if (i == size)
@@ -51,7 +50,7 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> insertSchoolPrecaution(StudentSchoolPrecaution schoolPrecaution) {
+    public <T> BaseResponse<T> insertSchoolPrecaution(StudentPrecaution schoolPrecaution) {
         int i = mapper.insert(schoolPrecaution);
         if (i > 0)
             return ResponseUtil.success();
@@ -61,13 +60,13 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
     @Override
     @Transactional
     public <T> BaseResponse<T> updateSchoolPrecaution(StudentSchoolPrecautionRequest studentSchoolPrecautionRequest) {
-        boolean update = UpdateChain.of(StudentSchoolPrecaution.class)
-                .set(StudentSchoolPrecaution::getSchoolPrecautionLevel, studentSchoolPrecautionRequest.getSchoolPrecautionLevel(), StringUtils.hasLength(studentSchoolPrecautionRequest.getSchoolPrecautionLevel()))
-                .set(StudentSchoolPrecaution::getPrecautionTerm, studentSchoolPrecautionRequest.getPrecautionTerm(), StringUtils.hasLength(studentSchoolPrecautionRequest.getPrecautionTerm()))
-                .set(StudentSchoolPrecaution::getComment, studentSchoolPrecautionRequest.getComment(), StringUtils.hasLength(studentSchoolPrecautionRequest.getComment()))
-                .set(StudentSchoolPrecaution::getDetailReason, studentSchoolPrecautionRequest.getDetailReason(), StringUtils.hasLength(studentSchoolPrecautionRequest.getDetailReason()))
-                .set(StudentSchoolPrecaution::getStudentId, studentSchoolPrecautionRequest.getStudentId(), StringUtils.hasLength(studentSchoolPrecautionRequest.getStudentId()))
-                .where(StudentSchoolPrecaution::getStudentSchoolPrecautionId).eq(studentSchoolPrecautionRequest.getStudentSchoolPrecautionId())
+        boolean update = UpdateChain.of(StudentPrecaution.class)
+                .set(StudentPrecaution::getSchoolPrecautionLevel, studentSchoolPrecautionRequest.getSchoolPrecautionLevel(), StringUtils.hasLength(studentSchoolPrecautionRequest.getSchoolPrecautionLevel()))
+                .set(StudentPrecaution::getPrecautionTerm, studentSchoolPrecautionRequest.getPrecautionTerm(), StringUtils.hasLength(studentSchoolPrecautionRequest.getPrecautionTerm()))
+                .set(StudentPrecaution::getComment, studentSchoolPrecautionRequest.getComment(), StringUtils.hasLength(studentSchoolPrecautionRequest.getComment()))
+                .set(StudentPrecaution::getDetailReason, studentSchoolPrecautionRequest.getDetailReason(), StringUtils.hasLength(studentSchoolPrecautionRequest.getDetailReason()))
+                .set(StudentPrecaution::getStudentId, studentSchoolPrecautionRequest.getStudentId(), StringUtils.hasLength(studentSchoolPrecautionRequest.getStudentId()))
+                .where(StudentPrecaution::getPrecautionId).eq(studentSchoolPrecautionRequest.getStudentSchoolPrecautionId())
                 .update();
         if (update)
             return ResponseUtil.success();
@@ -87,16 +86,17 @@ public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, Student
     public BaseResponse<Page<StudentSchoolPrecautionItem>> getAllRecords(PrecautionQuery query) {
         Integer pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
         Integer pageSize = Optional.ofNullable(query.getPageSize()).orElse(50);
-        Page<StudentSchoolPrecautionItem> studentSchoolPrecautionVOPage = QueryChain.of(StudentSchoolPrecaution.class)
-                .select(STUDENT_SCHOOL_PRECAUTION.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
-                .from(STUDENT_SCHOOL_PRECAUTION)
-                .innerJoin(STUDENT).on(STUDENT_SCHOOL_PRECAUTION.STUDENT_ID.eq(STUDENT.STUDENT_ID))
-                .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
-                .where(STUDENT.GRADE_ID.eq(query.getGrade()))
-                .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
-                .and(STUDENT_SCHOOL_PRECAUTION.SCHOOL_PRECAUTION_LEVEL.eq(query.getSchoolPrecautionLevel()))
-                .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionItem.class);
-        return ResponseUtil.success(studentSchoolPrecautionVOPage);
+        // Page<StudentSchoolPrecautionItem> studentSchoolPrecautionVOPage = QueryChain.of(StudentPrecaution.class)
+        //         .select(STUDENT_SCHOOL_PRECAUTION.ALL_COLUMNS, STUDENT.ALL_COLUMNS, MAJOR.ALL_COLUMNS)
+        //         .from(STUDENT_SCHOOL_PRECAUTION)
+        //         .innerJoin(STUDENT).on(STUDENT_SCHOOL_PRECAUTION.STUDENT_ID.eq(STUDENT.STUDENT_ID))
+        //         .innerJoin(MAJOR).on(STUDENT.MAJOR_ID.eq(MAJOR.MAJOR_ID))
+        //         .where(STUDENT.GRADE_ID.eq(query.getGrade()))
+        //         .and(STUDENT.MAJOR_ID.eq(query.getMajorId()))
+        //         .and(STUDENT_SCHOOL_PRECAUTION.SCHOOL_PRECAUTION_LEVEL.eq(query.getSchoolPrecautionLevel()))
+        //         .pageAs(Page.of(pageNo, pageSize), StudentSchoolPrecautionItem.class);
+        // return ResponseUtil.success(studentSchoolPrecautionVOPage);
+        return null;
     }
 
     @Override

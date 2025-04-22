@@ -1,4 +1,4 @@
-package edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution;
+package edu.guet.studentworkmanagementsystem.entity.po.precaution;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -24,12 +24,12 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "student_school_precaution")
-public class StudentSchoolPrecaution implements Serializable {
+@Table(value = "student_precaution")
+public class StudentPrecaution implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private String studentSchoolPrecautionId;
+    private String precautionId;
     @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
     private String studentId;
     /**

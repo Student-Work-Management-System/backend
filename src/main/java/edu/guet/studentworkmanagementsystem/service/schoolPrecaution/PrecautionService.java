@@ -7,14 +7,14 @@ import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionQuer
 import edu.guet.studentworkmanagementsystem.entity.dto.precaution.PrecautionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.PrecautionList;
 import edu.guet.studentworkmanagementsystem.entity.dto.schoolPrecaution.StudentSchoolPrecautionRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.schoolPrecaution.StudentSchoolPrecaution;
+import edu.guet.studentworkmanagementsystem.entity.po.precaution.StudentPrecaution;
 import edu.guet.studentworkmanagementsystem.entity.vo.schoolPrecaution.StudentSchoolPrecautionItem;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.HashMap;
 
 
-public interface PrecautionService extends IService<StudentSchoolPrecaution> {
+public interface PrecautionService extends IService<StudentPrecaution> {
     /**
      * 批量导入学业预警信息记录
      * @param schoolPrecautionList 学业预警信息列表
@@ -24,7 +24,7 @@ public interface PrecautionService extends IService<StudentSchoolPrecaution> {
      * 添加学业预警记录
      * @param schoolPrecaution 学业预警记录
      */
-    <T> BaseResponse<T> insertSchoolPrecaution(StudentSchoolPrecaution schoolPrecaution);
+    <T> BaseResponse<T> insertSchoolPrecaution(StudentPrecaution schoolPrecaution);
     /**
      * 修改学业预警记录
      * @param schoolPrecautionDTO 待修改的学业预警记录
