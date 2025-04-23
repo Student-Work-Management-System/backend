@@ -1,6 +1,20 @@
 package edu.guet.studentworkmanagementsystem.service.leave;
 
 
-public interface LeaveService {
+import com.mybatisflex.core.paginate.Page;
+import edu.guet.studentworkmanagementsystem.common.BaseQuery;
+import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditOperator;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveRequest;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
 
+public interface LeaveService {
+    <T> BaseResponse<T> addStudentLeave(StudentLeaveRequest request);
+    <T> BaseResponse<T> studentDestroyLeave(String leaveId);
+    <T> BaseResponse<T> counselorAudit(AuditOperator operator);
+    <T> BaseResponse<T> leaderAudit(AuditOperator operator);
+    <T> BaseResponse<T> studentRevokedLeave(String auditId);
+    BaseResponse<Page<StudentLeaveItem>> getStudentOnwRecord(BaseQuery query);
+    BaseResponse<Page<StudentLeaveItem>> getAuditRecord(LeaveQuery query);
 }

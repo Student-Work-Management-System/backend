@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface StudentLeaveEvidenceService extends IService<StudentLeaveEvidence> {
     void addEvidence(List<StudentLeaveEvidence> evidences);
-    void deleteAllLeaveEvidence(String leaveId);
-    void deleteLeaveEvidence(String evidenceId);
 }

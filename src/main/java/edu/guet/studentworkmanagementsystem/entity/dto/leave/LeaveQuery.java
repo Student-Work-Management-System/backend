@@ -18,6 +18,8 @@ public class LeaveQuery implements Serializable {
     private String totalDay;
     private String counselorState;
     private String leaderState;
+    private Boolean destroyed;
+    private Boolean revoked;
     private Integer pageNo;
     private Integer pageSize;
 }

@@ -47,4 +47,6 @@ public class StudentLeaveRequest implements Serializable {
     @NotNull(message = "请假结束日期不能为空")
     private LocalDate endDay;
     private List<String> evidences;
+    @NotBlank(message = "指派辅导员不能为空")
+    private String counselorId;
 }
