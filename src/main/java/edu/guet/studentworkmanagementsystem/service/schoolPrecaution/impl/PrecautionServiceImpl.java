@@ -1,7 +1,6 @@
 package edu.guet.studentworkmanagementsystem.service.schoolPrecaution.impl;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
@@ -29,9 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-
-import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentTableDef.STUDENT;
 
 @Service
 public class PrecautionServiceImpl extends ServiceImpl<PrecautionMapper, StudentPrecaution> implements PrecautionService {
