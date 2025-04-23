@@ -28,6 +28,7 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
     @Transactional
     public void addAudit(StudentLeaveAudit audit) {
         int i = mapper.insert(audit);
+        // todo: 通知辅导员(定时邮件任务)
         if (i == 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
@@ -43,7 +44,10 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
                 .update();
         if (!update)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        if (operator.isHasNext()) {
+        if (operator.isNeedNoticeStudent()) {
+            // todo: 通知学生完成审批
+        }
+        if (operator.isNeedNoticeLeader()) {
             // todo: 邮件通知领导审核
         }
         return ResponseUtil.success();
@@ -60,6 +64,9 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
                 .update();
         if (!update)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        if (operator.isNeedNoticeStudent()) {
+            // todo: 通知学生审批完成
+        }
         return ResponseUtil.success();
     }
 
@@ -72,10 +79,13 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
                 .one();
         if (!one.getStudentId().equals(username))
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        UpdateChain.of(StudentLeaveAudit.class)
+        boolean update = UpdateChain.of(StudentLeaveAudit.class)
                 .set(STUDENT_LEAVE_AUDIT.REVOKED, false)
                 .where(STUDENT_LEAVE_AUDIT.LEAVE_ID.eq(leaveId))
                 .update();
+        if (!update)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        // todo: 同时撤销定时邮件任务
         return ResponseUtil.success();
     }
 }

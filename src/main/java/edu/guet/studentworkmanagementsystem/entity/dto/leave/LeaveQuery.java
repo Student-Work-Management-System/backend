@@ -15,8 +15,9 @@ public class LeaveQuery implements Serializable {
     private String search;
     private String gradeId;
     private String majorId;
-    private String day;
-    private String state;
+    private String totalDay;
+    private String counselorState;
+    private String leaderState;
     private Integer pageNo;
     private Integer pageSize;
 }

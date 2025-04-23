@@ -19,6 +19,8 @@ public enum Common {
     PAPER("paper"),
     SOFT("soft"),
     PATENT("patent"),
+    LEAVE_COUNSELOR_PERMISSION("student_leave:counselor"),
+    LEAVE_LEADER_PERMISSION("student_leave:leader"),
     ;
     private final String value;
     Common(String str) {

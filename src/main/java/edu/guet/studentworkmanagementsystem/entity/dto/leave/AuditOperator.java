@@ -15,5 +15,6 @@ public class AuditOperator implements Serializable {
     private String auditId;
     private String username;
     private String state;
-    private boolean hasNext;
+    private boolean needNoticeStudent;
+    private boolean needNoticeLeader;
 }

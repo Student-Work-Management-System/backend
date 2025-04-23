@@ -32,7 +32,7 @@ public class StudentLeaveAudit implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private Long auditId;
+    private String auditId;
     /**
      * 请假记录id
      */

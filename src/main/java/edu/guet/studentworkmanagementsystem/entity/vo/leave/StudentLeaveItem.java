@@ -6,32 +6,63 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentLeaveItem implements Serializable {
-    private String studentLeaveId;
+    private String leaveId;
     private String studentId;
     private String name;
-    private String grade;
+    private String gradeName;
     private String majorName;
-    private String leaveType;
-    private String leaveReason;
+    private String type;
+    private String reason;
+    private String target;
+    private String targetDetail;
+    private boolean internship;
+    /**
+     * 请假时间, YYYY-MM-DD
+     */
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate leaveDate;
-    private Long leaveDuration;
-    private String auditorNo;
-    private String auditorName;
+    private LocalDate startDay;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate auditDate;
+    private LocalDate endDay;
+    private boolean destroyed;
+    private String auditId;
+    /**
+     * 辅导员审核信息
+     */
+    private String counselorId;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate counselorHandleTime;
+    private String counselorState;
+    /**
+     * 副书记审核信息
+     */
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String leaderId;
+    private LocalDate leaderHandleTime;
+    private String leaderState;
+    /**
+     * 学生是否撤销
+     */
+    private boolean revoked;
+    private List<String> evidences;
 }
