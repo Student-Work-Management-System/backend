@@ -60,5 +60,4 @@ public class LeaveController {
     public <T> BaseResponse<T> leaderAudit(@RequestBody AuditOperator operator) {
         return leaveService.leaderAudit(operator);
     }
-
 }

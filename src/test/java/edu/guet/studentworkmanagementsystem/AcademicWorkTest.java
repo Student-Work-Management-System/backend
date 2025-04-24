@@ -44,7 +44,6 @@ public class AcademicWorkTest {
         AcademicWorkMember member5 = new AcademicWorkMember("5", "1004");
         ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1, member2, member3, member4, member5));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
-                .uid("1")
                 .workName("测试论文")
                 .type("paper")
                 .evidence("https://www.baidu.com")
@@ -61,10 +60,10 @@ public class AcademicWorkTest {
                 .publishInstitution("测试")
                 .publishDate(LocalDate.now())
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1", false);
+        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
         ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
-                .uid("1")
+                .username("1")
                 .workName("测试论文")
                 .type("paper")
                 .evidence("https://www.baidu.com")
@@ -83,10 +82,10 @@ public class AcademicWorkTest {
                 .authorizationDate(LocalDate.now())
                 .publishDate(LocalDate.now())
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1", false);
+        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
         ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
-                .uid("1")
+                .username("1")
                 .workName("测试论文")
                 .type("paper")
                 .evidence("https://www.baidu.com")

@@ -51,19 +51,26 @@ public class StudentServiceImpl implements StudentService {
     private StudentMapper studentMapper;
     @Autowired
     private EnrollmentService enrollmentService;
+
     @Override
     @Transactional
     public <T> BaseResponse<T> importStudent(ValidateList<Enrollment> enrollments) {
         return enrollmentService.importEnrollment(enrollments);
     }
+
     @Override
     public BaseResponse<Page<EnrollmentItem>> getStudents(EnrollmentQuery query) {
         return enrollmentService.getAllRecords(query);
     }
 
     @Override
+    public BaseResponse<EnrollmentItem> getOwnEnrollment(String studentId) {
+        return enrollmentService.getOwnEnrollment(studentId);
+    }
+
+
+    @Override
     public BaseResponse<StudentArchive> getStudentArchive(String studentId) {
-        // todo: 总学生档案, 包含系统中所有关于学生的信息
         return ResponseUtil.success();
     }
 
@@ -76,6 +83,7 @@ public class StudentServiceImpl implements StudentService {
     public <T> BaseResponse<T> updateStudent(Enrollment enrollment) {
         return enrollmentService.updateEnrollment(enrollment);
     }
+
     /**
      * 根据学号(studentId)删除/恢复学生
      */
@@ -84,6 +92,7 @@ public class StudentServiceImpl implements StudentService {
     public <T> BaseResponse<T> deleteStudent(String studentId) {
         return enrollmentService.deleteEnrollment(studentId);
     }
+
     @Override
     @Transactional
     public <T> BaseResponse<T> recoveryStudent(String studentId) {

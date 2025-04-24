@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
             try {
                 mailSender.send(message);
             } catch (MailException exception) {
-                throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+                throw new ServiceException(ServiceExceptionEnum.EMAIL_SEND_FAILURE);
             }
         }, emailThreadPool);
     }

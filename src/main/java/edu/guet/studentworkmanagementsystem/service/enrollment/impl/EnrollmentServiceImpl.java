@@ -472,6 +472,34 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         return ResponseUtil.success(ret);
     }
 
+    @Override
+    public BaseResponse<EnrollmentItem> getOwnEnrollment(String studentId) {
+        CompletableFuture<EnrollmentItem> future = CompletableFuture.supplyAsync(() -> QueryChain.of(Enrollment.class)
+                .select(
+                        ENROLLMENT.ALL_COLUMNS,
+                        MAJOR.ALL_COLUMNS,
+                        POLITIC.ALL_COLUMNS,
+                        DEGREE.ALL_COLUMNS,
+                        GRADE.ALL_COLUMNS,
+                        STATUS.ALL_COLUMNS,
+                        USER.USERNAME.as("headerTeacherUsername"),
+                        USER.REAL_NAME.as("headerTeacherRealName"),
+                        USER.PHONE.as("headerTeacherPhone")
+                )
+                .from(ENROLLMENT)
+                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(ENROLLMENT.MAJOR_ID))
+                .innerJoin(POLITIC).on(POLITIC.POLITIC_ID.eq(ENROLLMENT.POLITIC_ID))
+                .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(ENROLLMENT.DEGREE_ID))
+                .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(ENROLLMENT.GRADE_ID))
+                .innerJoin(STUDENT_STATUS).on(ENROLLMENT.STUDENT_ID.eq(STUDENT_STATUS.STUDENT_ID).and(STUDENT_STATUS.STATUS_ENABLED.eq(true)))
+                .innerJoin(STATUS).on(STATUS.STATUS_ID.eq(STUDENT_STATUS.STATUS_ID))
+                .innerJoin(USER).on(ENROLLMENT.HEADER_TEACHER_USERNAME.eq(USER.USERNAME))
+                .where(ENROLLMENT.STUDENT_ID.eq(studentId))
+                .oneAs(EnrollmentItem.class), readThreadPool);
+        EnrollmentItem execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
     @Transactional
     public <T> BaseResponse<T> afterUpdateEnabled(String studentId, boolean enabled) {
         User user = QueryChain.of(User.class)

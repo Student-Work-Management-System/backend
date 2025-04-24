@@ -77,4 +77,10 @@ public class StudentController {
     public BaseResponse<List<StudentBasicItem>> getStudentBasics(@RequestBody List<String> studentIds) {
         return studentService.getStudentCompetitionTeam(studentIds);
     }
+
+    @PreAuthorize("hasAuthority('student:select:student')")
+    @GetMapping("/get/{studentId}")
+    public BaseResponse<EnrollmentItem> getStudentEnrollment(@PathVariable String studentId) {
+        return studentService.getOwnEnrollment(studentId);
+    }
 }

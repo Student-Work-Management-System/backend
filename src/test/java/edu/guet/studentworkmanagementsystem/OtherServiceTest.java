@@ -65,4 +65,11 @@ public class OtherServiceTest {
         List<UserWithCounselorRole> data = optionalCounselors.getData();
         System.out.println(optionalCounselors.getMessage());
     }
+
+    @Test
+    void getCounselors() {
+        BaseResponse<List<UserWithCounselorRole>> counselors = otherService.getOptionalCounselors("1");
+        List<UserWithCounselorRole> data = counselors.getData();
+        System.out.println(data);
+    }
 }

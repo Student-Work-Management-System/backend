@@ -59,5 +59,4 @@ public class StudentLeaveAudit implements Serializable {
      * 学生是否撤销
      */
     private boolean revoked;
-
 }

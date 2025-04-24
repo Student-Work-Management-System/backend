@@ -14,9 +14,6 @@ import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
 
 import java.util.List;
 
-/**
- * 因学生相关信息太大, 学生表信息拆分为StudentBasic和StudentDetail两个子模块
- */
 public interface StudentService {
     /**
      * 批量导入学生
@@ -28,6 +25,7 @@ public interface StudentService {
      * @return 学生列表
      */
     BaseResponse<Page<EnrollmentItem>> getStudents(EnrollmentQuery query);
+    BaseResponse<EnrollmentItem> getOwnEnrollment(String studentId);
     BaseResponse<StudentArchive> getStudentArchive(String studentId);
     /**
      * 修改学生信息(从档案上修改)

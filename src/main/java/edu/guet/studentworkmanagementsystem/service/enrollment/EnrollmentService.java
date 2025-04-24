@@ -36,4 +36,5 @@ public interface EnrollmentService extends IService<Enrollment> {
     BaseResponse<Page<EnrollmentItem>>  getAllRecords(EnrollmentQuery query);
     void download(EnrollmentStatQuery query, HttpServletResponse response);
     BaseResponse<HashMap<String, EnrollmentStatItem>> statistics(EnrollmentStatQuery query);
+    BaseResponse<EnrollmentItem> getOwnEnrollment(String studentId);
 }

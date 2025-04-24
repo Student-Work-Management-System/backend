@@ -172,6 +172,19 @@ public class OtherServiceImpl implements OtherService {
     }
 
     @Override
+    public BaseResponse<List<UserWithCounselorRole>> getOptionalCounselors(String gradeId) {
+        CompletableFuture<List<UserWithCounselorRole>> future = CompletableFuture.supplyAsync(() -> QueryChain.of(User.class)
+                .select(USER.ALL_COLUMNS)
+                .from(USER)
+                .innerJoin(USER_ROLE).on(USER_ROLE.UID.eq(USER.UID).and(USER_ROLE.RID.eq(3)))
+                .innerJoin(COUNSELOR).on(COUNSELOR.UID.eq(USER.UID).and(USER.ENABLED.eq(true)))
+                .and(COUNSELOR.GRADE_ID.eq(gradeId))
+                .listAs(UserWithCounselorRole.class), readThreadPool);
+        List<UserWithCounselorRole> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    @Override
     @Transactional
     public <T> BaseResponse<T> updateCounselor(CounselorRequest request) {
         String uid = request.getUid();

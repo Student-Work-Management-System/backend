@@ -30,7 +30,9 @@ public enum ServiceExceptionEnum {
     GET_RESOURCE_INTERRUPTED(-3004, "获取资源被终止"),
     // -5xxx: 来源于服务或系统错误
     UNKNOWN_ERROR(-5000, "未知异常"),
-    NULL_POINTER(-5001, "空指针异常");
+    NULL_POINTER(-5001, "空指针异常"),
+    EMAIL_SEND_FAILURE(-5002, "邮件发送失败"),
+    ;
     private final int code;
     private final String msg;
     ServiceExceptionEnum(int code, String msg) {
