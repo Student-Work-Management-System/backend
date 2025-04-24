@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveQuery implements Serializable {
+public class AuditLeaveQuery implements Serializable {
     private String search;
     private String gradeId;
     private String majorId;

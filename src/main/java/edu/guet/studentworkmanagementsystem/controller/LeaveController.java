@@ -1,10 +1,10 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import edu.guet.studentworkmanagementsystem.common.BaseQuery;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditOperator;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveRequest;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
 import edu.guet.studentworkmanagementsystem.service.leave.LeaveService;
@@ -27,13 +27,13 @@ public class LeaveController {
 
     @PreAuthorize("hasAuthority('student_leave:select:student') and hasAuthority('student_leave_audit:select:student')")
     @PostMapping("/student")
-    public BaseResponse<Page<StudentLeaveItem>> getOwn(@RequestBody BaseQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getOwn(@RequestBody StudentLeaveQuery query) {
         return leaveService.getStudentOnwRecord(query);
     }
 
     @PreAuthorize("hasAuthority('student_leave:select') and hasAuthority('student_leave_audit:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentLeaveItem>> getAuditRecord(@RequestBody LeaveQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getAuditRecord(@RequestBody AuditLeaveQuery query) {
         return leaveService.getAuditRecord(query);
     }
 

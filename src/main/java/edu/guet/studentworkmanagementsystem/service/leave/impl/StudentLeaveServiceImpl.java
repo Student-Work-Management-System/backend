@@ -8,7 +8,8 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseQuery;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveEvidence;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
@@ -68,11 +69,12 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
     }
 
     @Override
-    public BaseResponse<Page<StudentLeaveItem>> getOwnLeaves(BaseQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getOwnLeaves(StudentLeaveQuery query) {
         String studentId = SecurityUtil.getUserCredentials().getUsername();
         CompletableFuture<Page<StudentLeaveItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
+            QueryCondition condition = createCondition(query.getState(), query.getNeedLeader());
             Page<StudentLeaveItem> items = QueryChain.of(StudentLeave.class)
                     .select(
                             STUDENT_LEAVE.ALL_COLUMNS,
@@ -86,6 +88,8 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                     .where(STUDENT_LEAVE.STUDENT_ID.eq(studentId))
+                    .and(STUDENT_LEAVE.TYPE.eq(query.getType()))
+                    .and(condition)
                     .pageAs(Page.of(pageNo, pageSize), StudentLeaveItem.class);
             items.getRecords().forEach(it -> {
                 String leaveId = it.getLeaveId();
@@ -101,8 +105,20 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
         return ResponseUtil.success(execute);
     }
 
+    public QueryCondition createCondition(String state, Boolean needLeader) {
+        QueryCondition condition;
+        if (!needLeader) {
+            condition = STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(state);
+        } else {
+            condition = STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue())
+                    .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(state)
+                            .or(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(null)));
+        }
+        return condition;
+    }
+
     @Override
-    public BaseResponse<Page<StudentLeaveItem>> getLeaves(LeaveQuery query) {
+    public BaseResponse<Page<StudentLeaveItem>> getLeaves(AuditLeaveQuery query) {
         CompletableFuture<Page<StudentLeaveItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
@@ -151,7 +167,7 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
      * <br/>
      * 同时, 还需要根据审核状态来过滤
      */
-    public QueryCondition getCondition(LeaveQuery query) {
+    public QueryCondition getCondition(AuditLeaveQuery query) {
         QueryCondition condition = null;
         List<SystemAuthority> authorities = SecurityUtil.getUserAuthorities();
         String username = SecurityUtil.getUserCredentials().getUsername();
