@@ -127,7 +127,6 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .and(dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).eq(query.getTotalDay()))
                     .and(STUDENT_LEAVE.DESTROYED.eq(query.getDestroyed()))
-                    .and(STUDENT_LEAVE_AUDIT.REVOKED.eq(query.getRevoked()))
                     .and(condition)
                     .pageAs(Page.of(pageNo, pageSize), StudentLeaveItem.class);
             items.getRecords().forEach(it -> {

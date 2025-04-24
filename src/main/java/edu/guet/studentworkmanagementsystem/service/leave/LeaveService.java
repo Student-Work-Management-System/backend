@@ -14,7 +14,6 @@ public interface LeaveService {
     <T> BaseResponse<T> studentDestroyLeave(String leaveId);
     <T> BaseResponse<T> counselorAudit(AuditOperator operator);
     <T> BaseResponse<T> leaderAudit(AuditOperator operator);
-    <T> BaseResponse<T> studentRevokedLeave(String auditId);
     BaseResponse<Page<StudentLeaveItem>> getStudentOnwRecord(BaseQuery query);
     BaseResponse<Page<StudentLeaveItem>> getAuditRecord(LeaveQuery query);
 }

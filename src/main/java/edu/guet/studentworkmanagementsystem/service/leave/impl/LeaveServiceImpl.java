@@ -67,7 +67,6 @@ public class LeaveServiceImpl implements LeaveService {
                 .leaderId(null)
                 .leaderState(null)
                 .leaderHandleTime(null)
-                .revoked(false)
                 .build();
     }
     public List<StudentLeaveEvidence> createStudentLeaveEvidences(List<String> evidences, String leaveId) {
@@ -98,12 +97,6 @@ public class LeaveServiceImpl implements LeaveService {
     @Transactional
     public <T> BaseResponse<T> leaderAudit(AuditOperator operator) {
         return auditService.leaderAudit(operator);
-    }
-
-    @Override
-    @Transactional
-    public <T> BaseResponse<T> studentRevokedLeave(String auditId) {
-        return auditService.revokedLeaveAudit(auditId);
     }
 
     @Override

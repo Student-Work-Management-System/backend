@@ -9,5 +9,4 @@ public interface StudentLeaveAuditService extends IService<StudentLeaveAudit> {
     void addAudit(StudentLeaveAudit audit);
     <T> BaseResponse<T> counselorAudit(AuditOperator operator);
     <T> BaseResponse<T> leaderAudit(AuditOperator operator);
-    <T> BaseResponse<T> revokedLeaveAudit(String leaveId);
 }

@@ -43,12 +43,6 @@ public class LeaveController {
         return leaveService.studentDestroyLeave(leaveId);
     }
 
-    @PreAuthorize("hasAuthority('student_leave:update')")
-    @PutMapping("/student/revoked/{auditId}")
-    public BaseResponse<String> revoked(@PathVariable String auditId) {
-        return leaveService.studentRevokedLeave(auditId);
-    }
-
     @PreAuthorize("hasAuthority('student_leave_audit:update:counselor')")
     @PutMapping("/counselor/audit")
     public <T> BaseResponse<T> counselorAudit(@RequestBody AuditOperator operator) {

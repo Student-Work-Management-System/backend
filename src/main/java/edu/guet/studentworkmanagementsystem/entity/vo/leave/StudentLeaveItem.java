@@ -60,9 +60,5 @@ public class StudentLeaveItem implements Serializable {
     private String leaderId;
     private LocalDate leaderHandleTime;
     private String leaderState;
-    /**
-     * 学生是否撤销
-     */
-    private boolean revoked;
     private List<String> evidences;
 }
