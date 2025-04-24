@@ -40,7 +40,7 @@ public class LeaveServiceImpl implements LeaveService {
         StudentLeave studentLeave = createStudentLeave(request);
         String leaveId = leaveService.addStudentLeave(studentLeave);
         List<StudentLeaveEvidence> evidences = createStudentLeaveEvidences(request.getEvidences(), leaveId);
-        evidenceService.addEvidence(evidences);
+        if (!evidences.isEmpty()) evidenceService.addEvidence(evidences);
         StudentLeaveAudit studentLeaveAudit = createStudentLeaveAudit(request, leaveId);
         auditService.addAudit(studentLeaveAudit);
         return ResponseUtil.success();
@@ -62,10 +62,10 @@ public class LeaveServiceImpl implements LeaveService {
         return StudentLeaveAudit.builder()
                 .leaveId(leaveId)
                 .counselorId(request.getCounselorId())
-                .counselorState(Common.WAITING.getValue())
+                .counselorHandleState(Common.WAITING.getValue())
                 .counselorHandleTime(LocalDate.now())
                 .leaderId(null)
-                .leaderState(null)
+                .leaderHandleState(null)
                 .leaderHandleTime(null)
                 .build();
     }

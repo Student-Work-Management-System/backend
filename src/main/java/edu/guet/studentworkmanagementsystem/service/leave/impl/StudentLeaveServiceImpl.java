@@ -81,7 +81,7 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                             MAJOR.MAJOR_NAME,
                             GRADE.GRADE_NAME
                     )
-                    .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.LEADER_ID.eq(STUDENT_LEAVE.LEAVE_ID))
+                    .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.LEAVE_ID.eq(STUDENT_LEAVE.LEAVE_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_LEAVE.STUDENT_ID))
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
@@ -164,12 +164,12 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
         if (hasCounselorPermission && !hasLeaderPermission)
             condition = dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).le(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_ID.eq(username))
-                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_STATE.eq(query.getCounselorState()));
+                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(query.getCounselorHandleState()));
         else if (hasLeaderPermission && !hasCounselorPermission)
             condition = dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).gt(7)
-                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_STATE.eq(Common.PASS.getValue()))
+                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
                     .and(STUDENT_LEAVE_AUDIT.LEADER_ID.eq(username))
-                    .and(STUDENT_LEAVE_AUDIT.LEADER_STATE.eq(query.getLeaderState()));
+                    .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(query.getLeaderHandleState()));
         return condition;
     }
 }

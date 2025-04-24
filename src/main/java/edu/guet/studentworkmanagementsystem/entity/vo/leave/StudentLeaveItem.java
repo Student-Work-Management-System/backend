@@ -50,7 +50,7 @@ public class StudentLeaveItem implements Serializable {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate counselorHandleTime;
-    private String counselorState;
+    private String counselorHandleState;
     /**
      * 副书记审核信息
      */
@@ -59,6 +59,6 @@ public class StudentLeaveItem implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private String leaderId;
     private LocalDate leaderHandleTime;
-    private String leaderState;
+    private String leaderHandleState;
     private List<String> evidences;
 }

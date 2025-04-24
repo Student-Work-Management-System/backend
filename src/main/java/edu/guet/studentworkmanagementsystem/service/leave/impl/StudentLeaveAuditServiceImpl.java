@@ -34,7 +34,7 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
     public <T> BaseResponse<T> counselorAudit(AuditOperator operator) {
         boolean update = UpdateChain.of(StudentLeaveAudit.class)
                 .set(STUDENT_LEAVE_AUDIT.COUNSELOR_ID, operator.getUsername())
-                .set(STUDENT_LEAVE_AUDIT.COUNSELOR_STATE, operator.getState())
+                .set(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE, operator.getState())
                 .set(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_TIME, LocalDate.now())
                 .where(STUDENT_LEAVE_AUDIT.AUDIT_ID.eq(operator.getAuditId()))
                 .update();
@@ -54,7 +54,7 @@ public class StudentLeaveAuditServiceImpl extends ServiceImpl<StudentLeaveAuditM
     public <T> BaseResponse<T> leaderAudit(AuditOperator operator) {
         boolean update = UpdateChain.of(StudentLeaveAudit.class)
                 .set(STUDENT_LEAVE_AUDIT.LEADER_ID, operator.getUsername())
-                .set(STUDENT_LEAVE_AUDIT.LEADER_STATE, operator.getState())
+                .set(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE, operator.getState())
                 .set(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_TIME, LocalDate.now())
                 .where(STUDENT_LEAVE_AUDIT.AUDIT_ID.eq(operator.getAuditId()))
                 .update();
