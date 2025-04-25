@@ -164,10 +164,10 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
 
     @Override
     public BaseResponse<Page<StudentLeaveItem>> getLeaves(AuditLeaveQuery query) {
+        QueryCondition condition = getCondition(query);
         CompletableFuture<Page<StudentLeaveItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-            QueryCondition condition = getCondition(query);
             Page<StudentLeaveItem> items = QueryChain.of(StudentLeave.class)
                     .select(
                             STUDENT_LEAVE.ALL_COLUMNS,
@@ -176,7 +176,7 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                             MAJOR.MAJOR_NAME,
                             GRADE.GRADE_NAME
                     )
-                    .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.LEADER_ID.eq(STUDENT_LEAVE.LEAVE_ID))
+                    .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.LEAVE_ID.eq(STUDENT_LEAVE.LEAVE_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_LEAVE.STUDENT_ID))
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
@@ -214,7 +214,6 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
      * 同时, 还需要根据审核状态来过滤
      */
     public QueryCondition getCondition(AuditLeaveQuery query) {
-        QueryCondition condition = null;
         List<SystemAuthority> authorities = SecurityUtil.getUserAuthorities();
         String username = SecurityUtil.getUserCredentials().getUsername();
         boolean hasCounselorPermission = authorities.stream()
@@ -222,15 +221,15 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                 .anyMatch(Common.LEAVE_COUNSELOR_PERMISSION.getValue()::equals);
         boolean hasLeaderPermission = authorities.stream()
                 .map(SystemAuthority::getAuthority)
-                .anyMatch(Common.LEAVE_COUNSELOR_PERMISSION.getValue()::equals);
+                .anyMatch(Common.LEAVE_LEADER_PERMISSION.getValue()::equals);
         if (hasCounselorPermission && !hasLeaderPermission)
-            condition = dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).le(7)
+            return dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).le(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_ID.eq(username))
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(query.getCounselorHandleState()));
         else if (hasLeaderPermission && !hasCounselorPermission)
-            condition = dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).gt(7)
+            return dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).gt(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
                     .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(query.getLeaderHandleState()));
-        return condition;
+        return null;
     }
 }
