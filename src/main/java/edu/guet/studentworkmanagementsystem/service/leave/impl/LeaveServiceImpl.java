@@ -65,8 +65,8 @@ public class LeaveServiceImpl implements LeaveService {
                 .counselorHandleState(Common.WAITING.getValue())
                 .counselorHandleTime(LocalDate.now())
                 .leaderId(null)
-                .leaderHandleState(null)
-                .leaderHandleTime(null)
+                .leaderHandleState(Common.WAITING.getValue())
+                .leaderHandleTime(LocalDate.now())
                 .build();
     }
     public List<StudentLeaveEvidence> createStudentLeaveEvidences(List<String> evidences, String leaveId) {

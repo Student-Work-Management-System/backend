@@ -5,7 +5,6 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryCondition;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
-import edu.guet.studentworkmanagementsystem.common.BaseQuery;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
@@ -27,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,7 +74,10 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
         CompletableFuture<Page<StudentLeaveItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-            QueryCondition condition = createCondition(query.getState(), query.getNeedLeader());
+            QueryCondition condition = null;
+            if (Objects.nonNull(query.getState()) && Objects.nonNull(query.getNeedLeader())) {
+                condition = createCondition(query.getState(), query.getNeedLeader());
+            }
             Page<StudentLeaveItem> items = QueryChain.of(StudentLeave.class)
                     .select(
                             STUDENT_LEAVE.ALL_COLUMNS,
@@ -106,15 +109,57 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
     }
 
     public QueryCondition createCondition(String state, Boolean needLeader) {
-        QueryCondition condition;
-        if (!needLeader) {
-            condition = STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(state);
-        } else {
-            condition = STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue())
-                    .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(state)
-                            .or(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(null)));
+        /*
+          最终状态为: 审核中
+          请假天数 > 7
+            辅导员审核通过, 副书记审核审核中 -> 审核中
+            辅导员状态审核中 -> 审核中
+          请假天数 <= 7
+            辅导员状态审核中 -> 审核中
+         */
+        if (Common.WAITING.getValue().equals(state)) {
+            return needLeader
+                    ? dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).gt(7)
+                    .and(
+                            STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue())
+                                    .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(Common.WAITING.getValue()))
+                                    .or(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.WAITING))
+                    )
+                    : dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).le(7)
+                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.WAITING.getValue()));
         }
-        return condition;
+        /*
+          最终状态为: 拒绝
+          请假天数 > 7
+            辅导员审核通过, 副书记审核拒绝 -> 拒绝
+            辅导员状态拒绝 -> 拒绝
+          请假天数 <= 7
+            辅导员状态拒绝 -> 拒绝
+         */
+        if (Common.REJECT.getValue().equals(state)) {
+            return needLeader
+                    ? dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).gt(7)
+                    .and(
+                            STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue())
+                                    .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(Common.REJECT.getValue()))
+                                    .or(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.REJECT.getValue()))
+                    )
+                    : dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).le(7)
+                    .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.REJECT));
+        }
+        /*
+          最终状态为: 通过
+          请假天数 > 7
+            辅导员审核通过, 副书记审核通过 -> 通过
+          请假天数 <= 7
+            辅导员状态通过 -> 通过
+         */
+        return needLeader
+                ? dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).gt(7)
+                .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue())
+                        .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(Common.PASS.getValue())))
+                : dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).le(7)
+                .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()));
     }
 
     @Override
@@ -158,12 +203,13 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
         Page<StudentLeaveItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
+
     /**
      * 根据用户所拥有的权限生成SQL查询条件
      * <br/>
      * 有辅导员批假权限 -> 能查询到指派到该辅导员的请假申请
      * <br/>
-     * 有更高级领导权限(副书记) -> 成查询到辅导员已经批准且指派给ta的请假申请
+     * 有更高级领导权限(副书记) -> 成查询到辅导员已经批准的请假请求
      * <br/>
      * 同时, 还需要根据审核状态来过滤
      */
@@ -184,7 +230,6 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
         else if (hasLeaderPermission && !hasCounselorPermission)
             condition = dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).gt(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
-                    .and(STUDENT_LEAVE_AUDIT.LEADER_ID.eq(username))
                     .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(query.getLeaderHandleState()));
         return condition;
     }
