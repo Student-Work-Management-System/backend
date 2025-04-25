@@ -54,10 +54,10 @@ public class StudentLeaveItem implements Serializable {
     /**
      * 副书记审核信息
      */
+    private String leaderId;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private String leaderId;
     private LocalDate leaderHandleTime;
     private String leaderHandleState;
     private List<String> evidences;
