@@ -77,9 +77,9 @@ public class LanguageController {
         return foreignLanguageService.deleteForeignLanguage(foreignLanguageId);
     }
 
-    // @PreAuthorize("hasAuthority('')")
-    // @PostMapping("/student/stat")
-    // public BaseResponse<ForeignLanguageStatItem> getForeignLanguageStat(@RequestBody ForeignLanguageStatQuery query) {
-    //     return foreignLanguageService.getForeignLanguageStat(query);
-    // }
+    @PreAuthorize("hasAuthority('foreign:select')")
+    @PostMapping("/student/stat")
+    public BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStat(@RequestBody ForeignLanguageStatQuery query) {
+        return foreignLanguageService.getForeignLanguageStat(query);
+    }
 }
