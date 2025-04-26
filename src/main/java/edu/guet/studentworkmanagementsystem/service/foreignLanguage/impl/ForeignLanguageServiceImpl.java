@@ -114,7 +114,7 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
     }
 
     @Override
-    public BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStatus(ForeignLanguageStatQuery query) {
+    public BaseResponse<ForeignLanguageStatItem> getForeignLanguageStat(ForeignLanguageStatQuery query) {
         // todo: tobe finish
         return null;
     }

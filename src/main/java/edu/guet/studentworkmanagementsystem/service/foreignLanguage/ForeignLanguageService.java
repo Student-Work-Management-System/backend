@@ -17,5 +17,5 @@ public interface ForeignLanguageService extends IService<ForeignLanguage> {
     <T> BaseResponse<T> updateForeignLanguage(ForeignLanguage foreignLanguage);
     <T> BaseResponse<T> deleteForeignLanguage(String foreignLanguageId);
     BaseResponse<Page<ForeignLanguageItem>> getForeignLanguages(ForeignLanguageQuery query);
-    BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStatus(ForeignLanguageStatQuery query);
+    BaseResponse<ForeignLanguageStatItem> getForeignLanguageStat(ForeignLanguageStatQuery query);
 }
