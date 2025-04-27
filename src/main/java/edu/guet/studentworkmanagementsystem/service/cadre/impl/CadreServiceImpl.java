@@ -174,7 +174,7 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
 
     @Override
-    public BaseResponse<List<StudentCadreStatGroup>> getCadreStatus(CadreStatQuery query) {
+    public BaseResponse<List<StudentCadreStatGroup>> getCadreStat(CadreStatQuery query) {
         CompletableFuture<List<StudentCadreStatGroup>> future = CompletableFuture.supplyAsync(() -> {
             List<StudentCadreStatRow> rows = mapper.getCadreStatus(query);
             ArrayList<StudentCadreStatGroup> groups = new ArrayList<>();

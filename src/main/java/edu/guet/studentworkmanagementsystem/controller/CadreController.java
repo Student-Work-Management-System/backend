@@ -78,7 +78,7 @@ public class CadreController {
 
     @PreAuthorize("hasAuthority('student_cadre:select') and hasAuthority('cadre:select')")
     @PostMapping("/student_cadre/stat")
-    public BaseResponse<List<StudentCadreStatGroup>> getStudentCadreStatus(@RequestBody CadreStatQuery query) {
-        return cadreService.getCadreStatus(query);
+    public BaseResponse<List<StudentCadreStatGroup>> getStudentCadreStat(@RequestBody CadreStatQuery query) {
+        return cadreService.getCadreStat(query);
     }
 }

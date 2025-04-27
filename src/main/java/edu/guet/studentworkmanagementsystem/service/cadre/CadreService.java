@@ -52,5 +52,5 @@ public interface CadreService extends IService<StudentCadre> {
      * @return 学生任职记录
      */
     BaseResponse<Page<StudentCadreItem>> getAllStudentCadre(CadreQuery query);
-    BaseResponse<List<StudentCadreStatGroup>> getCadreStatus(CadreStatQuery query);
+    BaseResponse<List<StudentCadreStatGroup>> getCadreStat(CadreStatQuery query);
 }
