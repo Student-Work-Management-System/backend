@@ -13,4 +13,5 @@ public class ForeignLanguageStatQuery {
     private String gradeId;
     private String majorId;
     private String languageId;
+    private String term;
 }

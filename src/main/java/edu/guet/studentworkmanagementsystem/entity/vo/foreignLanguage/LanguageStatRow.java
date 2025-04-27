@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LanguageStatRow {
+    private String gradeName;
     private String majorName;
     private String languageName;
     private String passNumber;

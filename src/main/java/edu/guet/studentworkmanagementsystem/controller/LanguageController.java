@@ -10,7 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLa
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.ForeignLanguage;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.Language;
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatGrouped;
 import edu.guet.studentworkmanagementsystem.service.foreignLanguage.ForeignLanguageService;
 import edu.guet.studentworkmanagementsystem.service.foreignLanguage.LanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ public class LanguageController {
 
     @PreAuthorize("hasAuthority('foreign:select')")
     @PostMapping("/student/stat")
-    public BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStat(@RequestBody ForeignLanguageStatQuery query) {
+    public BaseResponse<List<ForeignLanguageStatGrouped>> getForeignLanguageStat(@RequestBody ForeignLanguageStatQuery query) {
         return foreignLanguageService.getForeignLanguageStat(query);
     }
 }

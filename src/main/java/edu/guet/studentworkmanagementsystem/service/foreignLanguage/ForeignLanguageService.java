@@ -8,7 +8,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLa
 import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLanguageStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.ForeignLanguage;
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatGrouped;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface ForeignLanguageService extends IService<ForeignLanguage> {
     <T> BaseResponse<T> updateForeignLanguage(ForeignLanguage foreignLanguage);
     <T> BaseResponse<T> deleteForeignLanguage(String foreignLanguageId);
     BaseResponse<Page<ForeignLanguageItem>> getForeignLanguages(ForeignLanguageQuery query);
-    BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStat(ForeignLanguageStatQuery query);
+    BaseResponse<List<ForeignLanguageStatGrouped>> getForeignLanguageStat(ForeignLanguageStatQuery query);
 }

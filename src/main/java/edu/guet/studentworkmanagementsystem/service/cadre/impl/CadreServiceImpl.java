@@ -170,7 +170,6 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
 
     @Override
     public BaseResponse<List<StudentCadreStatItem>> getCadreStatus(CadreStatQuery query) {
-        // todo: 完成mapper内实现
         CompletableFuture<List<StudentCadreStatItem>> future =
                 CompletableFuture.supplyAsync(() -> mapper.getCadreStatus(query), readThreadPool);
         List<StudentCadreStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();

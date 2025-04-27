@@ -10,7 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLa
 import edu.guet.studentworkmanagementsystem.entity.dto.foreignLanguage.ForeignLanguageStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.ForeignLanguage;
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.ForeignLanguageStatGrouped;
 import edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.LanguageStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -118,34 +118,47 @@ public class ForeignLanguageServiceImpl extends ServiceImpl<ForeignLanguageMappe
     }
 
     @Override
-    public BaseResponse<List<ForeignLanguageStatItem>> getForeignLanguageStat(ForeignLanguageStatQuery query) {
-        CompletableFuture<List<ForeignLanguageStatItem>> future =
+    public BaseResponse<List<ForeignLanguageStatGrouped>> getForeignLanguageStat(ForeignLanguageStatQuery query) {
+        CompletableFuture<List<ForeignLanguageStatGrouped>> future =
                 CompletableFuture.supplyAsync(() -> {
                     List<LanguageStatRow> rows = mapper.getStat(query);
-                    // 按专业名分类
-                    Map<String, List<LanguageStatRow>> groupedByMajor = rows.stream()
-                            .collect(Collectors.groupingBy(LanguageStatRow::getMajorName));
-                    ArrayList<ForeignLanguageStatItem> items = new ArrayList<>();
-                    // 遍历、组装
-                    for (Map.Entry<String, List<LanguageStatRow>> entry : groupedByMajor.entrySet()) {
-                        String majorName = entry.getKey();
-                        List<LanguageStatRow> languageRows = entry.getValue();
-                        List<ForeignLanguageStatItem.LanguageStatItem> languageStatItems = languageRows.stream()
-                                .map(row -> ForeignLanguageStatItem.LanguageStatItem.builder()
-                                        .languageName(row.getLanguageName())
-                                        .passNumber(row.getPassNumber())
-                                        .totalNumber(row.getTotalNumber())
-                                        .build())
-                                .collect(Collectors.toList());
-                        ForeignLanguageStatItem item = ForeignLanguageStatItem.builder()
-                                .majorName(majorName)
-                                .languageStatItems(languageStatItems)
+                    // 按年级分组
+                    Map<String, List<LanguageStatRow>> groupedByGrade = rows.stream()
+                            .collect(Collectors.groupingBy(LanguageStatRow::getGradeName));
+                    List<ForeignLanguageStatGrouped> groupedList = new ArrayList<>();
+                    for (Map.Entry<String, List<LanguageStatRow>> gradeEntry : groupedByGrade.entrySet()) {
+                        String gradeName = gradeEntry.getKey();
+                        List<LanguageStatRow> gradeRows = gradeEntry.getValue();
+                        // 年级内，再按专业分组
+                        Map<String, List<LanguageStatRow>> groupedByMajor = gradeRows.stream()
+                                .collect(Collectors.groupingBy(LanguageStatRow::getMajorName));
+                        List<ForeignLanguageStatGrouped.ForeignLanguageStatItem> foreignLanguageStatItems = new ArrayList<>();
+                        for (Map.Entry<String, List<LanguageStatRow>> majorEntry : groupedByMajor.entrySet()) {
+                            String majorName = majorEntry.getKey();
+                            List<LanguageStatRow> majorRows = majorEntry.getValue();
+                            List<ForeignLanguageStatGrouped.LanguageStatItem> languageStatItems = majorRows.stream()
+                                    .map(row -> ForeignLanguageStatGrouped.LanguageStatItem.builder()
+                                            .languageName(row.getLanguageName())
+                                            .passNumber(row.getPassNumber())
+                                            .totalNumber(row.getTotalNumber())
+                                            .build())
+                                    .collect(Collectors.toList());
+                            ForeignLanguageStatGrouped.ForeignLanguageStatItem foreignLanguageStatItem = ForeignLanguageStatGrouped.ForeignLanguageStatItem.builder()
+                                    .majorName(majorName)
+                                    .languageStatItems(languageStatItems)
+                                    .build();
+                            foreignLanguageStatItems.add(foreignLanguageStatItem);
+                        }
+                        ForeignLanguageStatGrouped grouped = ForeignLanguageStatGrouped.builder()
+                                .gradeName(gradeName)
+                                .foreignLanguageStatItems(foreignLanguageStatItems)
                                 .build();
-                        items.add(item);
+                        groupedList.add(grouped);
                     }
-                    return items;
+                    return groupedList;
                 }, readThreadPool);
-        List<ForeignLanguageStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        List<ForeignLanguageStatGrouped> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
+
 }

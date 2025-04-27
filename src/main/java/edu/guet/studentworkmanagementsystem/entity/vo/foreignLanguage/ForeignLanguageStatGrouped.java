@@ -7,9 +7,17 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ForeignLanguageStatItem {
-    private String majorName;
-    private List<LanguageStatItem> languageStatItems;
+public class ForeignLanguageStatGrouped {
+    private String gradeName;
+    private List<ForeignLanguageStatItem> foreignLanguageStatItems;
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForeignLanguageStatItem {
+        private String majorName;
+        private List<LanguageStatItem> languageStatItems;
+    }
     @Data
     @Builder
     @AllArgsConstructor

@@ -7,13 +7,15 @@
             resultType="edu.guet.studentworkmanagementsystem.entity.vo.foreignLanguage.LanguageStatRow">
         select
             major.major_name                                              as majorName,
+            grade.grade_name                                              as gradeName,
             concat(language.language_name, '-', language.type)            as languageName,
             SUM(IF(foreign_language.score >= language.total * 0.6, 1, 0)) AS passNumber,
             COUNT(*)                                                      AS totalNumber
         from student_basic
-                 inner join major on major.major_id = student_basic.major_id
-                 inner join foreign_language on foreign_language.student_id = student_basic.student_id
-                 inner join language on language.language_id = foreign_language.language_id
+            inner join major on major.major_id = student_basic.major_id
+            inner join grade on grade.grade_id = student_basic.grade_id
+            inner join foreign_language on foreign_language.student_id = student_basic.student_id
+            inner join language on language.language_id = foreign_language.language_id
         <where>
             <if test="gradeId != null and gradeId != ''">
                 student_basic.grade_id = #{gradeId}
@@ -24,8 +26,11 @@
             <if test="languageId != null and languageId != ''">
                 and foreign_language.language_id = #{languageId}
             </if>
+            <if test="term != null and term != ''">
+                and foreign_language.date = #{term}
+            </if>
         </where>
-        GROUP BY major.major_name, language.language_name, language.type
-        ORDER BY major.major_name, language.language_name, language.type;
+        GROUP BY grade.grade_name, major.major_name, language.language_name, language.type
+        ORDER BY grade.grade_name, major.major_name, language.language_name, language.type;
     </select>
 </mapper>
