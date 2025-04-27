@@ -11,7 +11,9 @@ import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatGroup.StudentCadreStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.cadre.CadreMapper;
@@ -26,9 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.CadreTableDef.CADRE;
 import static edu.guet.studentworkmanagementsystem.entity.po.cadre.table.StudentCadreTableDef.STUDENT_CADRE;
@@ -169,10 +174,45 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
     }
 
     @Override
-    public BaseResponse<List<StudentCadreStatItem>> getCadreStatus(CadreStatQuery query) {
-        CompletableFuture<List<StudentCadreStatItem>> future =
-                CompletableFuture.supplyAsync(() -> mapper.getCadreStatus(query), readThreadPool);
-        List<StudentCadreStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+    public BaseResponse<List<StudentCadreStatGroup>> getCadreStatus(CadreStatQuery query) {
+        CompletableFuture<List<StudentCadreStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentCadreStatRow> rows = mapper.getCadreStatus(query);
+            ArrayList<StudentCadreStatGroup> groups = new ArrayList<>();
+            // 按年级分组
+            Map<String, List<StudentCadreStatRow>> groupedByGrade = rows.stream()
+                    .collect(Collectors.groupingBy(StudentCadreStatRow::getGradeName));
+            for (Map.Entry<String, List<StudentCadreStatRow>> gradeEntry : groupedByGrade.entrySet()) {
+                String gradeName = gradeEntry.getKey();
+                List<StudentCadreStatRow> gradeRows = gradeEntry.getValue();
+                // 年级内，再按专业分组
+                Map<String, List<StudentCadreStatRow>> groupedByMajor = gradeRows.stream()
+                        .collect(Collectors.groupingBy(StudentCadreStatRow::getMajorName));
+                List<StudentCadreStatItem> studentCadreStatItems = new ArrayList<>();
+                for (Map.Entry<String, List<StudentCadreStatRow>> majorEntry : groupedByMajor.entrySet()) {
+                    String majorName = majorEntry.getKey();
+                    List<StudentCadreStatRow> majorRows = majorEntry.getValue();
+                    List<StudentCadreStatGroup.CadreStatItem> cadreStatItems = majorRows.stream()
+                            .map(row -> StudentCadreStatGroup.CadreStatItem.builder()
+                                    .cadreName(row.getCadreName())
+                                    .cadreBelong(row.getCadreBelong())
+                                    .appointmentTime(row.getAppointmentTime())
+                                    .build())
+                            .toList();
+                    StudentCadreStatItem studentCadreStatItem = StudentCadreStatItem.builder()
+                            .majorName(majorName)
+                            .cadreStatItems(cadreStatItems)
+                            .build();
+                    studentCadreStatItems.add(studentCadreStatItem);
+                }
+                StudentCadreStatGroup group = StudentCadreStatGroup.builder()
+                        .gradeName(gradeName)
+                        .studentCadreStatItems(studentCadreStatItems)
+                        .build();
+                groups.add(group);
+            }
+            return groups;
+        }, readThreadPool);
+        List<StudentCadreStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }

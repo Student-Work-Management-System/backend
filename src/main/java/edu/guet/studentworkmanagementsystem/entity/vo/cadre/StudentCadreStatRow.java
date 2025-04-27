@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentCadreStatRow {
+    private String gradeName;
     private String majorName;
     private String cadreName;
     private String cadreBelong;

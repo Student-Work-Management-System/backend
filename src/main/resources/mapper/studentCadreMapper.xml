@@ -4,7 +4,7 @@
 <mapper namespace="edu.guet.studentworkmanagementsystem.mapper.cadre.StudentCadreMapper">
     <select id="getCadreStatus"
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreStatQuery"
-            resultType="edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatItem">
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatRow">
 
     </select>
 </mapper>

@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.cadre.*;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.Cadre;
 import edu.guet.studentworkmanagementsystem.entity.po.cadre.StudentCadre;
 import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatGroup;
 import edu.guet.studentworkmanagementsystem.service.cadre.CadreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,7 +78,7 @@ public class CadreController {
 
     @PreAuthorize("hasAuthority('student_cadre:select') and hasAuthority('cadre:select')")
     @PostMapping("/student_cadre/stat")
-    public BaseResponse<List<StudentCadreStatItem>> getStudentCadreStatus(@RequestBody CadreStatQuery query) {
+    public BaseResponse<List<StudentCadreStatGroup>> getStudentCadreStatus(@RequestBody CadreStatQuery query) {
         return cadreService.getCadreStatus(query);
     }
 }

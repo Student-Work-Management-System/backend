@@ -11,9 +11,17 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentCadreStatItem {
-    private String majorName;
-    private List<CadreStatItem> cadreStatItems;
+public class StudentCadreStatGroup {
+    private String gradeName;
+    private List<StudentCadreStatItem> studentCadreStatItems;
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StudentCadreStatItem {
+        private String majorName;
+        private List<CadreStatItem> cadreStatItems;
+    }
     @Data
     @Builder
     @AllArgsConstructor
