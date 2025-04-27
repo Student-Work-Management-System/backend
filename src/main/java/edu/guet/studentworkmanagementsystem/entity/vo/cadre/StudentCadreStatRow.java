@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class StudentCadreStatRow {
     private String gradeName;
     private String majorName;
-    private String cadreName;
+    private String cadreLevel;
     private String cadreBelong;
+    private String total;
     private String appointmentTime;
 }

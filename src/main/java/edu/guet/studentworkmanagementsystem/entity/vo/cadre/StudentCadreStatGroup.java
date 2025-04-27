@@ -27,8 +27,8 @@ public class StudentCadreStatGroup {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CadreStatItem {
-        private String cadreName;
+        private String cadreLevel;
         private String cadreBelong;
-        private String appointmentTime;
+        private String total;
     }
 }

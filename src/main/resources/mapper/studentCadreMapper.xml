@@ -6,20 +6,20 @@
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.cadre.CadreStatQuery"
             resultType="edu.guet.studentworkmanagementsystem.entity.vo.cadre.StudentCadreStatRow">
         select
-            major.major_name as majorName,
             grade.grade_name as gradeName,
-            concat(cadre.cadre_position, ' - ', cadre.cadre_level) as cadreName,
+            major.major_name as majorName,
+            cadre.cadre_level as cadreLevel,
             cadre.cadre_belong as cadreBelong,
-
-            concat(student_cadre.appointment_start_term, ' - ', student_cadre.appointment_end_term) as appointmentTime
+            count(*) as total
         from student_basic
             inner join major on major.major_id = student_basic.major_id
             inner join grade on grade.grade_id = student_basic.grade_id
             inner join student_cadre on student_cadre.student_id = student_basic.student_id
             inner join cadre on cadre.cadre_id = student_cadre.cadre_id
         <where>
+            cadre.cadre_level not like '%班%'
             <if test="gradeId != null and gradeId != ''">
-                student_basic.grade_id = #{gradeId}
+                and student_basic.grade_id = #{gradeId}
             </if>
             <if test="majorId != null and majorId != ''">
                 and student_basic.major_id = #{majorId}
@@ -45,18 +45,12 @@
         GROUP BY
             major.major_name,
             grade.grade_name,
-            cadre.cadre_position,
             cadre.cadre_level,
-            cadre.cadre_belong,
-            student_cadre.appointment_start_term,
-            student_cadre.appointment_end_term
+            cadre.cadre_belong
         ORDER BY
             major.major_name,
             grade.grade_name,
-            cadre.cadre_position,
             cadre.cadre_level,
-            cadre.cadre_belong,
-            student_cadre.appointment_start_term,
-            student_cadre.appointment_end_term
+            cadre.cadre_belong
     </select>
 </mapper>

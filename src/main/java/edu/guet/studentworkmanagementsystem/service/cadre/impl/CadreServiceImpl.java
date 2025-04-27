@@ -193,9 +193,9 @@ public class CadreServiceImpl extends ServiceImpl<StudentCadreMapper, StudentCad
                     List<StudentCadreStatRow> majorRows = majorEntry.getValue();
                     List<StudentCadreStatGroup.CadreStatItem> cadreStatItems = majorRows.stream()
                             .map(row -> StudentCadreStatGroup.CadreStatItem.builder()
-                                    .cadreName(row.getCadreName())
+                                    .cadreLevel(row.getCadreLevel())
                                     .cadreBelong(row.getCadreBelong())
-                                    .appointmentTime(row.getAppointmentTime())
+                                    .total(row.getTotal())
                                     .build())
                             .toList();
                     StudentCadreStatItem studentCadreStatItem = StudentCadreStatItem.builder()
