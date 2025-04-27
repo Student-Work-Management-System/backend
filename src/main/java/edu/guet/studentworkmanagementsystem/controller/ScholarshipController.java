@@ -72,7 +72,7 @@ public class ScholarshipController {
         return scholarshipService.deleteStudentScholarship(studentScholarshipId);
     }
 
-    @PreAuthorize("hasAuthority('studnet_scholarship:select') and hasAuthority('scholarship:select')")
+    @PreAuthorize("hasAuthority('student_scholarship:select')")
     @PostMapping("/stat")
     public BaseResponse<List<StudentScholarshipStatGroup>> getStat(@RequestBody ScholarshipStatQuery query) {
         return scholarshipService.getStat(query);
