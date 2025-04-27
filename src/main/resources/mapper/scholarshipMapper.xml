@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.guet.studentworkmanagementsystem.mapper.scholarship.StudentScholarshipMapper">
+    <select id="getStat"
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipStatRow">
+        SELECT
+            grade.grade_name AS gradeName,
+            major.major_name AS majorName,
+            scholarship.scholarship_name AS scholarshipName,
+            scholarship.scholarship_level AS scholarshipLevel,
+            COUNT(student_scholarship.student_id) AS total
+        FROM student_scholarship
+            INNER JOIN student_basic ON student_basic.student_id = student_scholarship.student_id
+            INNER JOIN grade ON grade.grade_id = student_basic.grade_id
+            INNER JOIN major ON major.major_id = student_basic.major_id
+            INNER JOIN scholarship ON scholarship.scholarship_id = student_scholarship.scholarship_id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                AND student_basic.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                AND student_basic.major_id = #{majorId}
+            </if>
+            <if test="level != null and level != ''">
+                AND scholarship.scholarship_level = #{scholarshipLevel}
+            </if>
+            <if test="time != null and time != ''">
+                AND student_scholarship.award_year = #{time}
+            </if>
+        </where>
+        GROUP BY
+            grade.grade_name,
+            major.major_name,
+            scholarship.scholarship_name,
+            scholarship.scholarship_level
+        ORDER BY
+            grade.grade_name,
+            major.major_name,
+            scholarship.scholarship_level,
+            scholarship.scholarship_name
+    </select>
+</mapper>

@@ -8,9 +8,12 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.scholarship.ScholarshipMapper;
@@ -25,9 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
@@ -146,5 +152,54 @@ public class ScholarshipServiceImpl extends ServiceImpl<StudentScholarshipMapper
         if (i > 0)
             return ResponseUtil.success();
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+    }
+
+    @Override
+    public BaseResponse<List<StudentScholarshipStatGroup>> getStat(ScholarshipStatQuery query) {
+        CompletableFuture<List<StudentScholarshipStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentScholarshipStatRow> rows = mapper.getStat(query);
+            // 按年级分组
+            Map<String, List<StudentScholarshipStatRow>> gradeMap = rows.stream()
+                    .collect(Collectors.groupingBy(StudentScholarshipStatRow::getGradeName));
+
+            List<StudentScholarshipStatGroup> groups = new ArrayList<>();
+
+            for (Map.Entry<String, List<StudentScholarshipStatRow>> gradeEntry : gradeMap.entrySet()) {
+                String gradeName = gradeEntry.getKey();
+                List<StudentScholarshipStatRow> gradeRows = gradeEntry.getValue();
+
+                // 每个年级里再按专业分组
+                Map<String, List<StudentScholarshipStatRow>> majorMap = gradeRows.stream()
+                        .collect(Collectors.groupingBy(StudentScholarshipStatRow::getMajorName));
+
+                List<StudentScholarshipStatGroup.StudentScholarshipStatItem> statItems = new ArrayList<>();
+
+                for (Map.Entry<String, List<StudentScholarshipStatRow>> majorEntry : majorMap.entrySet()) {
+                    String majorName = majorEntry.getKey();
+                    List<StudentScholarshipStatRow> majorRows = majorEntry.getValue();
+
+                    List<StudentScholarshipStatGroup.ScholarshipStatItem> scholarshipStatItems = majorRows.stream()
+                            .map(row -> StudentScholarshipStatGroup.ScholarshipStatItem.builder()
+                                    .scholarshipName(row.getScholarshipName())
+                                    .scholarshipLevel(row.getScholarshipLevel())
+                                    .total(row.getTotal())
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    statItems.add(StudentScholarshipStatGroup.StudentScholarshipStatItem.builder()
+                            .majorName(majorName)
+                            .scholarshipStatItems(scholarshipStatItems)
+                            .build());
+                }
+
+                groups.add(StudentScholarshipStatGroup.builder()
+                        .gradeName(gradeName)
+                        .studentScholarshipStatItems(statItems)
+                        .build());
+            }
+            return groups;
+        }, readThreadPool);
+        List<StudentScholarshipStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 }

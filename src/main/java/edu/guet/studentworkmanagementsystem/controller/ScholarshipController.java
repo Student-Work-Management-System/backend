@@ -9,6 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.*;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipStatGroup;
 import edu.guet.studentworkmanagementsystem.service.scholarship.ScholarshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,7 +68,13 @@ public class ScholarshipController {
 
     @PreAuthorize("hasAuthority('student_scholarship:delete')")
     @DeleteMapping("/student/delete/{studentScholarshipId}")
-    public  <T> BaseResponse<T> deleteStudentScholarship(@PathVariable String studentScholarshipId) {
+    public <T> BaseResponse<T> deleteStudentScholarship(@PathVariable String studentScholarshipId) {
         return scholarshipService.deleteStudentScholarship(studentScholarshipId);
+    }
+
+    @PreAuthorize("hasAuthority('studnet_scholarship:select') and hasAuthority('scholarship:select')")
+    @PostMapping("/stat")
+    public BaseResponse<List<StudentScholarshipStatGroup>> getStat(@RequestBody ScholarshipStatQuery query) {
+        return scholarshipService.getStat(query);
     }
 }

@@ -5,9 +5,11 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.scholarship.ScholarshipStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.scholarship.StudentScholarshipStatGroup;
 
 import java.util.List;
 
@@ -50,4 +52,5 @@ public interface ScholarshipService extends IService<StudentScholarship> {
      * @param studentScholarshipId 学生奖学金记录id
      */
     <T> BaseResponse<T> deleteStudentScholarship(String studentScholarshipId);
+    BaseResponse<List<StudentScholarshipStatGroup>> getStat(ScholarshipStatQuery query);
 }
