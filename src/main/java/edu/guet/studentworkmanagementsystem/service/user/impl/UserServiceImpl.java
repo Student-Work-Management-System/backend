@@ -95,9 +95,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private OtherService otherService;
 
     @Override
-    public BaseResponse<LoginUserDetail> login(LoginUserRequest loginUserRequest) {
+    public BaseResponse<LoginUserDetail> login(LoginUserRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUserRequest.getUsername(), loginUserRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
         String redisKey = Common.LOGIN_UID.getValue() + securityUser.getUser().getUid();
@@ -105,8 +105,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             redisUtil.setValue(redisKey, JsonUtil.getMapper().writeValueAsString(securityUser));
         } catch (JsonProcessingException jsonProcessingException) {
-            log.error("UserServiceImpl#login(LoginUserDTO loginUserDTO)出现JSON解析异常: {}", jsonProcessingException.getMessage());
-            ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
+            log.error("UserServiceImpl#login(LoginUserRequest request)出现JSON解析异常: {}", jsonProcessingException.getMessage());
+            return ResponseUtil.failure(ServiceExceptionEnum.OPERATE_ERROR);
         }
         LoginUserDetail loginUserDetail = createLoginUser(securityUser, token);
         return ResponseUtil.success(loginUserDetail);
