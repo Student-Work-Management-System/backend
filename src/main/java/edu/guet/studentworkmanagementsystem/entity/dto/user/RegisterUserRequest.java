@@ -25,6 +25,7 @@ public class RegisterUserRequest implements Serializable {
     @NotBlank(message = "密码不能为空")
     private String password;
     @Phone
+    @NotBlank(message = "手机号不能为空")
     private String phone;
     private Set<String> roles;
 }
