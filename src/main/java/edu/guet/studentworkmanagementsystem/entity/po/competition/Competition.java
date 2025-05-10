@@ -37,6 +37,7 @@ public class Competition implements Serializable {
      */
     @NotBlank(message = "竞赛名不能为空", groups = {InsertGroup.class})
     private String competitionName;
+    private String subCompetitionName;
     /**
      * 竞赛性质： 团队/单人
      */
