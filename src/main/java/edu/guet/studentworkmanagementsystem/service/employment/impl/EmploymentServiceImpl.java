@@ -29,12 +29,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
+import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.PoliticTableDef.POLITIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
-import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentDetailTableDef.STUDENT_DETAIL;
 
 @Service
 public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper, StudentEmployment> implements EmploymentService {
@@ -63,7 +63,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
             return QueryChain.of(StudentEmployment.class)
                     .select(
                             STUDENT_BASIC.ALL_COLUMNS,
-                            STUDENT_DETAIL.ALL_COLUMNS,
+                            ENROLLMENT.ALL_COLUMNS,
                             STUDENT_EMPLOYMENT.ALL_COLUMNS,
                             MAJOR.MAJOR_NAME,
                             GRADE.GRADE_NAME,
@@ -72,7 +72,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
                     )
                     .from(STUDENT_EMPLOYMENT)
                     .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_EMPLOYMENT.STUDENT_ID))
-                    .innerJoin(STUDENT_DETAIL).on(STUDENT_DETAIL.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
+                    .innerJoin(ENROLLMENT).on(ENROLLMENT.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                     .innerJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
