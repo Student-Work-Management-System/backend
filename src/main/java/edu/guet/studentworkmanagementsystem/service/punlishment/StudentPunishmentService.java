@@ -5,8 +5,12 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentStatGroup;
+
+import java.util.List;
 
 
 public interface StudentPunishmentService extends IService<StudentPunishment> {
@@ -29,4 +33,5 @@ public interface StudentPunishmentService extends IService<StudentPunishment> {
      * 更新处分信息
      */
     <T> BaseResponse<T> updateStudentPunishment(StudentPunishment studentPunishment);
+    BaseResponse<List<StudentPunishmentStatGroup>> getStat(StudentPunishmentStatQuery query);
 }

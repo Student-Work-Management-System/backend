@@ -7,11 +7,14 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
-import edu.guet.studentworkmanagementsystem.mapper.punlishment.PunishmentMapper;
+import edu.guet.studentworkmanagementsystem.mapper.punishment.StudentPunishmentMapper;
 import edu.guet.studentworkmanagementsystem.service.punlishment.StudentPunishmentService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
@@ -22,8 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
@@ -31,7 +38,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.punishment.table.St
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 
 @Service
-public class StudentPunishmentServiceImpl extends ServiceImpl<PunishmentMapper, StudentPunishment> implements StudentPunishmentService {
+public class StudentPunishmentServiceImpl extends ServiceImpl<StudentPunishmentMapper, StudentPunishment> implements StudentPunishmentService {
 
     private final ThreadPoolTaskExecutor readThreadPool;
 
@@ -101,4 +108,49 @@ public class StudentPunishmentServiceImpl extends ServiceImpl<PunishmentMapper, 
         throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
+    @Override
+    public BaseResponse<List<StudentPunishmentStatGroup>> getStat(StudentPunishmentStatQuery query) {
+        CompletableFuture<List<StudentPunishmentStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentPunishmentStatRow> rows = mapper.getStat(query);
+            return convertToStatGroup(rows);
+        }, readThreadPool);
+        List<StudentPunishmentStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    public List<StudentPunishmentStatGroup> convertToStatGroup(List<StudentPunishmentStatRow> rows) {
+        Map<String, List<StudentPunishmentStatRow>> gradeMap = rows.stream()
+                .collect(Collectors.groupingBy(StudentPunishmentStatRow::getGradeName));
+
+        List<StudentPunishmentStatGroup> statGroups = new ArrayList<>();
+
+        for (Map.Entry<String, List<StudentPunishmentStatRow>> entry : gradeMap.entrySet()) {
+            String gradeName = entry.getKey();
+            List<StudentPunishmentStatRow> gradeRows = entry.getValue();
+
+            Map<String, List<StudentPunishmentStatRow>> majorMap = gradeRows.stream()
+                    .collect(Collectors.groupingBy(StudentPunishmentStatRow::getMajorName));
+
+            List<StudentPunishmentStatGroup.MajorGroup> majorGroups = new ArrayList<>();
+
+            for (Map.Entry<String, List<StudentPunishmentStatRow>> majorEntry : majorMap.entrySet()) {
+                String majorName = majorEntry.getKey();
+                List<StudentPunishmentStatRow> majorRows = majorEntry.getValue();
+
+                // 使用处分类型（punishmentName）进行分组
+                Map<String, Long> punishmentMap = majorRows.stream()
+                        .collect(Collectors.groupingBy(StudentPunishmentStatRow::getPunishmentName, Collectors.counting()));
+
+                List<StudentPunishmentStatGroup.PunishmentGroup> punishmentGroups = punishmentMap.entrySet().stream()
+                        .map(entry1 -> new StudentPunishmentStatGroup.PunishmentGroup(entry1.getKey(), entry1.getValue().toString()))
+                        .collect(Collectors.toList());
+
+                majorGroups.add(new StudentPunishmentStatGroup.MajorGroup(majorName, punishmentGroups));
+            }
+
+            statGroups.add(new StudentPunishmentStatGroup(gradeName, majorGroups));
+        }
+
+        return statGroups;
+    }
 }

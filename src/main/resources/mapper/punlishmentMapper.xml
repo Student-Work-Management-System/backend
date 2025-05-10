@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.guet.studentworkmanagementsystem.mapper.punishment.StudentPunishmentMapper">
+    <select id="getStat" resultType="edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentStatRow">
+        SELECT
+            grade.grade_name AS gradeName,
+            major.major_name AS majorName,
+            punishment.punishment_name AS punishmentName,
+            COUNT(*) AS number
+        FROM student_punishment sp
+                 JOIN student_basic ON sp.student_id = student_basic.student_id
+                 JOIN grade ON student_basic.grade_id = grade.grade_id
+                 JOIN major ON student_basic.major_id = major.major_id
+                 JOIN punishment ON sp.punishment_id = punishment.punishment_id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                AND student_basic.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                AND student_basic.major_id = #{majorId}
+            </if>
+        </where>
+        GROUP BY grade.grade_name, major.major_name, punishment.punishment_name
+        ORDER BY grade.grade_name, major.major_name, punishment.punishment_name
+    </select>
+</mapper>

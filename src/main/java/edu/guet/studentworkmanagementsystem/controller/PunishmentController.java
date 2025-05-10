@@ -1,18 +1,21 @@
 package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.common.InsertGroup;
-import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.common.ValidateList;
+import edu.guet.studentworkmanagementsystem.common.*;
 import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.punishment.StudentPunishmentStatQuery;
+import edu.guet.studentworkmanagementsystem.entity.po.punishment.Punishment;
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.punishment.StudentPunishmentStatGroup;
+import edu.guet.studentworkmanagementsystem.service.punlishment.PunishmentService;
 import edu.guet.studentworkmanagementsystem.service.punlishment.StudentPunishmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -20,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 public class PunishmentController {
     @Autowired
     private StudentPunishmentService studentPunishmentService;
+
+    @Autowired
+    private PunishmentService punishmentService;
 
     @PreAuthorize("hasAuthority('student_punishment:select')")
     @PostMapping("/student/gets")
@@ -39,9 +45,39 @@ public class PunishmentController {
         return studentPunishmentService.updateStudentPunishment(studentPunishment);
     }
 
+    @PreAuthorize("hasAuthority('student:punishment:select')")
+    @PostMapping("/stat")
+    public BaseResponse<List<StudentPunishmentStatGroup>> getStat(@RequestBody StudentPunishmentStatQuery query) {
+        return studentPunishmentService.getStat(query);
+    }
+
     @PreAuthorize("hasAuthority('student_punishment:delete')")
     @DeleteMapping("/student/delete/{studentPunishmentId}")
     public <T> BaseResponse<T> deleteStudentPunishment(@PathVariable String studentPunishmentId) {
         return studentPunishmentService.deleteStudentPunishment(studentPunishmentId);
+    }
+
+    @PreAuthorize("hasAuthority('punishment:select')")
+    @PostMapping("/gets")
+    public BaseResponse<Page<Punishment>> getPunishments(@RequestBody BaseQuery query) {
+        return punishmentService.getPunishments(query);
+    }
+
+    @PreAuthorize("hasAuthority('punishment:insert')")
+    @PostMapping("/add")
+    public <T> BaseResponse<T> addPunishmentItem(@RequestBody @Validated({InsertGroup.class}) Punishment punishment) {
+        return punishmentService.addPunishmentItem(punishment);
+    }
+
+    @PreAuthorize("hasAuthority('punishment:update')")
+    @PutMapping("/update")
+    public <T> BaseResponse<T> updatePunishmentItem(@RequestBody @Validated({UpdateGroup.class}) Punishment punishment) {
+        return punishmentService.updatePunishmentItem(punishment);
+    }
+
+    @PreAuthorize("hasAuthority('punishment:delete')")
+    @DeleteMapping("/delete/{punishmentId}")
+    public <T> BaseResponse<T> deletePunishmentItem(@PathVariable String punishmentId) {
+        return punishmentService.deletePunishmentItem(punishmentId);
     }
 }
