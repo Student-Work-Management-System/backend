@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
+import static edu.guet.studentworkmanagementsystem.entity.po.punishment.table.PunishmentTableDef.PUNISHMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.punishment.table.StudentPunishmentTableDef.STUDENT_PUNISHMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 
@@ -64,11 +65,13 @@ public class StudentPunishmentServiceImpl extends ServiceImpl<StudentPunishmentM
             return QueryChain.of(StudentPunishment.class)
                     .select(
                             STUDENT_PUNISHMENT.ALL_COLUMNS,
+                            PUNISHMENT.ALL_COLUMNS,
                             STUDENT_BASIC.ALL_COLUMNS,
                             MAJOR.ALL_COLUMNS,
                             GRADE.ALL_COLUMNS
                     )
                     .from(STUDENT_PUNISHMENT)
+                    .innerJoin(PUNISHMENT).on(PUNISHMENT.PUNISHMENT_ID.eq(STUDENT_PUNISHMENT.PUNISHMENT_ID))
                     .innerJoin(STUDENT_BASIC).on(STUDENT_PUNISHMENT.STUDENT_ID.eq(STUDENT_BASIC.STUDENT_ID))
                     .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                     .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
@@ -76,7 +79,7 @@ public class StudentPunishmentServiceImpl extends ServiceImpl<StudentPunishmentM
                             STUDENT_BASIC.NAME.like(query.getSearch())
                                     .or(STUDENT_BASIC.STUDENT_ID.likeLeft(query.getSearch()))
                     )
-                    .and(STUDENT_PUNISHMENT.LEVEL.eq(query.getLevel()))
+                    .and(STUDENT_PUNISHMENT.PUNISHMENT_ID.eq(query.getPunishmentId()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .pageAs(Page.of(pageNo, pageSize), StudentPunishmentItem.class);
@@ -98,7 +101,7 @@ public class StudentPunishmentServiceImpl extends ServiceImpl<StudentPunishmentM
     @Transactional
     public <T> BaseResponse<T> updateStudentPunishment(StudentPunishment studentPunishment) {
         boolean update = UpdateChain.of(StudentPunishment.class)
-                .set(STUDENT_PUNISHMENT.LEVEL, studentPunishment.getLevel(), StringUtils::hasLength)
+                .set(STUDENT_PUNISHMENT.PUNISHMENT_ID, studentPunishment.getPunishmentId(), StringUtils::hasLength)
                 .set(STUDENT_PUNISHMENT.REASON, studentPunishment.getReason(), StringUtils::hasLength)
                 .set(STUDENT_PUNISHMENT.DATE, LocalDate.now())
                 .where(STUDENT_PUNISHMENT.STUDENT_PUNISHMENT_ID.eq(studentPunishment.getStudentPunishmentId()))

@@ -45,16 +45,16 @@ public class PunishmentController {
         return studentPunishmentService.updateStudentPunishment(studentPunishment);
     }
 
-    @PreAuthorize("hasAuthority('student:punishment:select')")
-    @PostMapping("/stat")
-    public BaseResponse<List<StudentPunishmentStatGroup>> getStat(@RequestBody StudentPunishmentStatQuery query) {
-        return studentPunishmentService.getStat(query);
-    }
-
     @PreAuthorize("hasAuthority('student_punishment:delete')")
     @DeleteMapping("/student/delete/{studentPunishmentId}")
     public <T> BaseResponse<T> deleteStudentPunishment(@PathVariable String studentPunishmentId) {
         return studentPunishmentService.deleteStudentPunishment(studentPunishmentId);
+    }
+
+    @PreAuthorize("hasAuthority('student_punishment:select')")
+    @PostMapping("/stat")
+    public BaseResponse<List<StudentPunishmentStatGroup>> getStat(@RequestBody StudentPunishmentStatQuery query) {
+        return studentPunishmentService.getStat(query);
     }
 
     @PreAuthorize("hasAuthority('punishment:select')")

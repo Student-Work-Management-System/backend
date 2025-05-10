@@ -7,12 +7,10 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.enrollment.EnrollmentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.user.RegisterUserRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.StudentBasic;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
-import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentStatItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -24,7 +22,6 @@ import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -32,14 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
@@ -396,80 +389,6 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         }, readThreadPool);
         Page<EnrollmentItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
-    }
-
-    @Override
-    public void download(EnrollmentStatQuery query, HttpServletResponse response) {
-        try {
-            List<String> majorIds = query.getMajorIds();
-            if (majorIds.isEmpty()) {
-                int key = 1;
-                while (key <= 6) {
-                    majorIds.add(String.valueOf(key));
-                    key++;
-                }
-            }
-            query.setMajorIds(majorIds);
-            byte[] excelBytes = enrollmentFeign.exportWithStat(query);
-            String fileName = "招生信息统计.xlsx";
-            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
-            response.getOutputStream().write(excelBytes);
-        } catch (IOException exception) {
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        }
-    }
-
-    @Override
-    public BaseResponse<HashMap<String, EnrollmentStatItem>> statistics(EnrollmentStatQuery query) {
-        Set<String> keys = new HashSet<>();
-        List<String> majorIds = query.getMajorIds();
-        if (majorIds.isEmpty()) {
-            int key = 1;
-            while (key <= 6) {
-                String s = String.valueOf(key);
-                majorIds.add(s);
-                key++;
-            }
-            keys = majorName2MajorId.keySet();
-        } else {
-            for (String majorId : majorIds) {
-                for (String key : majorName2MajorId.keySet()) {
-                    if (majorName2MajorId.get(key).equals(majorId)) {
-                        keys.add(key);
-                    }
-                }
-            }
-        }
-        query.setMajorIds(majorIds);
-        HashMap<String, Object> map = enrollmentFeign.exportOnlyStat(query);
-        if (map.isEmpty())
-            return ResponseUtil.success();
-        HashMap<String, HashMap<String, Object>> originMap = (HashMap<String, HashMap<String, Object>>) map.get("生源地情况");
-        HashMap<String, HashMap<String, Object>> enrollmentStateMap = (HashMap<String, HashMap<String, Object>>) map.get("录取情况");
-        HashMap<String, Object> reginScoreMap = (HashMap<String, Object>) map.get("各生源地高考分数统计");
-        HashMap<String, EnrollmentStatItem> ret = new HashMap<>();
-        keys.forEach(key -> {
-            EnrollmentStatItem enrollmentStatItem = new EnrollmentStatItem();
-            HashMap<String, HashMap<String, Object>> reginScore = new HashMap<>();
-            if (originMap.containsKey(key)) {
-                enrollmentStatItem.setOrigin(originMap.get(key));
-            }
-            if (enrollmentStateMap.containsKey(key)) {
-                enrollmentStatItem.setEnrollmentState(enrollmentStateMap.get(key));
-            }
-            Set<String> reginScoreKeys = reginScoreMap.keySet();
-            reginScoreKeys.forEach(it -> {
-                HashMap<String, HashMap<String, Object>> hashMap = (HashMap<String, HashMap<String, Object>>) reginScoreMap.get(it);
-                if (hashMap.containsKey(key)) {
-                    reginScore.put(it, hashMap.get(key));
-                }
-            });
-            enrollmentStatItem.setRegionScores(reginScore);
-            ret.put(key, enrollmentStatItem);
-        });
-        return ResponseUtil.success(ret);
     }
 
     @Override

@@ -37,13 +37,13 @@ public class StudentPunishment implements Serializable {
     @Id(keyType = KeyType.Auto)
     @NotBlank(message = "id不能为空", groups = {UpdateGroup.class})
     private String studentPunishmentId;
-    @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
-    private String studentId;
     /**
      * 处分级别：警告、严重警告、记过、留校查看、开除学籍
      */
-    @NotBlank(message = "处分级别不能为空", groups = {InsertGroup.class})
-    private String level;
+    @NotBlank(message = "处分信息id不能为空", groups = {InsertGroup.class})
+    private String punishmentId;
+    @NotBlank(message = "学号不能为空", groups = {InsertGroup.class})
+    private String studentId;
     /**
      * 处分理由
      */

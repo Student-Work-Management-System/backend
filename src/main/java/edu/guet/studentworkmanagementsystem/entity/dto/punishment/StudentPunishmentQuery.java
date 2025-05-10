@@ -13,7 +13,7 @@ public class StudentPunishmentQuery implements Serializable {
     private String search;
     private String gradeId;
     private String majorId;
-    private String level;
+    private String punishmentId;
     private Integer pageNo;
     private Integer pageSize;
 }

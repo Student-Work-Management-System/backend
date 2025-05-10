@@ -24,7 +24,8 @@ public class StudentPunishmentItem implements Serializable {
     /**
      * 处分级别：警告、严重警告、记过、留校查看、开除学籍
      */
-    private String level;
+    private String punishmentId;
+    private String punishmentName;
     /**
      * 处分理由
      */
