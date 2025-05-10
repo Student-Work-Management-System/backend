@@ -2,9 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.guet.studentworkmanagementsystem.mapper.povertyAssistance.PovertyAssistanceMapper">
-    <select id="getPovertyAssistanceStatus"
+    <select id="getPovertyAssistanceStat"
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceStatQuery"
-            resultType="edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatItem">
-
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatRow">
+        SELECT
+            grade.grade_name AS gradeName,
+            major.major_name AS majorName,
+            poverty_level.level AS povertyLevel,
+            COUNT(*) AS number
+        FROM
+            poverty_assistance
+            LEFT JOIN student_basic ON poverty_assistance.student_id = student_basic.student_id
+            LEFT JOIN grade ON student_basic.grade_id = grade.grade_id
+            LEFT JOIN major ON student_basic.major_id = major.major_id
+            LEFT JOIN poverty_level ON poverty_assistance.level_id = poverty_level.level_id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                student_basic.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                AND student_basic.major_id = #{majorId}
+            </if>
+        </where>
+        GROUP BY grade.grade_name, major.major_name, poverty_level.level
     </select>
+
 </mapper>

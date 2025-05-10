@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
-import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.StudentPovertyAssistanceItem;
 
 import java.util.List;
@@ -59,5 +59,5 @@ public interface PovertyAssistanceService extends IService<StudentPovertyAssista
      * @param studentPovertyAssistanceId 学生贫困信息记录id
      */
     <T> BaseResponse<T> deleteStudentPovertyAssistance(String studentPovertyAssistanceId);
-    BaseResponse<List<PovertyAssistanceStatItem>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query);
+    BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query);
 }

@@ -9,7 +9,8 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.*;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.PovertyAssistance;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
-import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatRow;
 import edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.StudentPovertyAssistanceItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -26,8 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
@@ -169,11 +172,36 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     }
 
     @Override
-    public BaseResponse<List<PovertyAssistanceStatItem>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query) {
-        // todo: 需要完成mapper层
-        CompletableFuture<List<PovertyAssistanceStatItem>> future =
-                CompletableFuture.supplyAsync(() -> povertyAssistanceMapper.getPovertyAssistanceStatus(query));
-        List<PovertyAssistanceStatItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+    public BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query) {
+        CompletableFuture<List<PovertyAssistanceStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<PovertyAssistanceStatRow> rows = povertyAssistanceMapper.getPovertyAssistanceStat(query);
+            Map<String, List<PovertyAssistanceStatRow>> gradeMap = rows.stream()
+                    .collect(Collectors.groupingBy(PovertyAssistanceStatRow::getGradeName));
+            return gradeMap.entrySet().stream()
+                    .map(gradeEntry -> {
+                        Map<String, List<PovertyAssistanceStatRow>> majorMap = gradeEntry.getValue().stream()
+                                .collect(Collectors.groupingBy(PovertyAssistanceStatRow::getMajorName));
+
+                        List<PovertyAssistanceStatGroup.MajorGroup> majorGroups = majorMap.entrySet().stream()
+                                .map(majorEntry -> {
+                                    Map<String, List<PovertyAssistanceStatRow>> levelMap = majorEntry.getValue().stream()
+                                            .collect(Collectors.groupingBy(PovertyAssistanceStatRow::getPovertyLevel));
+
+                                    List<PovertyAssistanceStatGroup.LevelGroup> levelGroups = levelMap.entrySet().stream()
+                                            .map(levelEntry -> new PovertyAssistanceStatGroup.LevelGroup(
+                                                    levelEntry.getKey(),
+                                                    String.valueOf(levelEntry.getValue().size())))
+                                            .collect(Collectors.toList());
+
+                                    return new PovertyAssistanceStatGroup.MajorGroup(majorEntry.getKey(), levelGroups);
+                                })
+                                .collect(Collectors.toList());
+
+                        return new PovertyAssistanceStatGroup(gradeEntry.getKey(), majorGroups);
+                    })
+                    .collect(Collectors.toList());
+        }, readThreadPool);
+        List<PovertyAssistanceStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 }
