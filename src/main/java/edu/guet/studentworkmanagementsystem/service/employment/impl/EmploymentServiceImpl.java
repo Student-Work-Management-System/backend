@@ -8,7 +8,7 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
@@ -17,7 +17,6 @@ import edu.guet.studentworkmanagementsystem.network.EmploymentFeign;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -25,13 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static edu.guet.studentworkmanagementsystem.common.Majors.majorName2MajorId;
 import static edu.guet.studentworkmanagementsystem.entity.po.employment.table.StudentEmploymentTableDef.STUDENT_EMPLOYMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
@@ -134,76 +129,7 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
     }
 
     @Override
-    public void download(EmploymentStatQuery query, HttpServletResponse response) {
-        try {
-            List<String> majorIds = query.getMajorIds();
-            if (majorIds.isEmpty()) {
-                int key = 1;
-                while (key <= 6) {
-                    majorIds.add(String.valueOf(key));
-                    key++;
-                }
-            }
-            query.setMajorIds(majorIds);
-            byte[] excelBytes = employmentFeign.exportWithStat(query);
-            String fileName = "学生就业信息统计.xlsx";
-            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
-            response.getOutputStream().write(excelBytes);
-        } catch (IOException exception) {
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        }
-    }
-
-    @Override
-    public BaseResponse<HashMap<String, StudentEmploymentStatItem>> statistics(EmploymentStatQuery query) {
-        Set<String> keys = new HashSet<>();
-        List<String> majorIds = query.getMajorIds();
-        if (majorIds.isEmpty()) {
-            int key = 1;
-            while (key <= 6) {
-                String s = String.valueOf(key);
-                majorIds.add(s);
-                key++;
-            }
-            keys = majorName2MajorId.keySet();
-        } else {
-            for (String majorId : majorIds) {
-                for (String key : majorName2MajorId.keySet()) {
-                    if (majorName2MajorId.get(key).equals(majorId)) {
-                        keys.add(key);
-                    }
-                }
-            }
-        }
-        query.setMajorIds(majorIds);
-        HashMap<String, Object> map = employmentFeign.exportOnlyStat(query);
-        if (map.isEmpty())
-            return ResponseUtil.success();
-        HashMap<String, HashMap<String, Object>> graduationStatus = (HashMap<String, HashMap<String, Object>>) map.get("毕业后状态");
-        HashMap<String, HashMap<String, Object>> jobLocation = (HashMap<String, HashMap<String, Object>>) map.get("单位所在地");
-        HashMap<String, HashMap<String, Object>> jobIndustry = (HashMap<String, HashMap<String, Object>>) map.get("单位所处行业");
-        HashMap<String, Double> salaryMap = (HashMap<String, Double>) map.get("平均薪资");
-        HashMap<String, StudentEmploymentStatItem> statisticsHashMap = new HashMap<>();
-        keys.forEach(key -> {
-            StudentEmploymentStatItem tmp = new StudentEmploymentStatItem();
-            if (graduationStatus.containsKey(key)) {
-                tmp.setGraduationStatus(graduationStatus.get(key));
-            }
-            if (jobLocation.containsKey(key)) {
-                tmp.setJobLocation(jobLocation.get(key));
-            }
-            if (jobIndustry.containsKey(key)) {
-                tmp.setJobIndustry(jobIndustry.get(key));
-            }
-            if (salaryMap.containsKey(key)) {
-                tmp.setSalary(String.valueOf(salaryMap.get(key)));
-            }
-            if (graduationStatus.containsKey(key) || jobLocation.containsKey(key) || jobIndustry.containsKey(key) || salaryMap.containsKey(key)) {
-                statisticsHashMap.put(key, tmp);
-            }
-        });
-        return ResponseUtil.success(statisticsHashMap);
+    public BaseResponse<List<StudentEmploymentStatGroup>> getStat(EmploymentStatQuery query) {
+        return null;
     }
 }

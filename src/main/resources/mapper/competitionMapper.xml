@@ -4,7 +4,7 @@
 <mapper namespace="edu.guet.studentworkmanagementsystem.mapper.competition.StudentCompetitionMapper">
     <select id="getCadreStatus"
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionStatQuery"
-            resultType="edu.guet.studentworkmanagementsystem.entity.vo.competition.">
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.competition.CompetitionStatRow">
 
     </select>
 </mapper>

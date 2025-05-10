@@ -7,16 +7,15 @@ import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
 import edu.guet.studentworkmanagementsystem.service.employment.EmploymentService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/employment")
@@ -49,14 +48,8 @@ public class EmploymentController {
     }
 
     @PreAuthorize("hasAuthority('student_employment:select')")
-    @PostMapping("/download")
-    public void download(@RequestBody EmploymentStatQuery query, HttpServletResponse response) {
-        employmentService.download(query, response);
-    }
-
-    @PreAuthorize("hasAuthority('student_employment:select')")
     @PostMapping("/stat")
-    public BaseResponse<HashMap<String, StudentEmploymentStatItem>> statistics(@RequestBody EmploymentStatQuery query) {
-        return employmentService.statistics(query);
+    public BaseResponse<List<StudentEmploymentStatGroup>> getStat(@RequestBody EmploymentStatQuery query) {
+        return employmentService.getStat(query);
     }
 }

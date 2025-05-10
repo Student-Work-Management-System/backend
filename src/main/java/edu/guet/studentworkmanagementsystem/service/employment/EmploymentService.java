@@ -6,11 +6,10 @@ import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
-import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
-import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.HashMap;
+import java.util.List;
 
 public interface EmploymentService extends IService<StudentEmployment> {
     /**
@@ -32,12 +31,5 @@ public interface EmploymentService extends IService<StudentEmployment> {
      * 删除学生就业信息
      */
     <T> BaseResponse<T> deleteStudentEmployment(String studentEmploymentId);
-    /**
-     * 就业信息(文件下载)
-     */
-    void download(EmploymentStatQuery query, HttpServletResponse response);
-    /**
-     * 统计就业信息
-     */
-    BaseResponse<HashMap<String, StudentEmploymentStatItem>> statistics(EmploymentStatQuery query);
+    BaseResponse<List<StudentEmploymentStatGroup>> getStat(EmploymentStatQuery query);
 }
