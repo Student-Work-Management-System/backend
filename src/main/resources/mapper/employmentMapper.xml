@@ -5,6 +5,32 @@
     <select id="getStat"
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.employment.EmploymentStatQuery"
             resultType="edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatRow">
-
+        SELECT
+            grade.grade_name AS gradeName,
+            major.major_name AS majorName,
+            student_employment.whereabouts AS whereabouts,
+            COUNT(*) AS number
+        FROM
+            student_employment
+            inner JOIN student_basic ON student_employment.student_id = student_basic.student_id
+            inner JOIN major ON major.major_id = student_basic.major_id
+            inner JOIN grade ON grade.grade_id = student_basic.grade_id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                grade.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                major.major_id = #{majorId}
+            </if>
+        </where>
+        GROUP BY
+            grade.grade_name,
+            major.major_name,
+            student_employment.whereabouts
+        ORDER BY
+            grade.grade_name,
+            major.major_name,
+            student_employment.whereabouts
     </select>
+
 </mapper>

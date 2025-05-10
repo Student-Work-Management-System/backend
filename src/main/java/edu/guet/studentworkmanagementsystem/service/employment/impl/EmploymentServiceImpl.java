@@ -10,6 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.employment.*;
 import edu.guet.studentworkmanagementsystem.entity.po.employment.StudentEmployment;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.employment.StudentEmploymentStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.employment.StudentEmploymentMapper;
@@ -130,6 +131,48 @@ public class EmploymentServiceImpl extends  ServiceImpl<StudentEmploymentMapper,
 
     @Override
     public BaseResponse<List<StudentEmploymentStatGroup>> getStat(EmploymentStatQuery query) {
-        return null;
+        CompletableFuture<List<StudentEmploymentStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentEmploymentStatRow> rows = mapper.getStat(query);
+            return convertToStatGroup(rows);
+        }, readThreadPool);
+        List<StudentEmploymentStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    public List<StudentEmploymentStatGroup> convertToStatGroup(List<StudentEmploymentStatRow> rows) {
+        Map<String, StudentEmploymentStatGroup> gradeMap = new LinkedHashMap<>();
+
+        for (StudentEmploymentStatRow row : rows) {
+            // 获取或创建年级对象
+            StudentEmploymentStatGroup gradeGroup = gradeMap.computeIfAbsent(row.getGradeName(), g ->
+                    StudentEmploymentStatGroup.builder()
+                            .gradeName(g)
+                            .majors(new ArrayList<>())
+                            .build()
+            );
+
+            // 查找或创建专业对象
+            StudentEmploymentStatGroup.MajorGroup majorGroup = gradeGroup.getMajors().stream()
+                    .filter(m -> m.getMajorName().equals(row.getMajorName()))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        StudentEmploymentStatGroup.MajorGroup newMajor = StudentEmploymentStatGroup.MajorGroup.builder()
+                                .majorName(row.getMajorName())
+                                .employments(new ArrayList<>())
+                                .build();
+                        gradeGroup.getMajors().add(newMajor);
+                        return newMajor;
+                    });
+
+            // 添加就业信息
+            majorGroup.getEmployments().add(
+                    StudentEmploymentStatGroup.StudentEmploymentGroup.builder()
+                            .whereabouts(row.getWhereabouts())
+                            .number(row.getNumber())
+                            .build()
+            );
+        }
+
+        return new ArrayList<>(gradeMap.values());
     }
 }

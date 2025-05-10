@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class StudentEmploymentStatRow {
     private String gradeName;
     private String majorName;
+    private String whereabouts;
+    private String number;
 }

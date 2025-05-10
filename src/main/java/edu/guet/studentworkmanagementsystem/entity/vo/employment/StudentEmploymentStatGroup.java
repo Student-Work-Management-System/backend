@@ -20,5 +20,14 @@ public class StudentEmploymentStatGroup {
     @NoArgsConstructor
     public static class MajorGroup {
         private String majorName;
+        private List<StudentEmploymentGroup> employments;
+    }
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StudentEmploymentGroup {
+        private String whereabouts;
+        private String number;
     }
 }
