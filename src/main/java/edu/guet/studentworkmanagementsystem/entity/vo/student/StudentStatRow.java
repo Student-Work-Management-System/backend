@@ -5,13 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentStatItem implements Serializable {
+public class StudentStatRow {
+    private String gradeName;
     private String majorName;
     // 总人数
     private Long totalCount;

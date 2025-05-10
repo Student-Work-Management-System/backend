@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatGroup;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +56,8 @@ public class StudentController {
 
     @PreAuthorize("hasAuthority('student:status') or hasAuthority('student:status:all')")
     @PostMapping("/stat")
-    public BaseResponse<List<StudentStatItem>> getAllStudents(@RequestBody StudentStatQuery query) {
-        return studentService.getStudentStatus(query);
+    public BaseResponse<List<StudentStatGroup>> getAllStudents(@RequestBody StudentStatQuery query) {
+        return studentService.getStudentStat(query);
     }
 
     @PreAuthorize("hasAuthority('user:select') and hasAuthority('user_role:select') and hasAuthority('role:select')")

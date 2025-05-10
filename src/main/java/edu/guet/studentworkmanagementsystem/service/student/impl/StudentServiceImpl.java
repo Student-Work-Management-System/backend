@@ -11,9 +11,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.*;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
@@ -29,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
@@ -104,13 +103,61 @@ public class StudentServiceImpl implements StudentService {
      * @return 统计结果
      */
     @Override
-    public BaseResponse<List<StudentStatItem>> getStudentStatus(StudentStatQuery query) {
-        CompletableFuture<List<StudentStatItem>> future =
-                CompletableFuture.supplyAsync(()-> studentMapper.getStudentStatusList(query), readThreadPool);
-        List<StudentStatItem> list = FutureExceptionExecute.fromFuture(future).execute();
+    public BaseResponse<List<StudentStatGroup>> getStudentStat(StudentStatQuery query) {
+        CompletableFuture<List<StudentStatGroup>> future = CompletableFuture.supplyAsync(()-> {
+            List<StudentStatRow> rows = studentMapper.getStudentStat(query);
+            return convertToStudentStatGroups(rows);
+        }, readThreadPool);
+        List<StudentStatGroup> list = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(list);
     }
 
+    public List<StudentStatGroup> convertToStudentStatGroups(List<StudentStatRow> rows) {
+        Map<String, List<StudentStatRow>> groupedByGrade = rows.stream()
+                .collect(Collectors.groupingBy(StudentStatRow::getGradeName));
+
+        return groupedByGrade.entrySet().stream().map(gradeEntry -> {
+            String gradeName = gradeEntry.getKey();
+            List<StudentStatRow> majorRows = gradeEntry.getValue();
+
+            List<StudentStatGroup.MajorGroup> majors = majorRows.stream().map(row -> {
+                StudentStatGroup.StatData stat = StudentStatGroup.StatData.builder()
+                        .totalCount(row.getTotalCount())
+                        .normalCount(row.getNormalCount())
+                        .suspendCount(row.getSuspendCount())
+                        .militaryCount(row.getMilitaryCount())
+                        .returnCount(row.getReturnCount())
+                        .transferInCount(row.getTransferInCount())
+                        .transferOutCount(row.getTransferOutCount())
+                        .dropOfEnrollmentCount(row.getDropOfEnrollmentCount())
+                        .retainEnrollmentCount(row.getRetainEnrollmentCount())
+                        .graduationCount(row.getGraduationCount())
+                        .gradCount(row.getGradCount())
+                        .droppedCount(row.getDroppedCount())
+                        .rechristenCount(row.getRechristenCount())
+                        .deathCount(row.getDeathCount())
+                        .maleCount(row.getMaleCount())
+                        .femaleCount(row.getFemaleCount())
+                        .massCount(row.getMassCount())
+                        .leagueCount(row.getLeagueCount())
+                        .partyCount(row.getPartyCount())
+                        .prepareCount(row.getPrepareCount())
+                        .disabilityCount(row.getDisabilityCount())
+                        .minorityCount(row.getMinorityCount())
+                        .build();
+
+                return StudentStatGroup.MajorGroup.builder()
+                        .majorName(row.getMajorName())
+                        .stat(stat)
+                        .build();
+            }).collect(Collectors.toList());
+
+            return StudentStatGroup.builder()
+                    .gradeName(gradeName)
+                    .majors(majors)
+                    .build();
+        }).collect(Collectors.toList());
+    }
 
     @Override
     public BaseResponse<List<HeaderTeacher>> getHeaderTeachers() {

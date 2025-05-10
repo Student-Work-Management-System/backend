@@ -2,46 +2,49 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper">
-    <select id="getStudentStatusList"
+    <select id="getStudentStat"
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery"
-            resultType="edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatItem">
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatRow">
         SELECT
-            `major`.`major_name`,
-            COUNT(DISTINCT `enrollment`.`student_id`) AS `totalCount`,
-            SUM(IF(`status`.`status_name` = '在籍', 1, 0)) AS `normalCount`,
-            SUM(IF(`status`.`status_name` = '休学', 1, 0)) AS `suspendCount`,
-            SUM(IF(`status`.`status_name` = '入伍', 1, 0)) AS `militaryCount`,
-            SUM(IF(`status`.`status_name` = '复学', 1, 0)) AS `returnCount`,
-            SUM(IF(`status`.`status_name` = '转入', 1, 0)) AS `transferInCount`,
-            SUM(IF(`status`.`status_name` = '转出', 1, 0)) AS `transferOutCount`,
-            SUM(IF(`status`.`status_name` = '退学', 1, 0)) AS `dropOfEnrollmentCount`,
-            SUM(IF(`status`.`status_name` = '保留学籍', 1, 0)) AS `retainEnrollmentCount`,
-            SUM(IF(`status`.`status_name` = '毕业', 1, 0)) AS `graduationCount`,
-            SUM(IF(`status`.`status_name` = '结业', 1, 0)) AS `gradCount`,
-            SUM(IF(`status`.`status_name` = '退学', 1, 0)) AS `droppedCount`,
-            SUM(IF(`status`.`status_name` = '更名', 1, 0)) AS `rechristenCount`,
-            SUM(IF(`status`.`status_name` = '死亡', 1, 0)) as `deathCount`,
-            SUM(IF(`enrollment`.`gender` = '男', 1, 0)) AS `maleCount`,
-            SUM(IF(`enrollment`.`gender` = '女', 1, 0)) AS `femaleCount`,
-            SUM(IF(`politic`.`politic_status` = '群众', 1, 0)) AS `massCount`,
-            SUM(IF(`politic`.`politic_status` = '共青团员', 1, 0)) AS `leagueCount`,
-            SUM(IF(`politic`.`politic_status` = '中共党员', 1, 0)) AS `partyCount`,
-            SUM(IF(`politic`.`politic_status` = '预备党员', 1, 0)) AS `prepareCount`,
-            SUM(IF(`enrollment`.`nation` NOT LIKE '%汉%' AND `enrollment`.`nation` NOT LIKE '%汉族%', 1, 0)) AS `minorityCount`,
-            SUM(IF(`enrollment`.`disability` = 1, 1, 0)) AS `disabilityCount`
+        `grade`.`grade_name` AS `gradeName`,
+        `major`.`major_name` AS `majorName`,
+        COUNT(DISTINCT `enrollment`.`student_id`) AS `totalCount`,
+        SUM(IF(`status`.`status_name` = '在籍', 1, 0)) AS `normalCount`,
+        SUM(IF(`status`.`status_name` = '休学', 1, 0)) AS `suspendCount`,
+        SUM(IF(`status`.`status_name` = '入伍', 1, 0)) AS `militaryCount`,
+        SUM(IF(`status`.`status_name` = '复学', 1, 0)) AS `returnCount`,
+        SUM(IF(`status`.`status_name` = '转入', 1, 0)) AS `transferInCount`,
+        SUM(IF(`status`.`status_name` = '转出', 1, 0)) AS `transferOutCount`,
+        SUM(IF(`status`.`status_name` = '放弃入学资格', 1, 0)) AS `dropOfEnrollmentCount`,
+        SUM(IF(`status`.`status_name` = '保留学籍', 1, 0)) AS `retainEnrollmentCount`,
+        SUM(IF(`status`.`status_name` = '结业', 1, 0)) AS `graduationCount`,
+        SUM(IF(`status`.`status_name` = '毕业', 1, 0)) AS `gradCount`,
+        SUM(IF(`status`.`status_name` = '退学', 1, 0)) AS `droppedCount`,
+        SUM(IF(`status`.`status_name` = '更名', 1, 0)) AS `rechristenCount`,
+        SUM(IF(`status`.`status_name` = '死亡', 1, 0)) AS `deathCount`,
+        SUM(IF(`enrollment`.`gender` = '男', 1, 0)) AS `maleCount`,
+        SUM(IF(`enrollment`.`gender` = '女', 1, 0)) AS `femaleCount`,
+        SUM(IF(`politic`.`politic_status` = '群众', 1, 0)) AS `massCount`,
+        SUM(IF(`politic`.`politic_status` = '共青团员', 1, 0)) AS `leagueCount`,
+        SUM(IF(`politic`.`politic_status` = '中共党员', 1, 0)) AS `partyCount`,
+        SUM(IF(`politic`.`politic_status` = '预备党员', 1, 0)) AS `prepareCount`,
+        SUM(IF(`enrollment`.`nation` NOT LIKE '%汉%' AND `enrollment`.`nation` NOT LIKE '%汉族%', 1, 0)) AS `minorityCount`,
+        SUM(IF(`enrollment`.`disability` = 1, 1, 0)) AS `disabilityCount`
         FROM `enrollment`
-            LEFT JOIN `major` ON `major`.`major_id` = `enrollment`.`major_id`
-            LEFT JOIN `student_status` ON `enrollment`.`student_id` = `student_status`.`student_id` and `student_status`.status_enabled = true
-            LEFT JOIN `status` ON `student_status`.`status_id` = `status`.`status_id`
-            LEFT JOIN `politic` ON `enrollment`.`politic_id` = `politic`.`politic_id`
+        LEFT JOIN `grade` ON `enrollment`.`grade_id` = `grade`.`grade_id`
+        LEFT JOIN `major` ON `major`.`major_id` = `enrollment`.`major_id`
+        LEFT JOIN `student_status` ON `enrollment`.`student_id` = `student_status`.`student_id`
+        AND `student_status`.`status_enabled` = TRUE
+        LEFT JOIN `status` ON `student_status`.`status_id` = `status`.`status_id`
+        LEFT JOIN `politic` ON `enrollment`.`politic_id` = `politic`.`politic_id`
         <where>
             <if test="gradeId != null and gradeId != ''">
                 `enrollment`.`grade_id` = #{gradeId}
             </if>
             <if test="degreeId != null and degreeId != ''">
-                and `enrollment`.`degree_id` = #{degreeId}
+                AND `enrollment`.`degree_id` = #{degreeId}
             </if>
         </where>
-        GROUP BY `major`.`major_name`;
+        GROUP BY `grade`.`grade_name`, `major`.`major_name`
     </select>
 </mapper>
