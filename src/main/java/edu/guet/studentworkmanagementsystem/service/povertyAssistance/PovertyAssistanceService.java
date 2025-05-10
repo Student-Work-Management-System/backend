@@ -59,5 +59,5 @@ public interface PovertyAssistanceService extends IService<StudentPovertyAssista
      * @param studentPovertyAssistanceId 学生贫困信息记录id
      */
     <T> BaseResponse<T> deleteStudentPovertyAssistance(String studentPovertyAssistanceId);
-    BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query);
+    BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStat(PovertyAssistanceStatQuery query);
 }

@@ -6,16 +6,16 @@
             parameterType="edu.guet.studentworkmanagementsystem.entity.dto.povertyAssistance.PovertyAssistanceStatQuery"
             resultType="edu.guet.studentworkmanagementsystem.entity.vo.povertyAssistance.PovertyAssistanceStatRow">
         SELECT
-            grade.grade_name AS gradeName,
-            major.major_name AS majorName,
-            poverty_level.level AS povertyLevel,
-            COUNT(*) AS number
+        grade.grade_name AS gradeName,
+        major.major_name AS majorName,
+        poverty_assistance.poverty_level AS povertyLevel,
+        COUNT(*) AS number
         FROM
-            poverty_assistance
-            LEFT JOIN student_basic ON poverty_assistance.student_id = student_basic.student_id
-            LEFT JOIN grade ON student_basic.grade_id = grade.grade_id
-            LEFT JOIN major ON student_basic.major_id = major.major_id
-            LEFT JOIN poverty_level ON poverty_assistance.level_id = poverty_level.level_id
+        student_poverty_assistance
+        LEFT JOIN student_basic ON student_poverty_assistance.student_id = student_basic.student_id
+        LEFT JOIN grade ON student_basic.grade_id = grade.grade_id
+        LEFT JOIN major ON student_basic.major_id = major.major_id
+        LEFT JOIN poverty_assistance ON student_poverty_assistance.poverty_assistance_id = poverty_assistance.poverty_assistance_id
         <where>
             <if test="gradeId != null and gradeId != ''">
                 student_basic.grade_id = #{gradeId}
@@ -24,7 +24,7 @@
                 AND student_basic.major_id = #{majorId}
             </if>
         </where>
-        GROUP BY grade.grade_name, major.major_name, poverty_level.level
+        GROUP BY grade.grade_name, major.major_name, poverty_assistance.poverty_level
     </select>
 
 </mapper>

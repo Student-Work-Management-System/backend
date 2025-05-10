@@ -172,7 +172,7 @@ public class PovertyAssistanceServiceImpl extends ServiceImpl<StudentPovertyAssi
     }
 
     @Override
-    public BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStatus(PovertyAssistanceStatQuery query) {
+    public BaseResponse<List<PovertyAssistanceStatGroup>> getStudentPovertyAssistanceStat(PovertyAssistanceStatQuery query) {
         CompletableFuture<List<PovertyAssistanceStatGroup>> future = CompletableFuture.supplyAsync(() -> {
             List<PovertyAssistanceStatRow> rows = povertyAssistanceMapper.getPovertyAssistanceStat(query);
             Map<String, List<PovertyAssistanceStatRow>> gradeMap = rows.stream()
