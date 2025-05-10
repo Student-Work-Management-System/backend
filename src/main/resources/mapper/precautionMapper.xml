@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.guet.studentworkmanagementsystem.mapper.precaution.PrecautionMapper">
+    <select id="getStat" resultType="edu.guet.studentworkmanagementsystem.entity.vo.precaution.PrecautionStatRow">
+        SELECT
+        grade.grade_name AS gradeName,
+        major.major_name AS majorName,
+        student_precaution.term AS term,
+        student_precaution.level_code AS levelCode,
+        COUNT(CASE WHEN student_precaution.status = 1 THEN 1 END) as handledNumber,
+        COUNT(*) AS allNumber
+        from student_precaution
+        inner join student_basic on student_basic.student_id = student_precaution.student_id
+        left join grade on student_basic.grade_id = grade.grade_id
+        left join major on student_basic.major_id = major.major_id
+        <where>
+            <if test="gradeId != null and gradeId != ''">
+                student_basic.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                AND student_basic.major_id = #{majorId}
+            </if>
+            <if test="startTerm != null and startTerm != ''">
+                AND student_precaution.term &gt;= #{startTerm}
+            </if>
+            <if test="endTerm != null and endTerm != ''">
+                AND student_precaution.term &lt;= #{endTerm}
+            </if>
+        </where>
+        GROUP BY grade.grade_name, major.major_name, student_precaution.term, student_precaution.level_code
+        ORDER BY grade.grade_name, major.major_name, student_precaution.term, student_precaution.level_code
+    </select>
+</mapper>
