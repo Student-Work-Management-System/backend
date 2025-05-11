@@ -5,16 +5,18 @@ import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusStatGroup;
 
 import java.util.List;
 import java.util.Set;
 
 
-public interface StatusService extends IService<StudentStatus> {
+public interface StudentStatusService extends IService<StudentStatus> {
     BaseResponse<List<Status>> getAllStatus();
     <T> BaseResponse<T> addStatus(Status status);
     <T> BaseResponse<T> updateStatus(Status status);
@@ -41,4 +43,5 @@ public interface StatusService extends IService<StudentStatus> {
      */
     BaseResponse<Page<StudentStatusItem>> getAllRecords(StudentStatusQuery query);
     BaseResponse<List<StudentStatusItem>> getStudentStatusDetail(String studentId);
+    BaseResponse<List<StudentStatusStatGroup>> getStat(StudentStatusStatQuery query);
 }

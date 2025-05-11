@@ -17,7 +17,7 @@ import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.enrollment.EnrollmentMapper;
 import edu.guet.studentworkmanagementsystem.network.EnrollmentFeign;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
-import edu.guet.studentworkmanagementsystem.service.status.StatusService;
+import edu.guet.studentworkmanagementsystem.service.status.StudentStatusService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
@@ -50,7 +50,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
     @Autowired
     private StudentBasicService studentBasicService;
     @Autowired
-    private StatusService statusService;
+    private StudentStatusService studentStatusService;
     @Autowired
     private UserService userService;
     @Qualifier("readThreadPool")
@@ -120,7 +120,7 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
     @Transactional
     public void insertStudentEnrollmentStatus(ValidateList<Enrollment> enrollments) {
         Set<String> studentIds = enrollments.stream().map(Enrollment::getStudentId).collect(Collectors.toSet());
-        boolean success = statusService.enrollmentStudent(studentIds);
+        boolean success = studentStatusService.enrollmentStudent(studentIds);
         if (!success)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }

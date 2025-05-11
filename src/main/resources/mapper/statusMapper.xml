@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.guet.studentworkmanagementsystem.mapper.status.StudentStatusMapper">
+    <select id="getStat"
+            parameterType="edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusStatQuery"
+            resultType="edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusStatRow">
+        SELECT
+            grade.grade_name AS gradeName,
+            major.major_name AS majorName,
+            status.status_name AS statusName,
+            COUNT(*) AS number
+        FROM student_status
+            inner JOIN status ON student_status.status_id = status.status_id
+            inner JOIN student_basic ON student_status.student_id = student_basic.student_id
+            inner JOIN major ON student_basic.major_id = major.major_id
+            inner JOIN grade ON student_basic.grade_id = grade.grade_id
+        <where>
+            student_status.status_enabled = 1
+            <if test="gradeId != null and gradeId != ''">
+                AND grade.grade_id = #{gradeId}
+            </if>
+            <if test="majorId != null and majorId != ''">
+                AND major.major_id = #{majorId}
+            </if>
+        </where>
+        GROUP BY grade.grade_name, major.major_name, `status`.status_name
+        ORDER BY grade.grade_name, major.major_name, `status`.status_name
+    </select>
+</mapper>

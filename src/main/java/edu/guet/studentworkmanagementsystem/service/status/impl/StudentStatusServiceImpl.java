@@ -7,16 +7,19 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.status.StudentStatusStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.Scholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.Status;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
 import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.status.StudentStatusStatRow;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.status.StatusMapper;
 import edu.guet.studentworkmanagementsystem.mapper.status.StudentStatusMapper;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentBasicMapper;
-import edu.guet.studentworkmanagementsystem.service.status.StatusService;
+import edu.guet.studentworkmanagementsystem.service.status.StudentStatusService;
 import edu.guet.studentworkmanagementsystem.utils.FutureExceptionExecute;
 import edu.guet.studentworkmanagementsystem.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.status.table.Studen
 import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 
 @Service
-public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentStatus> implements StatusService {
+public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentStatus> implements StudentStatusService {
     @Qualifier("readThreadPool")
     @Autowired
     private ThreadPoolTaskExecutor readThreadPool;
@@ -117,7 +120,7 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
     public StudentStatus enrollmentStatus(String studentId) {
         return StudentStatus.builder()
                 .studentId(studentId)
-                .statusId("14")
+                .statusId("1")
                 .log("录入该生档案")
                 .modifiedTime(LocalDate.now())
                 .build();
@@ -220,6 +223,55 @@ public class StatusServiceImpl extends ServiceImpl<StudentStatusMapper, StudentS
                 .listAs(StudentStatusItem.class), readThreadPool);
         List<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
+    }
+
+    @Override
+    public BaseResponse<List<StudentStatusStatGroup>> getStat(StudentStatusStatQuery query) {
+        CompletableFuture<List<StudentStatusStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentStatusStatRow> rows = mapper.getStat(query);
+            return convertToStatGroups(rows);
+        }, readThreadPool);
+        List<StudentStatusStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    public List<StudentStatusStatGroup> convertToStatGroups(List<StudentStatusStatRow> rows) {
+        if (rows == null || rows.isEmpty()) return Collections.emptyList();
+
+        // 按年级分组
+        Map<String, List<StudentStatusStatRow>> gradeMap = rows.stream()
+                .collect(Collectors.groupingBy(StudentStatusStatRow::getGradeName));
+
+        List<StudentStatusStatGroup> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<StudentStatusStatRow>> gradeEntry : gradeMap.entrySet()) {
+            String gradeName = gradeEntry.getKey();
+            List<StudentStatusStatRow> gradeRows = gradeEntry.getValue();
+
+            // 按专业分组
+            Map<String, List<StudentStatusStatRow>> majorMap = gradeRows.stream()
+                    .collect(Collectors.groupingBy(StudentStatusStatRow::getMajorName));
+
+            List<StudentStatusStatGroup.MajorGroup> majors = new ArrayList<>();
+
+            for (Map.Entry<String, List<StudentStatusStatRow>> majorEntry : majorMap.entrySet()) {
+                String majorName = majorEntry.getKey();
+                List<StudentStatusStatRow> majorRows = majorEntry.getValue();
+
+                List<StudentStatusStatGroup.StatusGroup> statuses = majorRows.stream()
+                        .map(row -> new StudentStatusStatGroup.StatusGroup(
+                                row.getStatusName(),
+                                row.getNumber()
+                        ))
+                        .collect(Collectors.toList());
+
+                majors.add(new StudentStatusStatGroup.MajorGroup(majorName, statuses));
+            }
+
+            result.add(new StudentStatusStatGroup(gradeName, majors));
+        }
+
+        return result;
     }
 
 }

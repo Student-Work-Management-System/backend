@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentStatusStatQuery {
-    private int todo;
+    private String gradeId;
+    private String majorId;
 }
