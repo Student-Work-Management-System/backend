@@ -5,11 +5,14 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionWithMember;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetitionAudit;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetitionTeam;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.CompetitionStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.CompetitionStatRow;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.TeamItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.CompetitionTableDef.COMPETITION;
 import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionAuditTableDef.STUDENT_COMPETITION_AUDIT;
@@ -61,19 +65,19 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
         int i = mapper.insert(studentCompetition);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
+        // 加入审核表
+        String studentCompetitionId = studentCompetition.getStudentCompetitionId();
+        StudentCompetitionAudit studentCompetitionAudit = createStudentCompetitionAudit(studentCompetitionId);
+        boolean insertCompetitionAuditSuccess = competitionAuditService.insertCompetitionAudit(studentCompetitionAudit);
+        if (!insertCompetitionAuditSuccess)
+            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         // 检查团队性质, 0: 团队, 1: 单人
         if (competitionService.competitionNatureIsSolo(studentCompetition.getCompetitionId()))
             return ResponseUtil.success();
         // 到此表示为团队竞赛, 需要插入相关表记录队员
-        String studentCompetitionId = studentCompetition.getStudentCompetitionId();
         List<StudentCompetitionTeam> team = createTeam(studentCompetitionId, studentCompetitionWithMember.getStudentIds());
         boolean insertCompetitionTeamBatchSuccess = competitionTeamService.insertCompetitionTeamBatch(team);
         if (!insertCompetitionTeamBatchSuccess)
-            throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        // 加入审核表
-        StudentCompetitionAudit studentCompetitionAudit = createStudentCompetitionAudit(studentCompetitionId);
-        boolean insertCompetitionAuditSuccess = competitionAuditService.insertCompetitionAudit(studentCompetitionAudit);
-        if (!insertCompetitionAuditSuccess)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         return ResponseUtil.success();
     }
@@ -162,7 +166,6 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
         CompletableFuture<Page<StudentCompetitionItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-
             Page<String> idPage = QueryChain.of(StudentCompetition.class)
                     .select(STUDENT_COMPETITION.STUDENT_COMPETITION_ID)
                     .from(STUDENT_COMPETITION)
@@ -221,4 +224,75 @@ public class StudentCompetitionServiceImpl extends ServiceImpl<StudentCompetitio
         Page<StudentCompetitionItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
+
+    @Override
+    public BaseResponse<List<CompetitionStatGroup>> getStat(CompetitionStatQuery query) {
+        CompletableFuture<List<CompetitionStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<CompetitionStatRow> rows = mapper.getStat(query);
+            return toGroupResult(rows);
+        }, readThreadPool);
+        List<CompetitionStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+    private List<CompetitionStatGroup> toGroupResult(List<CompetitionStatRow> rows) {
+        // 按 gradeName 分组
+        Map<String, List<CompetitionStatRow>> gradeMap = rows.stream()
+                .collect(Collectors.groupingBy(CompetitionStatRow::getGradeName));
+
+        List<CompetitionStatGroup> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<CompetitionStatRow>> gradeEntry : gradeMap.entrySet()) {
+            String gradeName = gradeEntry.getKey();
+            List<CompetitionStatRow> gradeRows = gradeEntry.getValue();
+
+            // 按 majorName 分组
+            Map<String, List<CompetitionStatRow>> majorMap = gradeRows.stream()
+                    .collect(Collectors.groupingBy(CompetitionStatRow::getMajorName));
+
+            List<CompetitionStatGroup.MajorGroup> majorGroups = new ArrayList<>();
+
+            for (Map.Entry<String, List<CompetitionStatRow>> majorEntry : majorMap.entrySet()) {
+                String majorName = majorEntry.getKey();
+                List<CompetitionStatRow> majorRows = majorEntry.getValue();
+
+                // 按 type 分组
+                Map<String, List<CompetitionStatRow>> typeMap = majorRows.stream()
+                        .collect(Collectors.groupingBy(CompetitionStatRow::getType));
+
+                List<CompetitionStatGroup.TypeGroup> typeGroups = new ArrayList<>();
+
+                for (Map.Entry<String, List<CompetitionStatRow>> typeEntry : typeMap.entrySet()) {
+                    String type = typeEntry.getKey();
+                    List<CompetitionStatRow> typeRows = typeEntry.getValue();
+
+                    // 按 competitionTotalName 分组
+                    Map<String, List<CompetitionStatRow>> compMap = typeRows.stream()
+                            .collect(Collectors.groupingBy(CompetitionStatRow::getCompetitionTotalName));
+
+                    List<CompetitionStatGroup.CompetitionGroup> compGroups = new ArrayList<>();
+
+                    for (Map.Entry<String, List<CompetitionStatRow>> compEntry : compMap.entrySet()) {
+                        String compName = compEntry.getKey();
+                        List<CompetitionStatRow> compRows = compEntry.getValue();
+
+                        // 每一条是一个 level + count
+                        List<CompetitionStatGroup.LevelGroup> levelGroups = compRows.stream()
+                                .map(r -> new CompetitionStatGroup.LevelGroup(r.getLevel(), String.valueOf(r.getCount())))
+                                .collect(Collectors.toList());
+
+                        compGroups.add(new CompetitionStatGroup.CompetitionGroup(compName, levelGroups));
+                    }
+
+                    typeGroups.add(new CompetitionStatGroup.TypeGroup(type, compGroups));
+                }
+
+                majorGroups.add(new CompetitionStatGroup.MajorGroup(majorName, typeGroups));
+            }
+
+            result.add(new CompetitionStatGroup(gradeName, majorGroups));
+        }
+
+        return result;
+    }
+
 }

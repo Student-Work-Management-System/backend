@@ -68,7 +68,6 @@ public class CompetitionServiceImpl extends ServiceImpl<StudentCompetitionMapper
                 .set(COMPETITION.COMPETITION_NAME, competition.getCompetitionName(), StringUtils::hasLength)
                 .set(COMPETITION.COMPETITION_NATURE, competition.getCompetitionNature(), !Objects.isNull(competition.getCompetitionNature()))
                 .set(COMPETITION.COMPETITION_TYPE, competition.getCompetitionType(), StringUtils::hasLength)
-                .set(COMPETITION.COMMENT, competition.getComment(), StringUtils::hasLength)
                 .where(COMPETITION.COMPETITION_ID.eq(competition.getCompetitionId()))
                 .update();
         if (update)

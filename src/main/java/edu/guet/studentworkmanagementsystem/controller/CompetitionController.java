@@ -8,6 +8,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.*;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.Competition;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetitionAudit;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.CompetitionStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionItem;
 import edu.guet.studentworkmanagementsystem.service.competition.CompetitionAuditService;
 import edu.guet.studentworkmanagementsystem.service.competition.CompetitionService;
@@ -88,5 +89,11 @@ public class CompetitionController {
     @PutMapping("/student/update")
     public <T> BaseResponse<T> updateStudentCompetitionAudit(@RequestBody @Validated({UpdateGroup.class}) ValidateList<StudentCompetitionAudit> studentCompetitionAudits) {
         return competitionAuditService.updateCompetitionAudit(studentCompetitionAudits);
+    }
+
+    @PreAuthorize("hasAuthority('student_competition:select')")
+    @PostMapping("/student/stat")
+    public BaseResponse<List<CompetitionStatGroup>> getStat(@RequestBody CompetitionStatQuery query) {
+        return studentCompetitionService.getStat(query);
     }
 }

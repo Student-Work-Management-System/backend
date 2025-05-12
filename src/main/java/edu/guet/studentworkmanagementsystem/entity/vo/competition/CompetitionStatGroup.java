@@ -38,6 +38,6 @@ public class CompetitionStatGroup {
     @NoArgsConstructor
     public static class LevelGroup {
         private String level;
-        private Integer count;
+        private String count;
     }
 }

@@ -3,9 +3,11 @@ package edu.guet.studentworkmanagementsystem.service.competition;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
+import edu.guet.studentworkmanagementsystem.entity.dto.competition.CompetitionStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.competition.StudentCompetitionWithMember;
 import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.CompetitionStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.competition.StudentCompetitionItem;
 
 import java.util.List;
@@ -28,4 +30,5 @@ public interface StudentCompetitionService extends IService<StudentCompetition> 
      * 学生上报记录
      */
     BaseResponse<Page<StudentCompetitionItem>> getStudentCompetitions(StudentCompetitionQuery query);
+    BaseResponse<List<CompetitionStatGroup>> getStat(CompetitionStatQuery query);
 }

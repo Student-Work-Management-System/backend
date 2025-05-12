@@ -13,6 +13,7 @@ public class StudentCompetitionItem implements Serializable {
     private String studentCompetitionId;
     private String competitionId;
     private String competitionName;
+    private String subCompetitionName;
     private String competitionNature;
     private String competitionType;
     private String level;

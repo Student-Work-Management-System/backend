@@ -49,8 +49,4 @@ public class Competition implements Serializable {
      */
     @NotBlank(message = "竞赛类别不能为空", groups = {InsertGroup.class})
     private String competitionType;
-    /**
-     * 备注
-     */
-    private String comment;
 }
