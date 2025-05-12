@@ -12,9 +12,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
 import edu.guet.studentworkmanagementsystem.entity.po.user.User;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkMemberItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.*;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.academicWork.*;
@@ -30,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkAuditTableDef.STUDENT_ACADEMIC_WORK_AUDIT;
@@ -289,4 +285,122 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         List<AcademicWorkUser> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
+
+    @Override
+    public BaseResponse<AcademicWorkStatGroup> getStat() {
+        CompletableFuture<AcademicWorkStatGroup> future = CompletableFuture.supplyAsync(() -> {
+            HashMap<String, List<AcademicWorkStatItem>> map = getMap();
+            return handler(map);
+        }, readThreadPool);
+        AcademicWorkStatGroup execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    /**
+     * 获取原始数据
+     */
+    public HashMap<String, List<AcademicWorkStatItem>> getMap() {
+        List<AcademicWorkStatItem> records = getAllStudentAcademicWork();
+        String paper = Common.PAPER.getValue();
+        ArrayList<AcademicWorkStatItem> papers = new ArrayList<>();
+        String patent = Common.PATENT.getValue();
+        ArrayList<AcademicWorkStatItem> patents = new ArrayList<>();
+        String soft = Common.SOFT.getValue();
+        ArrayList<AcademicWorkStatItem> softs = new ArrayList<>();
+        HashMap<String, List<AcademicWorkStatItem>> map = new HashMap<>();
+        records.forEach(it -> {
+            String type = it.getType();
+            if (paper.equals(type)) {
+                papers.add(it);
+            } else if (patent.equals(type)) {
+                patents.add(it);
+            } else if (soft.equals(type)) {
+                softs.add(it);
+            }
+        });
+        map.put(paper, papers);
+        map.put(patent, patents);
+        map.put(soft, softs);
+        return map;
+    }
+    public List<AcademicWorkStatItem> getAllStudentAcademicWork() {
+        List<String> ids = QueryChain.of(StudentAcademicWork.class)
+                .select(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
+                .from(STUDENT_ACADEMIC_WORK)
+                .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
+                .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
+                .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(Common.PASS.getValue()))
+                .listAs(String.class);
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<AcademicWorkStatItem> result = QueryChain.of(StudentAcademicWork.class)
+                .select(
+                        STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
+                        STUDENT_ACADEMIC_WORK_AUDIT.STATE
+                )
+                .from(STUDENT_ACADEMIC_WORK)
+                .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
+                .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+                .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
+                .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.in(ids))
+                .listAs(AcademicWorkStatItem.class);
+        result.forEach(this::getAcademicWorkDetail);
+        return result;
+    }
+    public void getAcademicWorkDetail(AcademicWorkStatItem item) {
+        String type = item.getType();
+        String referenceId = item.getReferenceId();
+        if (Common.PAPER.getValue().equals(type)) {
+            StudentPaper studentPaper = paperMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentPaper);
+        } else if (Common.SOFT.getValue().equals(type)) {
+            StudentSoft studentSoft = softMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentSoft);
+        } else if (Common.PATENT.getValue().equals(type)) {
+            StudentPatent studentPatent = patentMapper.selectOneById(referenceId);
+            item.setAcademicWork(studentPatent);
+        }
+    }
+    /**
+     * 处理原始数据, 并转化
+     */
+    public AcademicWorkStatGroup handler(HashMap<String, List<AcademicWorkStatItem>> map) {
+        PaperStat paperStat = new PaperStat("0", "0", "0");
+        PatentStat patentStat = new PatentStat("0", "0");
+        SoftStat softStat = new SoftStat("0");
+
+        // 统计论文
+        List<AcademicWorkStatItem> papers = map.getOrDefault(Common.PAPER.getValue(), Collections.emptyList());
+        for (AcademicWorkStatItem item : papers) {
+            StudentPaper paper = (StudentPaper) item.getAcademicWork();
+            if (paper.getIsMeeting() != null && paper.getIsMeeting()) {
+                paperStat.setMeetingNumber(String.valueOf(Integer.parseInt(paperStat.getMeetingNumber()) + 1));
+            }
+            if (paper.getIsChineseCore() != null && paper.getIsChineseCore()) {
+                paperStat.setChineseCoreNumber(String.valueOf(Integer.parseInt(paperStat.getChineseCoreNumber()) + 1));
+            }
+            if (paper.getIsEI() != null && paper.getIsEI()) {
+                paperStat.setEI_Number(String.valueOf(Integer.parseInt(paperStat.getEI_Number()) + 1));
+            }
+        }
+
+        // 统计专利
+        List<AcademicWorkStatItem> patents = map.getOrDefault(Common.PATENT.getValue(), Collections.emptyList());
+        for (AcademicWorkStatItem item : patents) {
+            StudentPatent patent = (StudentPatent) item.getAcademicWork();
+            patentStat.setTotalNumber(String.valueOf(Integer.parseInt(patentStat.getTotalNumber()) + 1));
+            if ("授权".equals(patent.getPublishState())) {
+                patentStat.setNumber(String.valueOf(Integer.parseInt(patentStat.getNumber()) + 1));
+            }
+        }
+
+        // 统计软著
+        List<AcademicWorkStatItem> softs = map.getOrDefault(Common.SOFT.getValue(), Collections.emptyList());
+        softStat.setNumber(String.valueOf(softs.size()));
+
+        return new AcademicWorkStatGroup(paperStat, patentStat, softStat);
+    }
+
 }

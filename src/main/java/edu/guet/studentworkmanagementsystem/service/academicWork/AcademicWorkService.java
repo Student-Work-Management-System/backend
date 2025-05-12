@@ -7,6 +7,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkAudit;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 
@@ -20,4 +21,5 @@ public interface AcademicWorkService extends IService<StudentAcademicWork> {
     <T> BaseResponse<T> updateStudentAcademicWorkAudit(List<StudentAcademicWorkAudit> audits);
     BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query);
     BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(String username);
+    BaseResponse<AcademicWorkStatGroup> getStat();
 }

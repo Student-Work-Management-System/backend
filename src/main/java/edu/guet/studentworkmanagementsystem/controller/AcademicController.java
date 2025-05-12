@@ -8,6 +8,7 @@ import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkAudit;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/academic_work")
+@RequestMapping("/academicWork")
 public class AcademicController {
     @Autowired
     private AcademicWorkService academicWorkService;
@@ -58,5 +59,11 @@ public class AcademicController {
     @GetMapping("/user/{username}")
     public BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(@PathVariable String username) {
         return academicWorkService.getOptionalUserByUsername(username);
+    }
+
+    @PreAuthorize("hasAuthority('student_academic_work:select')")
+    @GetMapping("/stat")
+    public BaseResponse<AcademicWorkStatGroup> getStat() {
+        return academicWorkService.getStat();
     }
 }

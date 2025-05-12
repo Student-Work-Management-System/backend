@@ -9,6 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPaper;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPatent;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentSoft;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import org.junit.jupiter.api.Test;
@@ -111,6 +112,16 @@ public class AcademicWorkTest {
                 .build();
         BaseResponse<Page<StudentAcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllStudentAcademicWork(build);
         Page<StudentAcademicWorkItem> data = allStudentAcademicWork.getData();
+        System.out.println(data);
+    }
+
+    @Test
+    void statTest() {
+        BaseResponse<AcademicWorkStatGroup> response = academicWorkService.getStat();
+        int code = response.getCode();
+        String msg = response.getMessage();
+        System.out.println(code + " - " + msg);
+        AcademicWorkStatGroup data = response.getData();
         System.out.println(data);
     }
 }
