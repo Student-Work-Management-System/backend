@@ -2,7 +2,7 @@ package edu.guet.studentworkmanagementsystem.entity.dto.academicWork;
 
 import edu.guet.studentworkmanagementsystem.common.InsertGroup;
 import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AbstractAcademicWork;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,5 +30,5 @@ public class AcademicWorkRequest implements Serializable {
     @NotBlank(message = "证明材料地址不能为空", groups = {InsertGroup.class})
     private String evidence;
     @NotNull(message = "学生作品信息不能为空", groups = {InsertGroup.class})
-    private AcademicWork academicWork;
+    private AbstractAcademicWork abstractAcademicWork;
 }

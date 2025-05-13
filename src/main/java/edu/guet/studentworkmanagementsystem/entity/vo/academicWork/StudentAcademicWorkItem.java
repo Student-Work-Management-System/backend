@@ -1,6 +1,6 @@
 package edu.guet.studentworkmanagementsystem.entity.vo.academicWork;
 
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AbstractAcademicWork;
 import com.mybatisflex.annotation.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,8 +22,8 @@ public class StudentAcademicWorkItem implements Serializable {
     private String type;
     private String referenceId;
     @Column(ignore = true)
-    private AcademicWork academicWork;
-    private List<StudentAcademicWorkMemberItem> team;
+    private AbstractAcademicWork abstractAcademicWork;
+    private List<AcademicWorkMemberItem> team;
     private String operatorId;
     private String operatorTime;
     private String evidence;

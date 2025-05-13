@@ -7,7 +7,7 @@ import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
 import edu.guet.studentworkmanagementsystem.common.ValidateList;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentAcademicWorkAudit;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkAudit;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
@@ -28,31 +28,31 @@ public class AcademicController {
     @PreAuthorize("hasAuthority('student_academic_work:select:own')")
     @GetMapping("/get/{studentId}")
     public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(@PathVariable String studentId) {
-        return academicWorkService.getOwnStudentAcademicWork(studentId);
+        return academicWorkService.getOwnAcademicWork(studentId);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:select')")
     @PostMapping("/gets")
     public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(@RequestBody AcademicWorkQuery query) {
-        return academicWorkService.getAllStudentAcademicWork(query);
+        return academicWorkService.getAllAcademicWork(query);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:insert')")
     @PostMapping("/add")
     public <T> BaseResponse<T> insertStudentAcademicWork(@RequestBody @Validated({InsertGroup.class}) AcademicWorkRequest academicWorkRequest) {
-        return academicWorkService.insertStudentAcademicWork(academicWorkRequest);
+        return academicWorkService.insertAcademicWork(academicWorkRequest);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudentAcademicWork(@RequestBody @Validated({UpdateGroup.class}) ValidateList<StudentAcademicWorkAudit> audits) {
-        return academicWorkService.updateStudentAcademicWorkAudit(audits);
+    public <T> BaseResponse<T> updateStudentAcademicWork(@RequestBody @Validated({UpdateGroup.class}) ValidateList<AcademicWorkAudit> audits) {
+        return academicWorkService.updateAcademicWorkAudit(audits);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:delete')")
     @DeleteMapping("/delete/{studentAcademicWorkId}")
     public <T> BaseResponse<T> deleteStudentAcademicWork(@PathVariable String studentAcademicWorkId) {
-        return academicWorkService.deleteStudentAcademicWork(studentAcademicWorkId);
+        return academicWorkService.deleteAcademicWork(studentAcademicWorkId);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:select:own') or hasAuthority('student_academic_work:select')")

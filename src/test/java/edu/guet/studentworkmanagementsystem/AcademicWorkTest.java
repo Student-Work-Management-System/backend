@@ -6,9 +6,9 @@ import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPaper;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentPatent;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.StudentSoft;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Paper;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Patent;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Soft;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
@@ -27,7 +27,7 @@ public class AcademicWorkTest {
 
     @Test
     void addPaper() {
-        StudentPaper paper = StudentPaper.builder()
+        Paper paper = Paper.builder()
                 .periodicalName("测试期刊")
                 .jrcPartition("一区")
                 .casPartition("一区")
@@ -49,15 +49,15 @@ public class AcademicWorkTest {
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .academicWork(paper)
+                .abstractAcademicWork(paper)
                 .build();
-        BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
+        BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
     }
 
     @Test
     void addSoft() {
-        StudentSoft soft = StudentSoft.builder()
+        Soft soft = Soft.builder()
                 .publishInstitution("测试")
                 .publishDate(LocalDate.now())
                 .build();
@@ -69,15 +69,15 @@ public class AcademicWorkTest {
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .academicWork(soft)
+                .abstractAcademicWork(soft)
                 .build();
-        BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
+        BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
     }
 
     @Test
     void addPatent() {
-        StudentPatent patent = StudentPatent.builder()
+        Patent patent = Patent.builder()
                 .publishState(Common.WAITING.getValue())
                 .acceptDate(LocalDate.now())
                 .authorizationDate(LocalDate.now())
@@ -91,16 +91,16 @@ public class AcademicWorkTest {
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .academicWork(patent)
+                .abstractAcademicWork(patent)
                 .build();
-        BaseResponse<Object> response = academicWorkService.insertStudentAcademicWork(build);
+        BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
     }
 
     @Test
     void getOwnTest() {
         String studentId = "admin";
-        BaseResponse<List<StudentAcademicWorkItem>> own = academicWorkService.getOwnStudentAcademicWork(studentId);
+        BaseResponse<List<StudentAcademicWorkItem>> own = academicWorkService.getOwnAcademicWork(studentId);
         List<StudentAcademicWorkItem> data = own.getData();
         System.out.println(data);
     }
@@ -110,7 +110,7 @@ public class AcademicWorkTest {
         AcademicWorkQuery build = AcademicWorkQuery.builder()
                 .search("")
                 .build();
-        BaseResponse<Page<StudentAcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllStudentAcademicWork(build);
+        BaseResponse<Page<StudentAcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllAcademicWork(build);
         Page<StudentAcademicWorkItem> data = allStudentAcademicWork.getData();
         System.out.println(data);
     }

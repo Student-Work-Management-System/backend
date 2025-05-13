@@ -67,9 +67,9 @@ public class StudentServiceImpl implements StudentService {
         return enrollmentService.getOwnEnrollment(studentId);
     }
 
-
     @Override
     public BaseResponse<StudentArchive> getStudentArchive(String studentId) {
+
         return ResponseUtil.success();
     }
 
@@ -97,11 +97,7 @@ public class StudentServiceImpl implements StudentService {
     public <T> BaseResponse<T> recoveryStudent(String studentId) {
        return enrollmentService.recoveryEnrollment(studentId);
     }
-    /**
-     * 统计查询
-     * @param query 查询类
-     * @return 统计结果
-     */
+
     @Override
     public BaseResponse<List<StudentStatGroup>> getStudentStat(StudentStatQuery query) {
         CompletableFuture<List<StudentStatGroup>> future = CompletableFuture.supplyAsync(()-> {

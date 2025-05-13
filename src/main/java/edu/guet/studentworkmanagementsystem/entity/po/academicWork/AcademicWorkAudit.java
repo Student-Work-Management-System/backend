@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import edu.guet.studentworkmanagementsystem.common.InsertGroup;
+import edu.guet.studentworkmanagementsystem.common.UpdateGroup;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +17,10 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 /**
- * 学生作品相关(论文、专利和软著) 实体类。
+ * 学生学术著作作者认领 实体类。
+ *
  * @author fish
  * @since 2024-03-21
  */
@@ -26,19 +28,19 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "student_academic_work")
-public class StudentAcademicWork implements Serializable {
+@Table(value = "academic_work_audit")
+public class AcademicWorkAudit implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    @Id(keyType = KeyType.Auto)
-    private String studentAcademicWorkId;
-    private String username;
-    private String workName;
-    private String type;
-    private String referenceId;
-    private String evidence;
+    @Id
+    @NotBlank(message = "学术作品id不能为空", groups = {UpdateGroup.class})
+    private String academicWorkId;
+    @NotBlank(message = "审核状态不能为空", groups = {InsertGroup.class, UpdateGroup.class})
+    private String state;
+    private String rejectReason;
+    private String operatorId;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate time;
+    private String operatorTime;
 }

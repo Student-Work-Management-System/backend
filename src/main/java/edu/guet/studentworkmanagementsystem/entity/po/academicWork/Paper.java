@@ -23,12 +23,12 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "student_paper")
-public class StudentPaper implements Serializable, AcademicWork {
+@Table(value = "paper")
+public class Paper implements Serializable, AbstractAcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private String studentPaperId;
+    private String paperId;
     /**
      * 期刊名称
      */

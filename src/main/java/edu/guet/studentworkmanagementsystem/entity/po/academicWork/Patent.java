@@ -23,12 +23,12 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "student_patent")
-public class StudentPatent implements Serializable, AcademicWork {
+@Table(value = "patent")
+public class Patent implements Serializable, AbstractAcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)
-    private String studentPatentId;
+    private String patentId;
     /**
      * 发表状态：受理、公开或授权
      */

@@ -7,7 +7,6 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
-import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
@@ -31,9 +30,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkAuditTableDef.STUDENT_ACADEMIC_WORK_AUDIT;
-import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkMemberTableDef.STUDENT_ACADEMIC_WORK_MEMBER;
-import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.StudentAcademicWorkTableDef.STUDENT_ACADEMIC_WORK;
+import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkAuditTableDef.ACADEMIC_WORK_AUDIT;
+import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkMemberTableDef.ACADEMIC_WORK_MEMBER;
+import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkTableDef.ACADEMIC_WORK;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.DegreeTableDef.DEGREE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.GradeTableDef.GRADE;
 import static edu.guet.studentworkmanagementsystem.entity.po.other.table.MajorTableDef.MAJOR;
@@ -42,17 +41,17 @@ import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTabl
 
 @Service
 @Slf4j
-public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapper, StudentAcademicWork> implements AcademicWorkService {
+public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, AcademicWork> implements AcademicWorkService {
     @Autowired
-    private StudentPaperMapper paperMapper;
+    private PaperMapper paperMapper;
     @Autowired
-    private StudentPatentMapper patentMapper;
+    private PatentMapper patentMapper;
     @Autowired
-    private StudentSoftMapper softMapper;
+    private SoftMapper softMapper;
     @Autowired
-    private StudentAcademicWorkAuditMapper auditMapper;
+    private AcademicWorkAuditMapper auditMapper;
     @Autowired
-    private StudentAcademicWorkMemberMapper memberMapper;
+    private AcademicWorkMemberMapper memberMapper;
     @Qualifier("readThreadPool")
     @Autowired
     private ThreadPoolTaskExecutor readThreadPool;
@@ -60,39 +59,39 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> insertStudentAcademicWork(AcademicWorkRequest request) {
-        String referenceId = insertAcademicWork(request.getAcademicWork());
-        StudentAcademicWork studentAcademicWork = createStudentAcademicWork(request, referenceId);
-        int i = mapper.insert(studentAcademicWork);
+    public <T> BaseResponse<T> insertAcademicWork(AcademicWorkRequest request) {
+        String referenceId = insertAcademicWork(request.getAbstractAcademicWork());
+        AcademicWork academicWork = createStudentAcademicWork(request, referenceId);
+        int i = mapper.insert(academicWork);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        String studentAcademicWorkId = studentAcademicWork.getStudentAcademicWorkId();
-        insertStudentAcademicWorkTeam(request.getTeam(), studentAcademicWorkId);
-        insertStudentAcademicWorkAudit(studentAcademicWorkId);
+        String academicWorkId = academicWork.getAcademicWorkId();
+        insertStudentAcademicWorkTeam(request.getTeam(), academicWorkId);
+        insertStudentAcademicWorkAudit(academicWorkId);
         return ResponseUtil.success();
     }
 
     @Transactional
-    public String insertAcademicWork(AcademicWork academicWork) {
+    public String insertAcademicWork(AbstractAcademicWork abstractAcademicWork) {
         int effect = -1;
         String id = "";
-        if (academicWork instanceof StudentPaper studentPaper) {
-            effect = paperMapper.insert(studentPaper);
-            id = studentPaper.getStudentPaperId();
-        } else if (academicWork instanceof StudentPatent studentPatent) {
-            effect = patentMapper.insert(studentPatent);
-            id = studentPatent.getStudentPatentId();
-        } else if (academicWork instanceof StudentSoft studentSoft) {
-            effect = softMapper.insert(studentSoft);
-            id = studentSoft.getStudentSoftId();
+        if (abstractAcademicWork instanceof Paper paper) {
+            effect = paperMapper.insert(paper);
+            id = paper.getPaperId();
+        } else if (abstractAcademicWork instanceof Patent patent) {
+            effect = patentMapper.insert(patent);
+            id = patent.getPatentId();
+        } else if (abstractAcademicWork instanceof Soft soft) {
+            effect = softMapper.insert(soft);
+            id = soft.getSoftId();
         }
         if (effect <= 0 || !StringUtils.hasLength(id))
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         return id;
     }
 
-    public StudentAcademicWork createStudentAcademicWork(AcademicWorkRequest request, String referenceId) {
-        return StudentAcademicWork.builder()
+    public AcademicWork createStudentAcademicWork(AcademicWorkRequest request, String referenceId) {
+        return AcademicWork.builder()
                 .workName(request.getWorkName())
                 .type(request.getType())
                 .username(request.getUsername())
@@ -103,31 +102,31 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     }
 
     @Transactional
-    public void insertStudentAcademicWorkTeam(List<AcademicWorkMember> members, String studentAcademicWorkId) {
-        List<StudentAcademicWorkMember> studentAcademicWorkTeam = createStudentAcademicWorkTeam(members, studentAcademicWorkId);
+    public void insertStudentAcademicWorkTeam(List<edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember> members, String academicWorkId) {
+        List<AcademicWorkMember> studentAcademicWorkTeam = createStudentAcademicWorkTeam(members, academicWorkId);
         int i = memberMapper.insertBatch(studentAcademicWorkTeam);
         int size = studentAcademicWorkTeam.size();
         if (i != size)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
-    public List<StudentAcademicWorkMember> createStudentAcademicWorkTeam(List<AcademicWorkMember> members, String studentAcademicWorkId) {
-        ArrayList<StudentAcademicWorkMember> studentAcademicWorkMembers = new ArrayList<>();
+    public List<AcademicWorkMember> createStudentAcademicWorkTeam(List<edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember> members, String academicWorkId) {
+        ArrayList<AcademicWorkMember> academicWorkMembers = new ArrayList<>();
         members.forEach(member -> {
-            StudentAcademicWorkMember build = StudentAcademicWorkMember.builder()
-                    .studentAcademicWorkId(studentAcademicWorkId)
+            AcademicWorkMember build = AcademicWorkMember.builder()
+                    .academicWorkId(academicWorkId)
                     .username(member.getUsername())
                     .memberOrder(member.getMemberOrder())
                     .build();
-            studentAcademicWorkMembers.add(build);
+            academicWorkMembers.add(build);
         });
-        return studentAcademicWorkMembers;
+        return academicWorkMembers;
     }
 
     @Transactional
-    public void insertStudentAcademicWorkAudit(String studentAcademicWorkId) {
-        StudentAcademicWorkAudit build = StudentAcademicWorkAudit.builder()
-                .studentAcademicWorkId(studentAcademicWorkId)
+    public void insertStudentAcademicWorkAudit(String academicWorkId) {
+        AcademicWorkAudit build = AcademicWorkAudit.builder()
+                .academicWorkId(academicWorkId)
                 .state(Common.WAITING.getValue())
                 .build();
         int i = auditMapper.insert(build);
@@ -137,39 +136,39 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> deleteStudentAcademicWork(String studentAcademicWorkId) {
+    public <T> BaseResponse<T> deleteAcademicWork(String academicWorkId) {
         QueryWrapper deleteStudentAcademicWorkAuditWrapper =
                 QueryWrapper.create()
-                        .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId));
+                        .where(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(academicWorkId));
         int i = auditMapper.deleteByQuery(deleteStudentAcademicWorkAuditWrapper);
         if (i <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         QueryWrapper deleteStudentAcademicWorkMemberWrapper =
                 QueryWrapper.create()
-                        .where(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId));
+                        .where(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(academicWorkId));
         int j = memberMapper.deleteByQuery(deleteStudentAcademicWorkMemberWrapper);
         if (j <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
-        int k = mapper.deleteById(studentAcademicWorkId);
+        int k = mapper.deleteById(academicWorkId);
         if (k <= 0)
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
         return ResponseUtil.success();
     }
 
     @Override
-    public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(String studentId) {
+    public BaseResponse<List<StudentAcademicWorkItem>> getOwnAcademicWork(String username) {
         CompletableFuture<List<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
-            List<StudentAcademicWorkItem> items = QueryChain.of(StudentAcademicWork.class)
+            List<StudentAcademicWorkItem> items = QueryChain.of(AcademicWork.class)
                     .select(
                             USER.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
+                            ACADEMIC_WORK.ALL_COLUMNS,
+                            ACADEMIC_WORK_AUDIT.ALL_COLUMNS
                     )
-                    .from(STUDENT_ACADEMIC_WORK)
-                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
-                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
-                    .innerJoin(STUDENT_ACADEMIC_WORK_MEMBER).on(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
-                    .where(USER.USERNAME.eq(studentId).or(STUDENT_ACADEMIC_WORK_MEMBER.USERNAME.eq(studentId)))
+                    .from(ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
+                    .innerJoin(ACADEMIC_WORK_AUDIT).on(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
+                    .innerJoin(ACADEMIC_WORK_MEMBER).on(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
+                    .where(USER.USERNAME.eq(username).or(ACADEMIC_WORK_MEMBER.USERNAME.eq(username)))
                     .listAs(StudentAcademicWorkItem.class);
             items.forEach(this::getStudentAcademicWorkTeamAndDetail);
             return items;
@@ -179,49 +178,49 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     }
 
     public void getStudentAcademicWorkTeamAndDetail(StudentAcademicWorkItem item) {
-        String studentAcademicWorkId = item.getStudentAcademicWorkId();
-        List<StudentAcademicWorkMemberItem> memberItems = QueryChain.of(StudentAcademicWorkMember.class)
+        String academicWorkId = item.getStudentAcademicWorkId();
+        List<AcademicWorkMemberItem> memberItems = QueryChain.of(AcademicWorkMember.class)
                 .select(
-                        STUDENT_ACADEMIC_WORK_MEMBER.ALL_COLUMNS,
+                        ACADEMIC_WORK_MEMBER.ALL_COLUMNS,
                         USER.USERNAME,
                         USER.REAL_NAME,
                         MAJOR.MAJOR_NAME,
                         GRADE.GRADE_NAME,
                         DEGREE.DEGREE_NAME
                 )
-                .from(STUDENT_ACADEMIC_WORK_MEMBER)
-                .leftJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK_MEMBER.USERNAME))
+                .from(ACADEMIC_WORK_MEMBER)
+                .leftJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK_MEMBER.USERNAME))
                 .leftJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(USER.USERNAME))
                 .leftJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                 .leftJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                 .leftJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
-                .where(STUDENT_ACADEMIC_WORK_MEMBER.STUDENT_ACADEMIC_WORK_ID.eq(studentAcademicWorkId))
-                .listAs(StudentAcademicWorkMemberItem.class);
+                .where(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(academicWorkId))
+                .listAs(AcademicWorkMemberItem.class);
         item.setTeam(memberItems);
         String type = item.getType();
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
-            StudentPaper studentPaper = paperMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentPaper);
+            Paper paper = paperMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(paper);
         } else if (Common.SOFT.getValue().equals(type)) {
-            StudentSoft studentSoft = softMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentSoft);
+            Soft soft = softMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(soft);
         } else if (Common.PATENT.getValue().equals(type)) {
-            StudentPatent studentPatent = patentMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentPatent);
+            Patent studentPatent = patentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(studentPatent);
         }
     }
 
     @Override
     @Transactional
-    public <T> BaseResponse<T> updateStudentAcademicWorkAudit(List<StudentAcademicWorkAudit> audits)  {
+    public <T> BaseResponse<T> updateAcademicWorkAudit(List<AcademicWorkAudit> audits)  {
         audits.forEach(audit -> {
-            boolean update = UpdateChain.of(StudentAcademicWorkAudit.class)
-                    .set(STUDENT_ACADEMIC_WORK_AUDIT.STATE, audit.getState(), StringUtils::hasLength)
-                    .set(STUDENT_ACADEMIC_WORK_AUDIT.REJECT_REASON, audit.getRejectReason())
-                    .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_ID, audit.getOperatorId(), StringUtils::hasLength)
-                    .set(STUDENT_ACADEMIC_WORK_AUDIT.OPERATOR_TIME, LocalDate.now())
-                    .where(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(audit.getStudentAcademicWorkId()))
+            boolean update = UpdateChain.of(AcademicWorkAudit.class)
+                    .set(ACADEMIC_WORK_AUDIT.STATE, audit.getState(), StringUtils::hasLength)
+                    .set(ACADEMIC_WORK_AUDIT.REJECT_REASON, audit.getRejectReason())
+                    .set(ACADEMIC_WORK_AUDIT.OPERATOR_ID, audit.getOperatorId(), StringUtils::hasLength)
+                    .set(ACADEMIC_WORK_AUDIT.OPERATOR_TIME, LocalDate.now())
+                    .where(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(audit.getAcademicWorkId()))
                     .update();
             if (!update)
                 throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -230,42 +229,42 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
     }
 
     @Override
-    public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(AcademicWorkQuery query) {
+    public BaseResponse<Page<StudentAcademicWorkItem>> getAllAcademicWork(AcademicWorkQuery query) {
         CompletableFuture<Page<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
 
-            Page<String> idPage = QueryChain.of(StudentAcademicWork.class)
-                    .select(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
-                    .from(STUDENT_ACADEMIC_WORK)
-                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
-                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
-                    .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
+            Page<String> idPage = QueryChain.of(AcademicWork.class)
+                    .select(ACADEMIC_WORK.ACADEMIC_WORK_ID)
+                    .from(ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
+                    .innerJoin(ACADEMIC_WORK_AUDIT)
+                    .on(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
                     .where(
                             USER.USERNAME.likeLeft(query.getSearch())
                                     .or(USER.REAL_NAME.likeLeft(query.getSearch()))
-                                    .or(STUDENT_ACADEMIC_WORK.WORK_NAME.likeLeft(query.getSearch()))
+                                    .or(ACADEMIC_WORK.WORK_NAME.likeLeft(query.getSearch()))
                     )
-                    .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(query.getState()))
-                    .and(STUDENT_ACADEMIC_WORK.TYPE.eq(query.getType()))
+                    .and(ACADEMIC_WORK_AUDIT.STATE.eq(query.getState()))
+                    .and(ACADEMIC_WORK.TYPE.eq(query.getType()))
                     .pageAs(Page.of(pageNo, pageSize), String.class);
 
             if (idPage.getRecords().isEmpty()) {
                 return Page.of(pageNo, pageSize);
             }
 
-            List<StudentAcademicWorkItem> records = QueryChain.of(StudentAcademicWork.class)
+            List<StudentAcademicWorkItem> records = QueryChain.of(AcademicWork.class)
                     .select(
                             USER.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
-                            STUDENT_ACADEMIC_WORK_AUDIT.ALL_COLUMNS
+                            ACADEMIC_WORK.ALL_COLUMNS,
+                            ACADEMIC_WORK_AUDIT.ALL_COLUMNS
                     )
-                    .from(STUDENT_ACADEMIC_WORK)
-                    .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
-                    .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT).on(
-                            STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
+                    .from(ACADEMIC_WORK)
+                    .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
+                    .innerJoin(ACADEMIC_WORK_AUDIT).on(
+                            ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID)
                     )
-                    .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.in(idPage.getRecords()))
+                    .where(ACADEMIC_WORK.ACADEMIC_WORK_ID.in(idPage.getRecords()))
                     .listAs(StudentAcademicWorkItem.class);
 
             records.forEach(this::getStudentAcademicWorkTeamAndDetail);
@@ -324,27 +323,27 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         return map;
     }
     public List<AcademicWorkStatItem> getAllStudentAcademicWork() {
-        List<String> ids = QueryChain.of(StudentAcademicWork.class)
-                .select(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID)
-                .from(STUDENT_ACADEMIC_WORK)
-                .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
-                .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
-                .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
-                .and(STUDENT_ACADEMIC_WORK_AUDIT.STATE.eq(Common.PASS.getValue()))
+        List<String> ids = QueryChain.of(AcademicWork.class)
+                .select(ACADEMIC_WORK.ACADEMIC_WORK_ID)
+                .from(ACADEMIC_WORK)
+                .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
+                .innerJoin(ACADEMIC_WORK_AUDIT)
+                .on(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
+                .and(ACADEMIC_WORK_AUDIT.STATE.eq(Common.PASS.getValue()))
                 .listAs(String.class);
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
-        List<AcademicWorkStatItem> result = QueryChain.of(StudentAcademicWork.class)
+        List<AcademicWorkStatItem> result = QueryChain.of(AcademicWork.class)
                 .select(
-                        STUDENT_ACADEMIC_WORK.ALL_COLUMNS,
-                        STUDENT_ACADEMIC_WORK_AUDIT.STATE
+                        ACADEMIC_WORK.ALL_COLUMNS,
+                        ACADEMIC_WORK_AUDIT.STATE
                 )
-                .from(STUDENT_ACADEMIC_WORK)
-                .innerJoin(STUDENT_ACADEMIC_WORK_AUDIT)
-                .on(STUDENT_ACADEMIC_WORK_AUDIT.STUDENT_ACADEMIC_WORK_ID.eq(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID))
-                .innerJoin(USER).on(USER.USERNAME.eq(STUDENT_ACADEMIC_WORK.USERNAME))
-                .where(STUDENT_ACADEMIC_WORK.STUDENT_ACADEMIC_WORK_ID.in(ids))
+                .from(ACADEMIC_WORK)
+                .innerJoin(ACADEMIC_WORK_AUDIT)
+                .on(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
+                .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
+                .where(ACADEMIC_WORK.ACADEMIC_WORK_ID.in(ids))
                 .listAs(AcademicWorkStatItem.class);
         result.forEach(this::getAcademicWorkDetail);
         return result;
@@ -353,14 +352,14 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         String type = item.getType();
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
-            StudentPaper studentPaper = paperMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentPaper);
+            Paper paper = paperMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(paper);
         } else if (Common.SOFT.getValue().equals(type)) {
-            StudentSoft studentSoft = softMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentSoft);
+            Soft soft = softMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(soft);
         } else if (Common.PATENT.getValue().equals(type)) {
-            StudentPatent studentPatent = patentMapper.selectOneById(referenceId);
-            item.setAcademicWork(studentPatent);
+            Patent studentPatent = patentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(studentPatent);
         }
     }
     /**
@@ -374,7 +373,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         // 统计论文
         List<AcademicWorkStatItem> papers = map.getOrDefault(Common.PAPER.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : papers) {
-            StudentPaper paper = (StudentPaper) item.getAcademicWork();
+            Paper paper = (Paper) item.getAbstractAcademicWork();
             if (paper.getIsMeeting() != null && paper.getIsMeeting()) {
                 paperStat.setMeetingNumber(String.valueOf(Integer.parseInt(paperStat.getMeetingNumber()) + 1));
             }
@@ -389,7 +388,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<StudentAcademicWorkMapp
         // 统计专利
         List<AcademicWorkStatItem> patents = map.getOrDefault(Common.PATENT.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : patents) {
-            StudentPatent patent = (StudentPatent) item.getAcademicWork();
+            Patent patent = (Patent) item.getAbstractAcademicWork();
             patentStat.setTotalNumber(String.valueOf(Integer.parseInt(patentStat.getTotalNumber()) + 1));
             if ("授权".equals(patent.getPublishState())) {
                 patentStat.setNumber(String.valueOf(Integer.parseInt(patentStat.getNumber()) + 1));

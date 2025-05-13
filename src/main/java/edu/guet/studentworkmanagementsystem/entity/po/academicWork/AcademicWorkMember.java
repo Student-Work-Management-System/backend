@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("student_academic_work_member")
-public class StudentAcademicWorkMember {
+@Table("academic_work_member")
+public class AcademicWorkMember {
     @Id(keyType = KeyType.Auto)
     private String memberId;
-    private String studentAcademicWorkId;
+    private String academicWorkId;
     private String memberOrder;
     private String username;
 }
