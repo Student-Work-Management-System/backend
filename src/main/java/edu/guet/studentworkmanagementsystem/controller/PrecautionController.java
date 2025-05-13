@@ -48,6 +48,12 @@ public class PrecautionController {
         return precautionService.deletePrecaution(studentPrecautionId);
     }
 
+    @PreAuthorize("hasAuthority('student_precaution:update')")
+    @PutMapping("/handle/{studentPrecautionId}")
+    public <T> BaseResponse<T> handlePrecaution(@PathVariable String studentPrecautionId) {
+        return precautionService.handlePrecaution(studentPrecautionId);
+    }
+
     @PreAuthorize("hasAuthority('student_precaution:select')")
     @PostMapping("/gets")
     public BaseResponse<Page<StudentPrecautionItem>> getAllRecords(@RequestBody PrecautionQuery query) {
