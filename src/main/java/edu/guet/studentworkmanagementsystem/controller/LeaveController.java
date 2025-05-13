@@ -2,16 +2,15 @@ package edu.guet.studentworkmanagementsystem.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditOperator;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveRequest;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.*;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveStatGroup;
 import edu.guet.studentworkmanagementsystem.service.leave.LeaveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/leave")
@@ -53,5 +52,11 @@ public class LeaveController {
     @PutMapping("/leader/audit")
     public <T> BaseResponse<T> leaderAudit(@RequestBody AuditOperator operator) {
         return leaveService.leaderAudit(operator);
+    }
+
+    @PreAuthorize("hasAuthority('student_leave:select')")
+    @PostMapping("/stat")
+    public BaseResponse<List<StudentLeaveStatGroup>> getStat(@RequestBody LeaveStatQuery query) {
+        return leaveService.getStat(query);
     }
 }

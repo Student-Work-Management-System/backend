@@ -18,6 +18,7 @@ public class AuditLeaveQuery implements Serializable {
     private String totalDay;
     private String counselorHandleState;
     private String leaderHandleState;
+    private String type;
     private Boolean destroyed;
     private Integer pageNo;
     private Integer pageSize;

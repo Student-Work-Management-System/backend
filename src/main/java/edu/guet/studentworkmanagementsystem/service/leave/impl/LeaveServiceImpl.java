@@ -3,14 +3,12 @@ package edu.guet.studentworkmanagementsystem.service.leave.impl;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditOperator;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveQuery;
-import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveRequest;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.*;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveAudit;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveEvidence;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveStatGroup;
 import edu.guet.studentworkmanagementsystem.service.leave.StudentLeaveAuditService;
 import edu.guet.studentworkmanagementsystem.service.leave.LeaveService;
 import edu.guet.studentworkmanagementsystem.service.leave.StudentLeaveEvidenceService;
@@ -107,5 +105,10 @@ public class LeaveServiceImpl implements LeaveService {
     @Override
     public BaseResponse<Page<StudentLeaveItem>> getAuditRecord(AuditLeaveQuery query) {
         return leaveService.getLeaves(query);
+    }
+
+    @Override
+    public BaseResponse<List<StudentLeaveStatGroup>> getStat(LeaveStatQuery query) {
+        return leaveService.getStat(query);
     }
 }

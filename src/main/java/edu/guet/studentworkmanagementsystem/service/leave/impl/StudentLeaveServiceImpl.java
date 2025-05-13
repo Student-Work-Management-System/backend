@@ -8,10 +8,13 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.AuditLeaveQuery;
+import edu.guet.studentworkmanagementsystem.entity.dto.leave.LeaveStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.leave.StudentLeaveQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeave;
 import edu.guet.studentworkmanagementsystem.entity.po.leave.StudentLeaveEvidence;
 import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveStatGroup;
+import edu.guet.studentworkmanagementsystem.entity.vo.leave.StudentLeaveStatItem;
 import edu.guet.studentworkmanagementsystem.exception.ServiceException;
 import edu.guet.studentworkmanagementsystem.exception.ServiceExceptionEnum;
 import edu.guet.studentworkmanagementsystem.mapper.leave.StudentLeaveMapper;
@@ -25,10 +28,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.mybatisflex.core.query.QueryMethods.dateDiff;
 import static edu.guet.studentworkmanagementsystem.entity.po.leave.table.StudentLeaveAuditTableDef.STUDENT_LEAVE_AUDIT;
@@ -187,6 +189,7 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                     .and(dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).eq(query.getTotalDay()))
+                    .and(STUDENT_LEAVE.TYPE.eq(query.getType()))
                     .and(STUDENT_LEAVE.DESTROYED.eq(query.getDestroyed()))
                     .and(condition)
                     .pageAs(Page.of(pageNo, pageSize), StudentLeaveItem.class);
@@ -232,4 +235,88 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                     .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(query.getLeaderHandleState()));
         return null;
     }
+
+
+    @Override
+    public BaseResponse<List<StudentLeaveStatGroup>> getStat(LeaveStatQuery query) {
+        CompletableFuture<List<StudentLeaveStatGroup>> future = CompletableFuture.supplyAsync(() -> {
+            List<StudentLeaveStatItem> raws = getRawData(query);
+            return raw2Group(raws);
+        }, readThreadPool);
+        List<StudentLeaveStatGroup> execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
+    }
+
+    public List<StudentLeaveStatItem> getRawData(LeaveStatQuery query) {
+        return QueryChain.of(StudentLeave.class)
+                .select(
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME,
+                        STUDENT_LEAVE.TYPE,
+                        STUDENT_LEAVE.INTERNSHIP,
+                        STUDENT_LEAVE.DESTROYED
+                )
+                .from(STUDENT_LEAVE)
+                .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_LEAVE.STUDENT_ID))
+                .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .innerJoin(STUDENT_LEAVE_AUDIT).on(STUDENT_LEAVE_AUDIT.LEAVE_ID.eq(STUDENT_LEAVE.LEAVE_ID))
+                .where(STUDENT_BASIC.ENABLED.eq(true))
+                .and(GRADE.GRADE_ID.eq(query.getGradeId()))
+                .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
+                .and(
+                        dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).lt(7)
+                                .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
+                                .or(
+                                        dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).ge(7)
+                                                .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
+                                                .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(Common.PASS.getValue()))
+                                )
+                )
+                .listAs(StudentLeaveStatItem.class);
+    }
+    public List<StudentLeaveStatGroup> raw2Group(List<StudentLeaveStatItem> items) {
+        Map<String, Map<String, Map<String, List<StudentLeaveStatItem>>>> grouped =
+                items.stream().collect(Collectors.groupingBy(
+                        StudentLeaveStatItem::getGradeName,
+                        Collectors.groupingBy(
+                                StudentLeaveStatItem::getMajorName,
+                                Collectors.groupingBy(StudentLeaveStatItem::getType)
+                        )
+                ));
+
+        List<StudentLeaveStatGroup> result = new ArrayList<>();
+        for (Map.Entry<String, Map<String, Map<String, List<StudentLeaveStatItem>>>> gradeEntry : grouped.entrySet()) {
+            String grade = gradeEntry.getKey();
+            List<StudentLeaveStatGroup.MajorGroup> majorGroups = new ArrayList<>();
+
+            for (Map.Entry<String, Map<String, List<StudentLeaveStatItem>>> majorEntry : gradeEntry.getValue().entrySet()) {
+                String major = majorEntry.getKey();
+                List<StudentLeaveStatGroup.StudentLeaveStat> leaveStats = new ArrayList<>();
+
+                for (Map.Entry<String, List<StudentLeaveStatItem>> typeEntry : majorEntry.getValue().entrySet()) {
+                    String type = typeEntry.getKey();
+                    List<StudentLeaveStatItem> statItems = typeEntry.getValue();
+
+                    long destroyedCount = statItems.stream().filter(StudentLeaveStatItem::isDestroyed).count();
+                    long internshipCount = statItems.stream().filter(StudentLeaveStatItem::isInternship).count();
+                    long totalCount = statItems.size();
+
+                    leaveStats.add(new StudentLeaveStatGroup.StudentLeaveStat(
+                            type,
+                            String.valueOf(destroyedCount),
+                            String.valueOf(internshipCount),
+                            String.valueOf(totalCount)
+                    ));
+                }
+
+                majorGroups.add(new StudentLeaveStatGroup.MajorGroup(major, leaveStats));
+            }
+
+            result.add(new StudentLeaveStatGroup(grade, majorGroups));
+        }
+
+        return result;
+    }
+
 }
