@@ -7,6 +7,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMemberRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
@@ -43,11 +44,11 @@ import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTabl
 @Slf4j
 public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, AcademicWork> implements AcademicWorkService {
     @Autowired
-    private PaperMapper paperMapper;
+    private AcademicWorkPaperMapper academicWorkPaperMapper;
     @Autowired
-    private PatentMapper patentMapper;
+    private AcademicWorkPatentMapper academicWorkPatentMapper;
     @Autowired
-    private SoftMapper softMapper;
+    private AcademicWorkSoftMapper academicWorkSoftMapper;
     @Autowired
     private AcademicWorkAuditMapper auditMapper;
     @Autowired
@@ -75,15 +76,15 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
     public String insertAcademicWork(AbstractAcademicWork abstractAcademicWork) {
         int effect = -1;
         String id = "";
-        if (abstractAcademicWork instanceof Paper paper) {
-            effect = paperMapper.insert(paper);
-            id = paper.getPaperId();
-        } else if (abstractAcademicWork instanceof Patent patent) {
-            effect = patentMapper.insert(patent);
-            id = patent.getPatentId();
-        } else if (abstractAcademicWork instanceof Soft soft) {
-            effect = softMapper.insert(soft);
-            id = soft.getSoftId();
+        if (abstractAcademicWork instanceof AcademicWorkPaper academicWorkPaper) {
+            effect = academicWorkPaperMapper.insert(academicWorkPaper);
+            id = academicWorkPaper.getPaperId();
+        } else if (abstractAcademicWork instanceof AcademiciWorkPatent academiciWorkPatent) {
+            effect = academicWorkPatentMapper.insert(academiciWorkPatent);
+            id = academiciWorkPatent.getPatentId();
+        } else if (abstractAcademicWork instanceof AcademicWorkSoft academicWorkSoft) {
+            effect = academicWorkSoftMapper.insert(academicWorkSoft);
+            id = academicWorkSoft.getSoftId();
         }
         if (effect <= 0 || !StringUtils.hasLength(id))
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
@@ -102,7 +103,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
     }
 
     @Transactional
-    public void insertStudentAcademicWorkTeam(List<edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember> members, String academicWorkId) {
+    public void insertStudentAcademicWorkTeam(List<AcademicWorkMemberRequest> members, String academicWorkId) {
         List<AcademicWorkMember> studentAcademicWorkTeam = createStudentAcademicWorkTeam(members, academicWorkId);
         int i = memberMapper.insertBatch(studentAcademicWorkTeam);
         int size = studentAcademicWorkTeam.size();
@@ -110,7 +111,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
             throw new ServiceException(ServiceExceptionEnum.OPERATE_ERROR);
     }
 
-    public List<AcademicWorkMember> createStudentAcademicWorkTeam(List<edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember> members, String academicWorkId) {
+    public List<AcademicWorkMember> createStudentAcademicWorkTeam(List<AcademicWorkMemberRequest> members, String academicWorkId) {
         ArrayList<AcademicWorkMember> academicWorkMembers = new ArrayList<>();
         members.forEach(member -> {
             AcademicWorkMember build = AcademicWorkMember.builder()
@@ -200,14 +201,14 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         String type = item.getType();
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
-            Paper paper = paperMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(paper);
+            AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkPaper);
         } else if (Common.SOFT.getValue().equals(type)) {
-            Soft soft = softMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(soft);
+            AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
-            Patent studentPatent = patentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(studentPatent);
+            AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
         }
     }
 
@@ -352,14 +353,14 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         String type = item.getType();
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
-            Paper paper = paperMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(paper);
+            AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkPaper);
         } else if (Common.SOFT.getValue().equals(type)) {
-            Soft soft = softMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(soft);
+            AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
-            Patent studentPatent = patentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(studentPatent);
+            AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
         }
     }
     /**
@@ -373,14 +374,14 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         // 统计论文
         List<AcademicWorkStatItem> papers = map.getOrDefault(Common.PAPER.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : papers) {
-            Paper paper = (Paper) item.getAbstractAcademicWork();
-            if (paper.getIsMeeting() != null && paper.getIsMeeting()) {
+            AcademicWorkPaper academicWorkPaper = (AcademicWorkPaper) item.getAbstractAcademicWork();
+            if (academicWorkPaper.getIsMeeting() != null && academicWorkPaper.getIsMeeting()) {
                 paperStat.setMeetingNumber(String.valueOf(Integer.parseInt(paperStat.getMeetingNumber()) + 1));
             }
-            if (paper.getIsChineseCore() != null && paper.getIsChineseCore()) {
+            if (academicWorkPaper.getIsChineseCore() != null && academicWorkPaper.getIsChineseCore()) {
                 paperStat.setChineseCoreNumber(String.valueOf(Integer.parseInt(paperStat.getChineseCoreNumber()) + 1));
             }
-            if (paper.getIsEI() != null && paper.getIsEI()) {
+            if (academicWorkPaper.getIsEI() != null && academicWorkPaper.getIsEI()) {
                 paperStat.setEI_Number(String.valueOf(Integer.parseInt(paperStat.getEI_Number()) + 1));
             }
         }
@@ -388,9 +389,9 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         // 统计专利
         List<AcademicWorkStatItem> patents = map.getOrDefault(Common.PATENT.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : patents) {
-            Patent patent = (Patent) item.getAbstractAcademicWork();
+            AcademiciWorkPatent academiciWorkPatent = (AcademiciWorkPatent) item.getAbstractAcademicWork();
             patentStat.setTotalNumber(String.valueOf(Integer.parseInt(patentStat.getTotalNumber()) + 1));
-            if ("授权".equals(patent.getPublishState())) {
+            if ("授权".equals(academiciWorkPatent.getPublishState())) {
                 patentStat.setNumber(String.valueOf(Integer.parseInt(patentStat.getNumber()) + 1));
             }
         }

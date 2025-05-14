@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompetitionBase {
+    private String studentCompetitionId;
+    private String competitionId;
     private String competitionName;
     private String subCompetitionName;
     private String competitionNature;

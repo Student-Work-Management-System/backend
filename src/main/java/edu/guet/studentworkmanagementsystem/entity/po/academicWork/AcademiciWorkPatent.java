@@ -24,7 +24,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "patent")
-public class Patent implements Serializable, AbstractAcademicWork {
+public class AcademiciWorkPatent implements Serializable, AbstractAcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)

@@ -24,7 +24,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "paper")
-public class Paper implements Serializable, AbstractAcademicWork {
+public class AcademicWorkPaper implements Serializable, AbstractAcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)

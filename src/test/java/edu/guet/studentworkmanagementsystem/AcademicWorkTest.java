@@ -3,12 +3,12 @@ package edu.guet.studentworkmanagementsystem;
 import com.mybatisflex.core.paginate.Page;
 import edu.guet.studentworkmanagementsystem.common.BaseResponse;
 import edu.guet.studentworkmanagementsystem.common.Common;
-import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMember;
+import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkMemberRequest;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkQuery;
 import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWorkRequest;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Paper;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Patent;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.Soft;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkPaper;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademiciWorkPatent;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkSoft;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
@@ -27,7 +27,7 @@ public class AcademicWorkTest {
 
     @Test
     void addPaper() {
-        Paper paper = Paper.builder()
+        AcademicWorkPaper academicWorkPaper = AcademicWorkPaper.builder()
                 .periodicalName("测试期刊")
                 .jrcPartition("一区")
                 .casPartition("一区")
@@ -38,18 +38,18 @@ public class AcademicWorkTest {
                 .isEI(true)
                 .isEIRecorded(true)
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
-        AcademicWorkMember member2 = new AcademicWorkMember("2", "1001");
-        AcademicWorkMember member3 = new AcademicWorkMember("3", "1002");
-        AcademicWorkMember member4 = new AcademicWorkMember("4", "1003");
-        AcademicWorkMember member5 = new AcademicWorkMember("5", "1004");
-        ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1, member2, member3, member4, member5));
+        AcademicWorkMemberRequest member1 = new AcademicWorkMemberRequest("1", "1");
+        AcademicWorkMemberRequest member2 = new AcademicWorkMemberRequest("2", "1001");
+        AcademicWorkMemberRequest member3 = new AcademicWorkMemberRequest("3", "1002");
+        AcademicWorkMemberRequest member4 = new AcademicWorkMemberRequest("4", "1003");
+        AcademicWorkMemberRequest member5 = new AcademicWorkMemberRequest("5", "1004");
+        ArrayList<AcademicWorkMemberRequest> team = new ArrayList<>(List.of(member1, member2, member3, member4, member5));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
                 .workName("测试论文")
-                .type("paper")
+                .type("academicWorkPaper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(paper)
+                .abstractAcademicWork(academicWorkPaper)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
@@ -57,19 +57,19 @@ public class AcademicWorkTest {
 
     @Test
     void addSoft() {
-        Soft soft = Soft.builder()
+        AcademicWorkSoft academicWorkSoft = AcademicWorkSoft.builder()
                 .publishInstitution("测试")
                 .publishDate(LocalDate.now())
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
-        ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
+        AcademicWorkMemberRequest member1 = new AcademicWorkMemberRequest("1", "1");
+        ArrayList<AcademicWorkMemberRequest> team = new ArrayList<>(List.of(member1));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
                 .username("1")
                 .workName("测试论文")
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(soft)
+                .abstractAcademicWork(academicWorkSoft)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
@@ -77,21 +77,21 @@ public class AcademicWorkTest {
 
     @Test
     void addPatent() {
-        Patent patent = Patent.builder()
+        AcademiciWorkPatent academiciWorkPatent = AcademiciWorkPatent.builder()
                 .publishState(Common.WAITING.getValue())
                 .acceptDate(LocalDate.now())
                 .authorizationDate(LocalDate.now())
                 .publishDate(LocalDate.now())
                 .build();
-        AcademicWorkMember member1 = new AcademicWorkMember("1", "1");
-        ArrayList<AcademicWorkMember> team = new ArrayList<>(List.of(member1));
+        AcademicWorkMemberRequest member1 = new AcademicWorkMemberRequest("1", "1");
+        ArrayList<AcademicWorkMemberRequest> team = new ArrayList<>(List.of(member1));
         AcademicWorkRequest build = AcademicWorkRequest.builder()
                 .username("1")
                 .workName("测试论文")
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(patent)
+                .abstractAcademicWork(academiciWorkPatent)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());

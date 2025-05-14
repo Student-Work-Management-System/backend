@@ -26,7 +26,7 @@ public class AcademicWorkRequest implements Serializable {
     private String workName;
     private String type;
     @NotNull(message = "作者不能为空", groups = {InsertGroup.class})
-    private List<AcademicWorkMember> team;
+    private List<AcademicWorkMemberRequest> team;
     @NotBlank(message = "证明材料地址不能为空", groups = {InsertGroup.class})
     private String evidence;
     @NotNull(message = "学生作品信息不能为空", groups = {InsertGroup.class})

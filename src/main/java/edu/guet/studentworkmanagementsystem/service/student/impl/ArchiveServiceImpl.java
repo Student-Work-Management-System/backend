@@ -2,7 +2,8 @@ package edu.guet.studentworkmanagementsystem.service.student.impl;
 
 import com.mybatisflex.core.query.QueryChain;
 import edu.guet.studentworkmanagementsystem.common.Common;
-import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
+import edu.guet.studentworkmanagementsystem.entity.po.academicWork.*;
+import edu.guet.studentworkmanagementsystem.entity.po.competition.StudentCompetition;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.ForeignLanguage;
 import edu.guet.studentworkmanagementsystem.entity.po.povertyAssistance.StudentPovertyAssistance;
@@ -10,8 +11,14 @@ import edu.guet.studentworkmanagementsystem.entity.po.precaution.StudentPrecauti
 import edu.guet.studentworkmanagementsystem.entity.po.punishment.StudentPunishment;
 import edu.guet.studentworkmanagementsystem.entity.po.scholarship.StudentScholarship;
 import edu.guet.studentworkmanagementsystem.entity.po.status.StudentStatus;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkMemberItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.competition.TeamItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.archive.*;
+import edu.guet.studentworkmanagementsystem.mapper.academicWork.AcademicWorkPaperMapper;
+import edu.guet.studentworkmanagementsystem.mapper.academicWork.AcademicWorkPatentMapper;
+import edu.guet.studentworkmanagementsystem.mapper.academicWork.AcademicWorkSoftMapper;
+import edu.guet.studentworkmanagementsystem.service.competition.CompetitionService;
+import edu.guet.studentworkmanagementsystem.service.competition.CompetitionTeamService;
 import edu.guet.studentworkmanagementsystem.service.student.ArchiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +30,9 @@ import java.util.List;
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkAuditTableDef.ACADEMIC_WORK_AUDIT;
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkMemberTableDef.ACADEMIC_WORK_MEMBER;
 import static edu.guet.studentworkmanagementsystem.entity.po.academicWork.table.AcademicWorkTableDef.ACADEMIC_WORK;
+import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.CompetitionTableDef.COMPETITION;
+import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionTableDef.STUDENT_COMPETITION;
+import static edu.guet.studentworkmanagementsystem.entity.po.competition.table.StudentCompetitionTeamTableDef.STUDENT_COMPETITION_TEAM;
 import static edu.guet.studentworkmanagementsystem.entity.po.enrollment.table.EnrollmentTableDef.ENROLLMENT;
 import static edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.table.ForeignLanguageTableDef.FOREIGN_LANGUAGE;
 import static edu.guet.studentworkmanagementsystem.entity.po.foreignLanguage.table.LanguageTableDef.LANGUAGE;
@@ -39,6 +49,7 @@ import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.S
 import static edu.guet.studentworkmanagementsystem.entity.po.scholarship.table.StudentScholarshipTableDef.STUDENT_SCHOLARSHIP;
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StatusTableDef.STATUS;
 import static edu.guet.studentworkmanagementsystem.entity.po.status.table.StudentStatusTableDef.STUDENT_STATUS;
+import static edu.guet.studentworkmanagementsystem.entity.po.student.table.StudentBasicTableDef.STUDENT_BASIC;
 import static edu.guet.studentworkmanagementsystem.entity.po.user.table.UserTableDef.USER;
 
 @Service
@@ -46,6 +57,16 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Autowired
     @Qualifier("readThreadPool")
     private ThreadPoolTaskExecutor readThreadPool;
+    @Autowired
+    private AcademicWorkPaperMapper academicWorkPaperMapper;
+    @Autowired
+    private AcademicWorkSoftMapper academicWorkSoftMapper;
+    @Autowired
+    private AcademicWorkPatentMapper academicWorkPatentMapper;
+    @Autowired
+    private CompetitionService competitionService;
+    @Autowired
+    private CompetitionTeamService competitionTeamService;
 
     @Override
     public EnrollmentBase getEnrollmentBase(String studentId) {
@@ -164,28 +185,68 @@ public class ArchiveServiceImpl implements ArchiveService {
                 .on(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
                 .where(USER.USERNAME.eq(studentId).or(ACADEMIC_WORK_MEMBER.USERNAME.eq(studentId)))
                 .listAs(AcademicWorkBase.class);
-
-        List<StudentAcademicWorkItem> records = QueryChain.of(AcademicWork.class)
-                .select(
-                        USER.ALL_COLUMNS,
-                        ACADEMIC_WORK.ALL_COLUMNS,
-                        ACADEMIC_WORK_AUDIT.ALL_COLUMNS
-                )
-                .from(ACADEMIC_WORK)
-                .innerJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK.USERNAME))
-                .innerJoin(ACADEMIC_WORK_AUDIT).on(
-                        ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID)
-                )
-                .where(ACADEMIC_WORK.ACADEMIC_WORK_ID.in())
-                .listAs(StudentAcademicWorkItem.class);
-        academicWorkBases.forEach(item -> {
-
-        });
+        academicWorkBases.forEach(this::getStudentAcademicWorkTeamAndDetail);
         return List.of();
+    }
+    public void getStudentAcademicWorkTeamAndDetail(AcademicWorkBase item) {
+        String academicWorkId = item.getStudentAcademicWorkId();
+        List<AcademicWorkMemberItem> memberItems = QueryChain.of(AcademicWorkMember.class)
+                .select(
+                        ACADEMIC_WORK_MEMBER.ALL_COLUMNS,
+                        USER.USERNAME,
+                        USER.REAL_NAME,
+                        MAJOR.MAJOR_NAME,
+                        GRADE.GRADE_NAME,
+                        DEGREE.DEGREE_NAME
+                )
+                .from(ACADEMIC_WORK_MEMBER)
+                .leftJoin(USER).on(USER.USERNAME.eq(ACADEMIC_WORK_MEMBER.USERNAME))
+                .leftJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(USER.USERNAME))
+                .leftJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
+                .leftJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
+                .leftJoin(DEGREE).on(DEGREE.DEGREE_ID.eq(STUDENT_BASIC.DEGREE_ID))
+                .where(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(academicWorkId))
+                .listAs(AcademicWorkMemberItem.class);
+        item.setTeam(memberItems);
+        String type = item.getType();
+        String referenceId = item.getReferenceId();
+        if (Common.PAPER.getValue().equals(type)) {
+            AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkPaper);
+        } else if (Common.SOFT.getValue().equals(type)) {
+            AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academicWorkSoft);
+        } else if (Common.PATENT.getValue().equals(type)) {
+            AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
+        }
     }
 
     @Override
     public List<CompetitionBase> getCompetitionBaseList(String studentId) {
-        return List.of();
+        List<CompetitionBase> items = QueryChain.of(StudentCompetition.class)
+                .select(
+                        COMPETITION.ALL_COLUMNS,
+                        STUDENT_COMPETITION.ALL_COLUMNS,
+                        STUDENT_BASIC.NAME.as("headerName")
+                )
+                .from(STUDENT_COMPETITION)
+                .innerJoin(COMPETITION).on(COMPETITION.COMPETITION_ID.eq(STUDENT_COMPETITION.COMPETITION_ID))
+                .innerJoin(STUDENT_BASIC).on(STUDENT_BASIC.STUDENT_ID.eq(STUDENT_COMPETITION.HEADER_ID))
+                .leftJoin(STUDENT_COMPETITION_TEAM).on(STUDENT_COMPETITION_TEAM.STUDENT_COMPETITION_ID.eq(STUDENT_COMPETITION.STUDENT_COMPETITION_ID))
+                .where(
+                        STUDENT_COMPETITION.HEADER_ID.eq(studentId)
+                                .or(STUDENT_COMPETITION_TEAM.STUDENT_ID.eq(studentId))
+                )
+                .listAs(CompetitionBase.class);
+        for (CompetitionBase item : items) {
+            String competitionId = item.getCompetitionId();
+            if (competitionService.competitionNatureIsSolo(competitionId))
+                continue;
+            String studentCompetitionId = item.getStudentCompetitionId();
+            List<TeamItem> team = competitionTeamService.getTeamByStudentCompetitionId(studentCompetitionId);
+            item.setTeam(team);
+        }
+        return items;
     }
 }

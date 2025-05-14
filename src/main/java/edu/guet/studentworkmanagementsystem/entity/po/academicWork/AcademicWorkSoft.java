@@ -24,7 +24,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "soft")
-public class Soft implements Serializable, AbstractAcademicWork {
+public class AcademicWorkSoft implements Serializable, AbstractAcademicWork {
     @Serial
     private static final long serialVersionUID = 1L;
     @Id(keyType = KeyType.Auto)

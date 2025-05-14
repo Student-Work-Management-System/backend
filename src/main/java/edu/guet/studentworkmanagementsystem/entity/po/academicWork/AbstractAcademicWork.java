@@ -9,9 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Paper.class, name = "paper"),
-        @JsonSubTypes.Type(value = Soft.class, name = "soft"),
-        @JsonSubTypes.Type(value = Patent.class, name = "patent")
+        @JsonSubTypes.Type(value = AcademicWorkPaper.class, name = "paper"),
+        @JsonSubTypes.Type(value = AcademicWorkSoft.class, name = "soft"),
+        @JsonSubTypes.Type(value = AcademiciWorkPatent.class, name = "patent")
 })
 public interface AbstractAcademicWork {
 

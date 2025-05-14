@@ -14,6 +14,7 @@ import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.*;
 import edu.guet.studentworkmanagementsystem.mapper.student.StudentMapper;
 import edu.guet.studentworkmanagementsystem.service.enrollment.EnrollmentService;
+import edu.guet.studentworkmanagementsystem.service.student.ArchiveService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentBasicService;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
 import edu.guet.studentworkmanagementsystem.service.user.UserService;
@@ -50,6 +51,8 @@ public class StudentServiceImpl implements StudentService {
     private StudentMapper studentMapper;
     @Autowired
     private EnrollmentService enrollmentService;
+    @Autowired
+    private ArchiveService archiveService;
 
     @Override
     @Transactional
@@ -69,8 +72,20 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public BaseResponse<StudentArchive> getStudentArchive(String studentId) {
-
-        return ResponseUtil.success();
+        CompletableFuture<StudentArchive> future = CompletableFuture.supplyAsync(() -> StudentArchive.builder()
+                .studentId(studentId)
+                .enrollment(archiveService.getEnrollmentBase(studentId))
+                .statuses(archiveService.getStatusBaseList(studentId))
+                .scholarships(archiveService.getScholarshipBaseList(studentId))
+                .punishments(archiveService.getPunishmentBaseList(studentId))
+                .povertyAssistances(archiveService.getPovertyAssistanceBaseList(studentId))
+                .foreignLanguages(archiveService.getForeignLanguageBaseList(studentId))
+                .precautions(archiveService.getPrecautionBaseList(studentId))
+                .academicWorks(archiveService.getAcademicWorkBaseList(studentId))
+                .competitions(archiveService.getCompetitionBaseList(studentId))
+                .build(), readThreadPool);
+        StudentArchive execute = FutureExceptionExecute.fromFuture(future).execute();
+        return ResponseUtil.success(execute);
     }
 
     /**

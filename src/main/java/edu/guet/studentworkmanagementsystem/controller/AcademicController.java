@@ -27,31 +27,31 @@ public class AcademicController {
 
     @PreAuthorize("hasAuthority('student_academic_work:select:own')")
     @GetMapping("/get/{studentId}")
-    public BaseResponse<List<StudentAcademicWorkItem>> getOwnStudentAcademicWork(@PathVariable String studentId) {
+    public BaseResponse<List<StudentAcademicWorkItem>> getOwnAcademicWork(@PathVariable String studentId) {
         return academicWorkService.getOwnAcademicWork(studentId);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentAcademicWorkItem>> getAllStudentAcademicWork(@RequestBody AcademicWorkQuery query) {
+    public BaseResponse<Page<StudentAcademicWorkItem>> getAllAcademicWork(@RequestBody AcademicWorkQuery query) {
         return academicWorkService.getAllAcademicWork(query);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:insert')")
     @PostMapping("/add")
-    public <T> BaseResponse<T> insertStudentAcademicWork(@RequestBody @Validated({InsertGroup.class}) AcademicWorkRequest academicWorkRequest) {
+    public <T> BaseResponse<T> insertAcademicWork(@RequestBody @Validated({InsertGroup.class}) AcademicWorkRequest academicWorkRequest) {
         return academicWorkService.insertAcademicWork(academicWorkRequest);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:update')")
     @PutMapping("/update")
-    public <T> BaseResponse<T> updateStudentAcademicWork(@RequestBody @Validated({UpdateGroup.class}) ValidateList<AcademicWorkAudit> audits) {
+    public <T> BaseResponse<T> updateAcademicWork(@RequestBody @Validated({UpdateGroup.class}) ValidateList<AcademicWorkAudit> audits) {
         return academicWorkService.updateAcademicWorkAudit(audits);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:delete')")
     @DeleteMapping("/delete/{studentAcademicWorkId}")
-    public <T> BaseResponse<T> deleteStudentAcademicWork(@PathVariable String studentAcademicWorkId) {
+    public <T> BaseResponse<T> deleteAcademicWork(@PathVariable String studentAcademicWorkId) {
         return academicWorkService.deleteAcademicWork(studentAcademicWorkId);
     }
 
