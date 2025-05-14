@@ -15,6 +15,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EnrollmentBase {
+    /**
+     * 个人信息
+     */
+    private String studentId;
     private String idNumber;      // 身份证号
     private String name;          // 姓名
     private String gender;        // 性别
@@ -67,27 +71,6 @@ public class EnrollmentBase {
     private String receiver;        // 收件人
     private String receiverPhone;   // 联系电话
     private String postalCode;      // 邮政编码
-    /**
-     * 户口信息
-     */
-    private String householdRegistration;   // 户籍所在地
-    private String householdType;   // 户口类型
-    private String address;         // 地址
-    private String fatherName; // 父亲姓名
-    private String fatherPhone; // 父亲联系方式
-    private String fatherOccupation; // 父亲职业
-    private String motherName; // 母亲姓名
-    private String motherPhone; // 母亲联系方式
-    private String motherOccupation; // 母亲职业
-    private String guardian; // 监护人姓名
-    private String guardianPhone; // 监护人联系方式
-    private String familyPopulation; // 家庭人口
-    private String familyMembers; // 家庭成员
-    private String familyLocation; // 家庭所在地
-    private Boolean isOnlyChild; // 是否独生子女
-    /**
-     * 中学信息
-     */
     private String highSchoolCode;  // 中学代码
     private String highSchoolName;  // 中学名称
     private String candidateCategoryClassification; // 考生类别分类
@@ -107,6 +90,24 @@ public class EnrollmentBase {
     private String scoreGeography;      // 地理
     private String scoreTechnology;     // 技术
     private String selectedSubjects;    // 选考科目
+    /**
+     * 户口信息
+     */
+    private String householdRegistration;   // 户籍所在地
+    private String householdType;   // 户口类型
+    private String address;         // 地址
+    private String fatherName; // 父亲姓名
+    private String fatherPhone; // 父亲联系方式
+    private String fatherOccupation; // 父亲职业
+    private String motherName; // 母亲姓名
+    private String motherPhone; // 母亲联系方式
+    private String motherOccupation; // 母亲职业
+    private String guardian; // 监护人姓名
+    private String guardianPhone; // 监护人联系方式
+    private String familyPopulation; // 家庭人口
+    private String familyMembers; // 家庭成员
+    private String familyLocation; // 家庭所在地
+    private Boolean isOnlyChild; // 是否独生子女
     /**
      * 其他
      */

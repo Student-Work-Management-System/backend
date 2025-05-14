@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentArchive {
-    private String studentId;
     /**
      * 学籍信息
      */

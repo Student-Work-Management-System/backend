@@ -73,7 +73,6 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public BaseResponse<StudentArchive> getStudentArchive(String studentId) {
         CompletableFuture<StudentArchive> future = CompletableFuture.supplyAsync(() -> StudentArchive.builder()
-                .studentId(studentId)
                 .enrollment(archiveService.getEnrollmentBase(studentId))
                 .statuses(archiveService.getStatusBaseList(studentId))
                 .scholarships(archiveService.getScholarshipBaseList(studentId))

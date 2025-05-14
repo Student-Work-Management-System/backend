@@ -28,7 +28,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -122,7 +122,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
                 .studentId(studentId)
                 .statusId("1")
                 .log("录入该生档案")
-                .modifiedTime(LocalDate.now())
+                .modifiedTime(LocalDateTime.now())
                 .build();
     }
 
@@ -155,7 +155,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
                 .statusId(studentStatus.getStatusId())
                 .studentId(studentStatus.getStudentId())
                 .log(studentStatus.getLog())
-                .modifiedTime(studentStatus.getModifiedTime())
+                .modifiedTime(LocalDateTime.now())
                 .statusEnabled(true)
                 .build();
     }
@@ -195,7 +195,6 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
                     .and(STATUS.STATUS_ID.eq(query.getStatusId()))
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
-                    .orderBy(STUDENT_STATUS.STUDENT_ID.asc())
                     .pageAs(Page.of(pageNo, pageSize), StudentStatusItem.class);
         }, readThreadPool);
         Page<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
@@ -219,7 +218,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
                 .innerJoin(MAJOR).on(MAJOR.MAJOR_ID.eq(STUDENT_BASIC.MAJOR_ID))
                 .innerJoin(GRADE).on(GRADE.GRADE_ID.eq(STUDENT_BASIC.GRADE_ID))
                 .where(STUDENT_STATUS.STUDENT_ID.eq(studentId))
-                .orderBy(STUDENT_STATUS.STUDENT_STATUS_ID.desc())
+                .orderBy(STUDENT_STATUS.MODIFIED_TIME.asc())
                 .listAs(StudentStatusItem.class), readThreadPool);
         List<StudentStatusItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);

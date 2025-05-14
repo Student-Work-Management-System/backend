@@ -8,6 +8,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.student.StudentStatQuery;
 import edu.guet.studentworkmanagementsystem.entity.po.enrollment.Enrollment;
 import edu.guet.studentworkmanagementsystem.entity.po.student.HeaderTeacher;
 import edu.guet.studentworkmanagementsystem.entity.vo.enrollment.EnrollmentItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentArchive;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentBasicItem;
 import edu.guet.studentworkmanagementsystem.entity.vo.student.StudentStatGroup;
 import edu.guet.studentworkmanagementsystem.service.student.StudentService;
@@ -82,5 +83,11 @@ public class StudentController {
     @GetMapping("/get/{studentId}")
     public BaseResponse<EnrollmentItem> getStudentEnrollment(@PathVariable String studentId) {
         return studentService.getOwnEnrollment(studentId);
+    }
+
+    @PreAuthorize("hasAuthority('student:select')")
+    @GetMapping("/archive/{studentId}")
+    public BaseResponse<StudentArchive> getArchive(@PathVariable String studentId) {
+        return studentService.getStudentArchive(studentId);
     }
 }

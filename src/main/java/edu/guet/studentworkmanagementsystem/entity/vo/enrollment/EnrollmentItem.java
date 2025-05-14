@@ -131,4 +131,5 @@ public class EnrollmentItem implements Serializable {
      * 备注
      */
     private String otherNotes; // 备注
+    private Boolean enabled;
 }
