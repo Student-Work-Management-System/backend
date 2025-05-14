@@ -19,7 +19,7 @@ public class AcademicWorkBase {
     private String type;
     private String referenceId;
     @Column(ignore = true)
-    private AbstractAcademicWork abstractAcademicWork;
+    private AbstractAcademicWork academicWork;
     private List<AcademicWorkMemberItem> team;
     private String evidence;
 }

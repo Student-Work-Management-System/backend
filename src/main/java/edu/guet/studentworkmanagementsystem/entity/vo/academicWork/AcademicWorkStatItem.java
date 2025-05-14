@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AcademicWorkStatItem {
-    private String studentAcademicWorkId;
+    private String academicWorkId;
     private String type;
     private String referenceId;
     @Column(ignore = true)
-    private AbstractAcademicWork abstractAcademicWork;
+    private AbstractAcademicWork academicWork;
 }

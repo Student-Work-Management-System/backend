@@ -14,15 +14,15 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentAcademicWorkItem implements Serializable {
-    private String studentAcademicWorkId;
+public class AcademicWorkItem implements Serializable {
+    private String academicWorkId;
     private String username;
     private String realName;
     private String workName;
     private String type;
     private String referenceId;
     @Column(ignore = true)
-    private AbstractAcademicWork abstractAcademicWork;
+    private AbstractAcademicWork academicWork;
     private List<AcademicWorkMemberItem> team;
     private String operatorId;
     private String operatorTime;

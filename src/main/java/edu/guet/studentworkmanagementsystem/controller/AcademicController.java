@@ -10,7 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.dto.academicWork.AcademicWork
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkAudit;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,13 +27,13 @@ public class AcademicController {
 
     @PreAuthorize("hasAuthority('student_academic_work:select:own')")
     @GetMapping("/get/{studentId}")
-    public BaseResponse<List<StudentAcademicWorkItem>> getOwnAcademicWork(@PathVariable String studentId) {
+    public BaseResponse<List<AcademicWorkItem>> getOwnAcademicWork(@PathVariable String studentId) {
         return academicWorkService.getOwnAcademicWork(studentId);
     }
 
     @PreAuthorize("hasAuthority('student_academic_work:select')")
     @PostMapping("/gets")
-    public BaseResponse<Page<StudentAcademicWorkItem>> getAllAcademicWork(@RequestBody AcademicWorkQuery query) {
+    public BaseResponse<Page<AcademicWorkItem>> getAllAcademicWork(@RequestBody AcademicWorkQuery query) {
         return academicWorkService.getAllAcademicWork(query);
     }
 

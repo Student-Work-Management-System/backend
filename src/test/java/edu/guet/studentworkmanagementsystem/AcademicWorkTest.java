@@ -10,7 +10,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkP
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademiciWorkPatent;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkSoft;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkItem;
 import edu.guet.studentworkmanagementsystem.service.academicWork.AcademicWorkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class AcademicWorkTest {
                 .type("academicWorkPaper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(academicWorkPaper)
+                .academicWork(academicWorkPaper)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
@@ -69,7 +69,7 @@ public class AcademicWorkTest {
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(academicWorkSoft)
+                .academicWork(academicWorkSoft)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
@@ -91,7 +91,7 @@ public class AcademicWorkTest {
                 .type("paper")
                 .evidence("https://www.baidu.com")
                 .team(team)
-                .abstractAcademicWork(academiciWorkPatent)
+                .academicWork(academiciWorkPatent)
                 .build();
         BaseResponse<Object> response = academicWorkService.insertAcademicWork(build);
         System.out.println(response.getCode() + ": " + response.getMessage());
@@ -100,8 +100,8 @@ public class AcademicWorkTest {
     @Test
     void getOwnTest() {
         String studentId = "admin";
-        BaseResponse<List<StudentAcademicWorkItem>> own = academicWorkService.getOwnAcademicWork(studentId);
-        List<StudentAcademicWorkItem> data = own.getData();
+        BaseResponse<List<AcademicWorkItem>> own = academicWorkService.getOwnAcademicWork(studentId);
+        List<AcademicWorkItem> data = own.getData();
         System.out.println(data);
     }
 
@@ -110,8 +110,8 @@ public class AcademicWorkTest {
         AcademicWorkQuery build = AcademicWorkQuery.builder()
                 .search("")
                 .build();
-        BaseResponse<Page<StudentAcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllAcademicWork(build);
-        Page<StudentAcademicWorkItem> data = allStudentAcademicWork.getData();
+        BaseResponse<Page<AcademicWorkItem>> allStudentAcademicWork = academicWorkService.getAllAcademicWork(build);
+        Page<AcademicWorkItem> data = allStudentAcademicWork.getData();
         System.out.println(data);
     }
 

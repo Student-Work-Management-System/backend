@@ -9,7 +9,7 @@ import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWork;
 import edu.guet.studentworkmanagementsystem.entity.po.academicWork.AcademicWorkAudit;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkStatGroup;
 import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkUser;
-import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.StudentAcademicWorkItem;
+import edu.guet.studentworkmanagementsystem.entity.vo.academicWork.AcademicWorkItem;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import java.util.List;
 public interface AcademicWorkService extends IService<AcademicWork> {
     <T> BaseResponse<T> insertAcademicWork(AcademicWorkRequest academicWorkRequest);
     <T> BaseResponse<T> deleteAcademicWork(String studentAcademicWorkId);
-    BaseResponse<List<StudentAcademicWorkItem>> getOwnAcademicWork(String username);
+    BaseResponse<List<AcademicWorkItem>> getOwnAcademicWork(String username);
     <T> BaseResponse<T> updateAcademicWorkAudit(List<AcademicWorkAudit> audits);
-    BaseResponse<Page<StudentAcademicWorkItem>> getAllAcademicWork(AcademicWorkQuery query);
+    BaseResponse<Page<AcademicWorkItem>> getAllAcademicWork(AcademicWorkQuery query);
     BaseResponse<List<AcademicWorkUser>> getOptionalUserByUsername(String username);
     BaseResponse<AcademicWorkStatGroup> getStat();
 }

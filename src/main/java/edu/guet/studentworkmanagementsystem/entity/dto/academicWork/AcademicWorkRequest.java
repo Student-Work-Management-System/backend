@@ -30,5 +30,5 @@ public class AcademicWorkRequest implements Serializable {
     @NotBlank(message = "证明材料地址不能为空", groups = {InsertGroup.class})
     private String evidence;
     @NotNull(message = "学生作品信息不能为空", groups = {InsertGroup.class})
-    private AbstractAcademicWork abstractAcademicWork;
+    private AbstractAcademicWork academicWork;
 }

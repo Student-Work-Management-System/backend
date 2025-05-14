@@ -61,7 +61,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
     @Override
     @Transactional
     public <T> BaseResponse<T> insertAcademicWork(AcademicWorkRequest request) {
-        String referenceId = insertAcademicWork(request.getAbstractAcademicWork());
+        String referenceId = insertAcademicWork(request.getAcademicWork());
         AcademicWork academicWork = createStudentAcademicWork(request, referenceId);
         int i = mapper.insert(academicWork);
         if (i <= 0)
@@ -157,9 +157,9 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
     }
 
     @Override
-    public BaseResponse<List<StudentAcademicWorkItem>> getOwnAcademicWork(String username) {
-        CompletableFuture<List<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
-            List<StudentAcademicWorkItem> items = QueryChain.of(AcademicWork.class)
+    public BaseResponse<List<AcademicWorkItem>> getOwnAcademicWork(String username) {
+        CompletableFuture<List<AcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
+            List<AcademicWorkItem> items = QueryChain.of(AcademicWork.class)
                     .select(
                             USER.ALL_COLUMNS,
                             ACADEMIC_WORK.ALL_COLUMNS,
@@ -170,16 +170,16 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
                     .innerJoin(ACADEMIC_WORK_AUDIT).on(ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
                     .innerJoin(ACADEMIC_WORK_MEMBER).on(ACADEMIC_WORK_MEMBER.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID))
                     .where(USER.USERNAME.eq(username).or(ACADEMIC_WORK_MEMBER.USERNAME.eq(username)))
-                    .listAs(StudentAcademicWorkItem.class);
+                    .listAs(AcademicWorkItem.class);
             items.forEach(this::getStudentAcademicWorkTeamAndDetail);
             return items;
         }, readThreadPool);
-        List<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        List<AcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 
-    public void getStudentAcademicWorkTeamAndDetail(StudentAcademicWorkItem item) {
-        String academicWorkId = item.getStudentAcademicWorkId();
+    public void getStudentAcademicWorkTeamAndDetail(AcademicWorkItem item) {
+        String academicWorkId = item.getAcademicWorkId();
         List<AcademicWorkMemberItem> memberItems = QueryChain.of(AcademicWorkMember.class)
                 .select(
                         ACADEMIC_WORK_MEMBER.ALL_COLUMNS,
@@ -202,13 +202,13 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
             AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkPaper);
+            item.setAcademicWork(academicWorkPaper);
         } else if (Common.SOFT.getValue().equals(type)) {
             AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkSoft);
+            item.setAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
             AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
+            item.setAcademicWork(studentAcademiciWorkPatent);
         }
     }
 
@@ -230,11 +230,11 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
     }
 
     @Override
-    public BaseResponse<Page<StudentAcademicWorkItem>> getAllAcademicWork(AcademicWorkQuery query) {
-        CompletableFuture<Page<StudentAcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
+    public BaseResponse<Page<AcademicWorkItem>> getAllAcademicWork(AcademicWorkQuery query) {
+        CompletableFuture<Page<AcademicWorkItem>> future = CompletableFuture.supplyAsync(() -> {
             int pageNo = Optional.ofNullable(query.getPageNo()).orElse(1);
             int pageSize = Optional.ofNullable(query.getPageSize()).orElse(10);
-
+            // 筛选出符合条件的学术成果id
             Page<String> idPage = QueryChain.of(AcademicWork.class)
                     .select(ACADEMIC_WORK.ACADEMIC_WORK_ID)
                     .from(ACADEMIC_WORK)
@@ -253,8 +253,8 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
             if (idPage.getRecords().isEmpty()) {
                 return Page.of(pageNo, pageSize);
             }
-
-            List<StudentAcademicWorkItem> records = QueryChain.of(AcademicWork.class)
+            // 获取真实数据
+            List<AcademicWorkItem> records = QueryChain.of(AcademicWork.class)
                     .select(
                             USER.ALL_COLUMNS,
                             ACADEMIC_WORK.ALL_COLUMNS,
@@ -266,13 +266,13 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
                             ACADEMIC_WORK_AUDIT.ACADEMIC_WORK_ID.eq(ACADEMIC_WORK.ACADEMIC_WORK_ID)
                     )
                     .where(ACADEMIC_WORK.ACADEMIC_WORK_ID.in(idPage.getRecords()))
-                    .listAs(StudentAcademicWorkItem.class);
+                    .listAs(AcademicWorkItem.class);
 
             records.forEach(this::getStudentAcademicWorkTeamAndDetail);
 
             return new Page<>(records, pageNo, pageSize, idPage.getTotalRow());
         }, readThreadPool);
-        Page<StudentAcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
+        Page<AcademicWorkItem> execute = FutureExceptionExecute.fromFuture(future).execute();
         return ResponseUtil.success(execute);
     }
 
@@ -354,13 +354,13 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
             AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkPaper);
+            item.setAcademicWork(academicWorkPaper);
         } else if (Common.SOFT.getValue().equals(type)) {
             AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkSoft);
+            item.setAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
             AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
+            item.setAcademicWork(studentAcademiciWorkPatent);
         }
     }
     /**
@@ -374,7 +374,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         // 统计论文
         List<AcademicWorkStatItem> papers = map.getOrDefault(Common.PAPER.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : papers) {
-            AcademicWorkPaper academicWorkPaper = (AcademicWorkPaper) item.getAbstractAcademicWork();
+            AcademicWorkPaper academicWorkPaper = (AcademicWorkPaper) item.getAcademicWork();
             if (academicWorkPaper.getIsMeeting() != null && academicWorkPaper.getIsMeeting()) {
                 paperStat.setMeetingNumber(String.valueOf(Integer.parseInt(paperStat.getMeetingNumber()) + 1));
             }
@@ -389,7 +389,7 @@ public class AcademicWorkServiceImpl extends ServiceImpl<AcademicWorkMapper, Aca
         // 统计专利
         List<AcademicWorkStatItem> patents = map.getOrDefault(Common.PATENT.getValue(), Collections.emptyList());
         for (AcademicWorkStatItem item : patents) {
-            AcademiciWorkPatent academiciWorkPatent = (AcademiciWorkPatent) item.getAbstractAcademicWork();
+            AcademiciWorkPatent academiciWorkPatent = (AcademiciWorkPatent) item.getAcademicWork();
             patentStat.setTotalNumber(String.valueOf(Integer.parseInt(patentStat.getTotalNumber()) + 1));
             if ("授权".equals(academiciWorkPatent.getPublishState())) {
                 patentStat.setNumber(String.valueOf(Integer.parseInt(patentStat.getNumber()) + 1));

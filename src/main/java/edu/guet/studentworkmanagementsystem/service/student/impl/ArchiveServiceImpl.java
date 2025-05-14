@@ -212,13 +212,13 @@ public class ArchiveServiceImpl implements ArchiveService {
         String referenceId = item.getReferenceId();
         if (Common.PAPER.getValue().equals(type)) {
             AcademicWorkPaper academicWorkPaper = academicWorkPaperMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkPaper);
+            item.setAcademicWork(academicWorkPaper);
         } else if (Common.SOFT.getValue().equals(type)) {
             AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academicWorkSoft);
+            item.setAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
             AcademiciWorkPatent academiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(academiciWorkPatent);
+            item.setAcademicWork(academiciWorkPatent);
         }
     }
 
