@@ -27,7 +27,6 @@ public class EnrollmentBase {
     private String nation;        // 民族
     private String height;        // 身高
     private String weight;        // 体重
-    private String politicId;     // 政治面貌id
     private String politicStatus; // 政治面貌
     private String phone;         // 联系手机
     private String email;         // 邮箱
@@ -39,11 +38,8 @@ public class EnrollmentBase {
     private String headerTeacherPhone;    // 班主任联系方式
     private String dormitory;     // 宿舍号
     private String classNo;       // 班级
-    private String majorId;       // 专业id
     private String majorName;     // 专业名
-    private String degreeId;      // 培养层次id
     private String degreeName;    // 培养层次名
-    private String gradeId;       // 年级id
     private String gradeName;     // 年级名
     /**
      * 高考信息

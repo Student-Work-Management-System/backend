@@ -217,8 +217,8 @@ public class ArchiveServiceImpl implements ArchiveService {
             AcademicWorkSoft academicWorkSoft = academicWorkSoftMapper.selectOneById(referenceId);
             item.setAbstractAcademicWork(academicWorkSoft);
         } else if (Common.PATENT.getValue().equals(type)) {
-            AcademiciWorkPatent studentAcademiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
-            item.setAbstractAcademicWork(studentAcademiciWorkPatent);
+            AcademiciWorkPatent academiciWorkPatent = academicWorkPatentMapper.selectOneById(referenceId);
+            item.setAbstractAcademicWork(academiciWorkPatent);
         }
     }
 
