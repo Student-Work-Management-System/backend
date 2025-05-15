@@ -51,7 +51,7 @@ public class UsernameTrie {
     private TrieNode searchPrefix(String prefix) {
         TrieNode node = root;
         for (char ch : prefix.toCharArray()) {
-            int index = ch - '0';
+            int index = getIndex(ch);
             if (node.children[index] == null) {
                 return null;
             }
