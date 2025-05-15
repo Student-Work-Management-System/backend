@@ -188,7 +188,6 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                     )
                     .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                     .and(GRADE.GRADE_ID.eq(query.getGradeId()))
-                    .and(dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).eq(query.getTotalDay()))
                     .and(STUDENT_LEAVE.TYPE.eq(query.getType()))
                     .and(STUDENT_LEAVE.DESTROYED.eq(query.getDestroyed()))
                     .and(condition)
@@ -226,11 +225,11 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                 .map(SystemAuthority::getAuthority)
                 .anyMatch(Common.LEAVE_LEADER_PERMISSION.getValue()::equals);
         if (hasCounselorPermission && !hasLeaderPermission)
-            return dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).le(7)
+            return dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).le(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_ID.eq(username))
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(query.getCounselorHandleState()));
         else if (hasLeaderPermission && !hasCounselorPermission)
-            return dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).gt(7)
+            return dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).gt(7)
                     .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
                     .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(query.getLeaderHandleState()));
         return null;
@@ -265,10 +264,10 @@ public class StudentLeaveServiceImpl extends ServiceImpl<StudentLeaveMapper, Stu
                 .and(GRADE.GRADE_ID.eq(query.getGradeId()))
                 .and(MAJOR.MAJOR_ID.eq(query.getMajorId()))
                 .and(
-                        dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).lt(7)
+                        dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).lt(7)
                                 .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
                                 .or(
-                                        dateDiff(STUDENT_LEAVE.END_DAY, STUDENT_LEAVE.START_DAY).ge(7)
+                                        dateDiff(STUDENT_LEAVE.START_DAY, STUDENT_LEAVE.END_DAY).ge(7)
                                                 .and(STUDENT_LEAVE_AUDIT.COUNSELOR_HANDLE_STATE.eq(Common.PASS.getValue()))
                                                 .and(STUDENT_LEAVE_AUDIT.LEADER_HANDLE_STATE.eq(Common.PASS.getValue()))
                                 )

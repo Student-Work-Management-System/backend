@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,7 @@ public class Enrollment implements Serializable {
     /**
      * 个人基础信息
      */
+    @NotBlank(message = "学号不能为空")
     private String studentId;     // 学号
     private String idNumber;      // 身份证号
     private String name;          // 姓名

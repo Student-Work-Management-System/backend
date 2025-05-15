@@ -93,7 +93,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private ThreadPoolTaskExecutor readThreadPool;
     @Autowired
     private OtherService otherService;
-
     @Override
     public BaseResponse<LoginUserDetail> login(LoginUserRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -247,7 +246,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             if (!root.search(username))
                 continue;
             UsernameTrie.TrieNode node = root.getNode(username);
-            UserRoleRequest userRoleRequest = createUserRoleDTO(uid, node.getRoles());
+            UserRoleRequest userRoleRequest = createUserRoleRequest(uid, node.getRoles());
             userRoleRequests.add(userRoleRequest);
         }
         return userRoleRequests;
@@ -265,7 +264,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .build();
     }
 
-    public UserRoleRequest createUserRoleDTO(String uid, Set<String> roles) {
+    public UserRoleRequest createUserRoleRequest(String uid, Set<String> roles) {
         return UserRoleRequest.builder()
                 .uid(uid)
                 .roles(roles)
@@ -275,13 +274,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public void addUserRoleBatch(List<UserRoleRequest> userRoleRequests) {
         userRoleRequests.forEach(it -> {
-            if (RoleNotNullOrEmpty(it.getRoles()))
+            Set<String> roles = it.getRoles();
+            if (RoleNotNullOrEmpty(roles))
                 addUserRole(it.getRoles(), it.getUid());
         });
     }
 
     @Override
-    // @Cacheable(value = "userDetailCache", key = "username")
     public BaseResponse<UserDetailItem> getUserDetails(String username) {
         CompletableFuture<UserDetailItem> future = CompletableFuture.supplyAsync(() -> {
             UserDetailItem user = QueryChain.of(User.class)
@@ -320,10 +319,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .map(Role::getRid)
                     .filter(StringUtils::hasLength)
                     .collect(Collectors.toSet());
+            boolean hasStudentRole = roleSetFromDB.contains("5");
             Set<String> roleSetFromWeb = userRoleRequest.getRoles();
             List<String> delete = getDelete(roleSetFromWeb, roleSetFromDB).stream().toList();
             delete.forEach(item -> userRoleMapper.delete(new UserRole(uid, item)));
-            List<String> insert = getInsert(roleSetFromWeb, roleSetFromDB).stream().toList();
+            List<String> insert = new ArrayList<>(getInsert(roleSetFromWeb, roleSetFromDB).stream().toList());
+            if (hasStudentRole)
+                insert.add("5");
             insert.forEach(item -> userRoleMapper.insert(new UserRole(uid, item)));
         }
         userRoleUpdateHandler(uid);
